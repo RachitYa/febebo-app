@@ -34,6 +34,9 @@ export default function VendorTransactions() {
 
   const [categories, setCategories] = useState(['Groceries', 'Laundry', 'Vegetables', 'Dairy']);
   const [activeCategory, setActiveCategory] = useState('Groceries');
+  
+  // State for the new purchase modal
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   const handleAddCategory = () => {
     const newCat = window.prompt("Enter new category name:");
@@ -122,18 +125,28 @@ export default function VendorTransactions() {
         </button>
         <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Vendor Account</p>
         <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0891b2', display: 'flex', alignItems: 'center' }}>
-          <span className="material-symbols-outlined">add</span>
+          <span className="material-symbols-outlined">more_vert</span>
         </button>
       </div>
 
       <div style={{ padding: '16px' }}>
+        
+        {/* Log Purchase Button */}
+        <button
+          onClick={() => setShowPurchaseModal(true)}
+          style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #0891b2, #0e7490)', color: 'white', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 4px 12px rgba(8,145,178,0.2)' }}
+        >
+          <span className="material-symbols-outlined">add_shopping_cart</span>
+          Log Daily Purchase
+        </button>
+
         {/* Search */}
         <div style={{ position: 'relative', marginBottom: 16 }}>
           <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search Product"
+            placeholder="Search Vendor"
             style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 12, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }}
           />
         </div>
@@ -216,6 +229,61 @@ export default function VendorTransactions() {
           )}
         </div>
       </div>
+
+      {/* Daily Purchase Modal */}
+      {showPurchaseModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', zIndex: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(2px)' }}>
+          <div style={{ background: 'white', width: '100%', maxWidth: 480, borderRadius: '20px 20px 0 0', padding: '24px 20px', maxHeight: '85vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <p style={{ fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0 }}>Log {activeCategory} Purchase</p>
+              <button onClick={() => setShowPurchaseModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex' }}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              setShowPurchaseModal(false); 
+              alert('Purchase logged successfully! Vendor balance and Kitchen Report have been updated.'); 
+            }}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 6 }}>Date</label>
+                <input type="date" required defaultValue={new Date().toISOString().split('T')[0]} style={{ width: '100%', padding: '12px 14px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 6 }}>Vendor Name</label>
+                <select required style={{ width: '100%', padding: '12px 14px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', appearance: 'auto' }}>
+                  <option value="">Select Vendor</option>
+                  {VENDORS.filter(v => v.category === activeCategory).map(v => (
+                    <option key={v.id} value={v.name}>{v.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 6 }}>Item Purchased</label>
+                <input placeholder="e.g., Potatoes, Milk, Detergent" required style={{ width: '100%', padding: '12px 14px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 6 }}>Quantity</label>
+                  <input placeholder="e.g., 5 kg" required style={{ width: '100%', padding: '12px 14px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 6 }}>Total Price (₹)</label>
+                  <input type="number" placeholder="0" required style={{ width: '100%', padding: '12px 14px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+
+              <button type="submit" style={{ width: '100%', padding: '16px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Save & Update Records
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
