@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const VENDORS = [
-  { id: 1, name: 'Sunil Kumar Vendor', store: 'The Local Market',    phone: '+919234876543', amount: '5,000',  status: 'Paid' },
-  { id: 2, name: 'Akash Kumar Vendor', store: 'Daily Harvest Store', phone: '+919123456789', amount: '3,000',  status: 'Paid' },
-  { id: 3, name: 'Sunil Kumar Vendor', store: 'The Local Market',    phone: '+919234876543', amount: '5,000',  status: 'Paid' },
-  { id: 4, name: 'Akash Kumar Vendor', store: 'Daily Harvest Store', phone: '+919123456789', amount: '3,000',  status: 'Paid' },
-  { id: 5, name: 'Sunil Kumar Vendor', store: 'The Local Market',    phone: '+919234876543', amount: '5,000',  status: 'Paid' },
-  { id: 6, name: 'Akash Kumar Vendor', store: 'Daily Harvest Store', phone: '+919123456789', amount: '3,000',  status: 'Pending' },
+  { id: 1, name: 'Sunil Kumar Vendor', store: 'The Local Market',    phone: '+919234876543', amount: '5,000',  status: 'Paid', category: 'Groceries' },
+  { id: 2, name: 'Akash Kumar Vendor', store: 'Daily Harvest Store', phone: '+919123456789', amount: '3,000',  status: 'Paid', category: 'Vegetables' },
+  { id: 3, name: 'Sunil Kumar Vendor', store: 'The Local Market',    phone: '+919234876543', amount: '5,000',  status: 'Paid', category: 'Laundry' },
+  { id: 4, name: 'Akash Kumar Vendor', store: 'Daily Harvest Store', phone: '+919123456789', amount: '3,000',  status: 'Paid', category: 'Dairy' },
+  { id: 5, name: 'Sunil Kumar Vendor', store: 'The Local Market',    phone: '+919234876543', amount: '5,000',  status: 'Paid', category: 'Groceries' },
+  { id: 6, name: 'Akash Kumar Vendor', store: 'Daily Harvest Store', phone: '+919123456789', amount: '3,000',  status: 'Pending', category: 'Vegetables' },
 ];
 
 const MONTHLY_DATA = [
@@ -25,8 +25,6 @@ const MONTHLY_DATA = [
   { month: 'December 2025',  amount: '25,000' },
 ];
 
-const s = (css) => css; // passthrough for style objects
-
 export default function VendorTransactions() {
   const navigate = useNavigate();
   const [selectedVendor, setSelectedVendor] = useState(null);
@@ -34,10 +32,25 @@ export default function VendorTransactions() {
   const [fromDate, setFromDate] = useState('2025-02-02');
   const [toDate, setToDate] = useState('2025-02-02');
 
-  const filtered = VENDORS.filter(v =>
-    v.name.toLowerCase().includes(search.toLowerCase()) ||
-    v.store.toLowerCase().includes(search.toLowerCase())
-  );
+  const [categories, setCategories] = useState(['Groceries', 'Laundry', 'Vegetables', 'Dairy']);
+  const [activeCategory, setActiveCategory] = useState('Groceries');
+
+  const handleAddCategory = () => {
+    const newCat = window.prompt("Enter new category name:");
+    if (newCat && newCat.trim()) {
+      const trimmed = newCat.trim();
+      if (!categories.includes(trimmed)) {
+        setCategories([...categories, trimmed]);
+      }
+      setActiveCategory(trimmed);
+    }
+  };
+
+  const filtered = VENDORS.filter(v => {
+    const matchSearch = v.name.toLowerCase().includes(search.toLowerCase()) || v.store.toLowerCase().includes(search.toLowerCase());
+    const matchCategory = v.category === activeCategory || !v.category; // fallback for unassigned
+    return matchSearch && matchCategory;
+  });
 
   // ── Detail View ──
   if (selectedVendor) {
@@ -125,31 +138,82 @@ export default function VendorTransactions() {
           />
         </div>
 
+        {/* Sub Tabs */}
+        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 16, marginBottom: 16, msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              style={{
+                whiteSpace: 'nowrap',
+                padding: '8px 16px',
+                borderRadius: 20,
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: activeCategory === cat ? 'none' : '1px solid #cbd5e1',
+                background: activeCategory === cat ? '#0891b2' : 'white',
+                color: activeCategory === cat ? 'white' : '#64748b',
+                transition: 'all 0.2s',
+                boxShadow: activeCategory === cat ? '0 4px 6px -1px rgba(8,145,178,0.2)' : 'none'
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+          <button
+            onClick={handleAddCategory}
+            style={{
+              whiteSpace: 'nowrap',
+              padding: '8px 16px',
+              borderRadius: 20,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: '1.5px dashed #0891b2',
+              background: '#ecfeff',
+              color: '#0891b2',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
+            New Tab
+          </button>
+        </div>
+
         {/* Vendor List */}
         <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-          {filtered.map((v, i) => (
-            <div
-              key={v.id}
-              onClick={() => setSelectedVendor(v)}
-              style={{ padding: '14px 16px', borderBottom: i < filtered.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}
-            >
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px' }}>{v.name}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>store</span>
-                  <span style={{ fontSize: 13, color: '#64748b' }}>{v.store}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>phone</span>
-                  <span style={{ fontSize: 13, color: '#64748b' }}>{v.phone}</span>
-                </div>
-              </div>
-              <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
-                <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px' }}>₹ {v.amount}</p>
-                <span style={{ fontSize: 13, fontWeight: 600, color: v.status === 'Paid' ? '#059669' : '#e11d48' }}>{v.status}</span>
-              </div>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '32px 16px', color: '#94a3b8' }}>
+              No vendors found for this category
             </div>
-          ))}
+          ) : (
+            filtered.map((v, i) => (
+              <div
+                key={v.id}
+                onClick={() => setSelectedVendor(v)}
+                style={{ padding: '14px 16px', borderBottom: i < filtered.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}
+              >
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px' }}>{v.name}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>store</span>
+                    <span style={{ fontSize: 13, color: '#64748b' }}>{v.store}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>phone</span>
+                    <span style={{ fontSize: 13, color: '#64748b' }}>{v.phone}</span>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
+                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px' }}>₹ {v.amount}</p>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: v.status === 'Paid' ? '#059669' : '#e11d48' }}>{v.status}</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
