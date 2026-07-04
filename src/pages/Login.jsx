@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 const cyan = '#0891b2';
 
-const Field = ({ icon, placeholder, type = 'text', value, onChange, disabled }) => (
+const Field = ({ icon, placeholder, type = 'text', value, onChange, disabled, maxLength }) => (
   <div style={{ position: 'relative', marginBottom: 16 }}>
     <span className="material-symbols-outlined" style={{
       position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
@@ -16,6 +16,7 @@ const Field = ({ icon, placeholder, type = 'text', value, onChange, disabled }) 
       value={value}
       onChange={onChange}
       disabled={disabled}
+      maxLength={maxLength}
       style={{
         width: '100%', padding: '14px 14px 14px 44px',
         border: `1.5px solid ${disabled ? '#e2e8f0' : cyan}`,
@@ -32,7 +33,6 @@ export default function Login() {
   const [mobile, setMobile] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
-  const [role, setRole] = useState('admin');
   const [signUpName, setSignUpName] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
 
@@ -41,9 +41,9 @@ export default function Login() {
 
   const handleSendOTP = (e) => {
     e.preventDefault();
-    if (mobile.length >= 10) {
+    if (mobile.replace(/\D/g, '').length === 10) {
       setOtpSent(true);
-      alert('Dummy OTP is 1234');
+      setOtp('1234'); // prefill OTP for demo
     } else {
       alert('Please enter a valid 10-digit mobile number');
     }
@@ -52,7 +52,7 @@ export default function Login() {
   const handleVerifyOTP = (e) => {
     e.preventDefault();
     if (otp === '1234') {
-      login(mobile, role);
+      login(mobile, 'admin');
       navigate('/');
     } else {
       alert('Invalid OTP. Use 1234');
@@ -89,7 +89,7 @@ export default function Login() {
           fontSize: 32, color: cyan, margin: '0 0 6px', letterSpacing: -1
         }}>febebo</h1>
         <p style={{ color: '#64748b', fontSize: 14, margin: 0 }}>
-          {isLogin ? 'Welcome back! Sign in to continue.' : 'Create your account to get started.'}
+          {isLogin ? 'Admin Portal — Sign in to continue.' : 'Create your admin account.'}
         </p>
       </div>
 
@@ -100,28 +100,14 @@ export default function Login() {
         boxShadow: '0 8px 40px rgba(8,145,178,0.1)',
         border: '1px solid rgba(8,145,178,0.1)'
       }}>
-        {/* Role Selector */}
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 8 }}>
-            Login As
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
-            {[
-              { val: 'admin', label: 'Admin', icon: 'admin_panel_settings' },
-              { val: 'staff', label: 'Staff', icon: 'badge' },
-              { val: 'customer', label: 'Tenant', icon: 'person' },
-            ].map(r => (
-              <button key={r.val} onClick={() => setRole(r.val)} style={{
-                padding: '10px 4px', borderRadius: 10, cursor: 'pointer',
-                border: role === r.val ? `2px solid ${cyan}` : '1.5px solid #e2e8f0',
-                background: role === r.val ? '#ecfeff' : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                transition: 'all 0.2s'
-              }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 20, color: role === r.val ? cyan : '#94a3b8' }}>{r.icon}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: role === r.val ? cyan : '#64748b' }}>{r.label}</span>
-              </button>
-            ))}
+        {/* Admin badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#ecfeff', borderRadius: 12, padding: '12px 16px', marginBottom: 20, border: '1px solid #a5f3fc' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#0891b2,#0e7490)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span className="material-symbols-outlined" style={{ color: 'white', fontSize: 20 }}>admin_panel_settings</span>
+          </div>
+          <div>
+            <p style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', margin: 0 }}>Admin Access</p>
+            <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>PG Management Portal</p>
           </div>
         </div>
 
@@ -133,21 +119,47 @@ export default function Login() {
           </>
         )}
 
-        {/* Mobile */}
-        <Field icon="smartphone" type="tel" placeholder="+91 — Enter mobile number" value={mobile} onChange={e => setMobile(e.target.value)} disabled={otpSent} />
+        {/* Mobile — 10 digit only */}
+        <div style={{ marginBottom: 4 }}>
+          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 8 }}>Mobile Number</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flexShrink: 0, padding: '14px 12px', border: `1.5px solid ${cyan}`, borderRadius: 12, background: '#ecfeff', fontSize: 14, fontWeight: 700, color: cyan }}>
+              +91
+            </div>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: cyan, fontSize: 20, pointerEvents: 'none' }}>smartphone</span>
+              <input
+                type="tel"
+                placeholder="10-digit mobile number"
+                value={mobile}
+                onChange={e => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                disabled={otpSent}
+                maxLength={10}
+                style={{
+                  width: '100%', padding: '14px 14px 14px 44px',
+                  border: `1.5px solid ${otpSent ? '#e2e8f0' : cyan}`,
+                  borderRadius: 12, fontSize: 15, fontFamily: "'Hanken Grotesk',sans-serif",
+                  background: otpSent ? '#f8fafc' : 'white', color: '#1e293b',
+                  outline: 'none', boxSizing: 'border-box'
+                }}
+              />
+            </div>
+          </div>
+          <p style={{ fontSize: 12, color: '#94a3b8', margin: '6px 0 16px' }}>{mobile.length}/10 digits</p>
+        </div>
 
         {/* OTP */}
         {otpSent && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#64748b' }}>Enter OTP</label>
-              <button onClick={() => setOtpSent(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: cyan, fontWeight: 600 }}>
+              <button onClick={() => { setOtpSent(false); setOtp(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: cyan, fontWeight: 600 }}>
                 Change Number
               </button>
             </div>
-            <Field icon="lock" placeholder="1234" value={otp} onChange={e => setOtp(e.target.value)} />
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: -10, marginBottom: 16 }}>
-              OTP sent to +91 {mobile}
+            <Field icon="lock" placeholder="OTP" value={otp} onChange={e => setOtp(e.target.value)} />
+            <p style={{ fontSize: 12, color: '#059669', marginTop: -10, marginBottom: 16, fontWeight: 600 }}>
+              ✓ OTP sent to +91 {mobile} (pre-filled for demo)
             </p>
           </div>
         )}
@@ -186,9 +198,8 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Footer hint */}
       <p style={{ textAlign: 'center', fontSize: 12, color: '#94a3b8', marginTop: 24, padding: '0 24px' }}>
-        For demo: OTP is <strong style={{ color: cyan }}>1234</strong>
+        Demo: Enter any 10-digit number. OTP auto-fills as <strong style={{ color: cyan }}>1234</strong>
       </p>
     </div>
   );
