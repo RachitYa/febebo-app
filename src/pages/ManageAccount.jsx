@@ -89,7 +89,7 @@ export default function ManageAccount() {
     t.room.includes(search)
   );
 
-  const activeTab = TABS.find(t => t.key === rentTab);
+  const activeTab = TABS.find(t => t.key === rentTab) || TABS[0];
 
   if (activeModule === 'total-rents') {
     return (
@@ -120,13 +120,15 @@ export default function ManageAccount() {
             {TABS.map(tab => (
               <button
                 key={tab.key}
-                onClick={() => setRentTab(tab.key)}
+                onClick={() => { setRentTab(tab.key); setSearch(''); }}
                 style={{
-                  flex: 1, padding: '10px 4px', border: `1.5px solid ${rentTab === tab.key ? tab.color : '#e2e8f0'}`,
-                  borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                  flex: 1, padding: '10px 4px',
+                  border: `1.5px solid ${rentTab === tab.key ? tab.color : '#e2e8f0'}`,
+                  borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                  fontFamily: 'inherit',
                   background: rentTab === tab.key ? tab.color : 'white',
                   color: rentTab === tab.key ? 'white' : '#64748b',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s', whiteSpace: 'nowrap'
                 }}
               >
                 {tab.label}
@@ -135,25 +137,30 @@ export default function ManageAccount() {
           </div>
 
           {/* Summary pill */}
-          <div style={{ background: `${activeTab.color}15`, border: `1px solid ${activeTab.color}30`, borderRadius: 10, padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: activeTab.color }}>{activeTab.label}</span>
+          <div style={{ background: `${activeTab.color}15`, border: `1px solid ${activeTab.color}40`, borderRadius: 10, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span className="material-symbols-outlined" style={{ color: activeTab.color, fontSize: 18 }}>
+                {rentTab === 'pending' ? 'pending_actions' : rentTab === 'collected' ? 'check_circle' : 'upcoming'}
+              </span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: activeTab.color }}>{activeTab.label}</span>
+            </div>
             <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 16, fontWeight: 700, color: activeTab.color }}>
-              ₹{currentData.reduce((s, t) => s + parseInt(t.amount.replace(',','')), 0).toLocaleString('en-IN')}
+              ₹ {currentData.reduce((s, t) => s + parseInt((t.amount || '0').replace(/,/g, '')), 0).toLocaleString('en-IN')}
             </span>
           </div>
 
           {/* List */}
           {currentData.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 8 }}>search_off</span>
-              No results found
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8', background: 'white', borderRadius: 16, border: '1px solid #e2e8f0' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 8, color: '#cbd5e1' }}>search_off</span>
+              <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>No results found</p>
             </div>
           ) : (
             <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               {currentData.map((t, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 16px', borderBottom: i < currentData.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: '50%', background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: '50%', background: t.color || '#0891b2', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
                       {t.initials}
                     </div>
                     <div>
@@ -162,7 +169,7 @@ export default function ManageAccount() {
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 15, margin: 0, color: rentTab === 'pending' ? '#e11d48' : rentTab === 'collected' ? '#059669' : '#0f172a' }}>₹{t.amount}</p>
+                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 15, margin: 0, color: rentTab === 'pending' ? '#e11d48' : rentTab === 'collected' ? '#059669' : '#0f172a' }}>₹ {t.amount}</p>
                     <p style={{ fontSize: 11, color: '#94a3b8', margin: '2px 0 0' }}>{t.date}</p>
                   </div>
                 </div>
