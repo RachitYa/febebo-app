@@ -216,109 +216,75 @@ function UserInventoryView({ user, onBack }) {
   );
 }
 
-// ─── LEVEL 3: Room Detail — Residents + Items tabs ────────────────
+// ─── LEVEL 3: Room Detail — Items only (assigned to + exchange dates) ───
 function RoomDetailView({ room, onBack }) {
-  const [tab, setTab] = useState('residents');
-  const [selectedUser, setSelectedUser] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const residents = USERS_DATA.filter(u => room.residentIds.includes(u.id));
 
-  if (selectedUser) return <UserInventoryView user={selectedUser} onBack={() => setSelectedUser(null)} />;
   if (selectedItem !== null) {
     return <ItemDetailView item={ROOM_ITEMS_DATA[selectedItem]} roomNo={`Room No. ${room.roomNo}`} onBack={() => setSelectedItem(null)} />;
   }
 
   return (
     <div style={BASE}>
-      <Header title={`Room No. ${room.roomNo}`} onBack={onBack} />
+      <Header title={`Room No. ${room.roomNo}`} onBack={onBack} action={<button style={{ background: cyan, color: 'white', border: 'none', borderRadius: 8, padding: '6px 16px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Save</button>} />
       <div style={{ padding: 16 }}>
-        {/* Room photo + info */}
-        <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
-          <img src={room.img} alt={room.name} style={{ width: '100%', height: 190, objectFit: 'cover', display: 'block' }}
+        {/* Room hero card */}
+        <div style={{ background: cyan, borderRadius: 16, overflow: 'hidden', marginBottom: 16, boxShadow: '0 4px 16px rgba(8,145,178,0.25)' }}>
+          <img src={room.img} alt={room.name} style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block', opacity: 0.85 }}
             onError={e => { e.target.src = DEFAULT_IMG; }} />
-          <div style={{ background: 'white', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: 0 }}>{room.name}</p>
-              <p style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>{room.type}</p>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, background: room.status === 'occupied' ? '#dcfce7' : '#f1f5f9', color: room.status === 'occupied' ? '#059669' : '#64748b', padding: '4px 12px', borderRadius: 20 }}>
-                {room.status === 'occupied' ? 'Occupied' : 'Vacated'}
-              </span>
-              <p style={{ fontSize: 12, color: '#94a3b8', margin: '4px 0 0' }}>{room.beds} beds · {residents.length} residents</p>
+          <div style={{ padding: '14px 16px' }}>
+            <p style={{ fontWeight: 700, fontSize: 16, color: 'white', margin: '0 0 2px' }}>{room.name}</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', margin: '0 0 6px' }}>{room.type}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>people</span>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>{residents.length} resident{residents.length !== 1 ? 's' : ''} · {room.beds} bed{room.beds !== 1 ? 's' : ''}</span>
             </div>
           </div>
         </div>
 
-        {/* Tab toggle */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
-          {[{ id: 'residents', label: 'Residents', icon: 'people' }, { id: 'items', label: 'Room Items', icon: 'inventory_2' }].map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ padding: '12px', borderRadius: 12, border: tab === t.id ? `2px solid ${cyan}` : '1.5px solid #e2e8f0', background: tab === t.id ? '#ecfeff' : 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'inherit' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 20, color: tab === t.id ? cyan : '#94a3b8' }}>{t.icon}</span>
-              <span style={{ fontWeight: 700, fontSize: 14, color: tab === t.id ? cyan : '#64748b' }}>{t.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Residents tab */}
-        {tab === 'residents' && (
-          residents.length === 0 ? (
-            <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '36px', textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 44, color: '#cbd5e1', display: 'block', marginBottom: 8 }}>person_off</span>
-              <p style={{ color: '#94a3b8', fontSize: 14, margin: 0 }}>No residents in this room</p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {residents.map(user => (
-                <div key={user.id} onClick={() => setSelectedUser(user)}
-                  style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 12, display: 'flex', gap: 12, alignItems: 'center', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-                  <img src={user.img} alt={user.name} style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px' }}>{user.name}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 13, color: cyan }}>bed</span>
-                      <span style={{ fontSize: 12, color: '#475569' }}>{user.bed}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 13, color: cyan }}>phone</span>
-                      <span style={{ fontSize: 12, color: '#475569' }}>{user.phone}</span>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#94a3b8' }}>chevron_right</span>
-                    <span style={{ fontSize: 10, color: '#94a3b8' }}>inventory</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )
-        )}
-
-        {/* Items tab */}
-        {tab === 'items' && (
-          <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            {ROOM_ITEMS_DATA.map((item, idx) => (
+        {/* Room Items — with assigned to + exchange badge */}
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 10 }}>Room Items — tap to see details</p>
+        <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          {ROOM_ITEMS_DATA.map((item, idx) => {
+            const exchangeCount = (EXCHANGE_DATA[item.name] || []).length;
+            const latestDate = exchangeCount > 0 ? EXCHANGE_DATA[item.name][0].date : null;
+            return (
               <div key={item.name} onClick={() => setSelectedItem(idx)}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 16px', borderBottom: idx < ROOM_ITEMS_DATA.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 20, color: cyan }}>{item.icon}</span>
                   </div>
                   <div>
-                    <p style={{ fontWeight: 600, fontSize: 14, color: '#0f172a', margin: 0 }}>{item.name}</p>
-                    <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>→ {item.assignedTo}</p>
+                    <p style={{ fontWeight: 600, fontSize: 14, color: '#0f172a', margin: '0 0 2px' }}>{item.name}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 12, color: '#94a3b8' }}>person</span>
+                      <span style={{ fontSize: 12, color: '#64748b' }}>{item.assignedTo}</span>
+                    </div>
+                    {latestDate && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 11, color: '#ca8a04' }}>swap_horiz</span>
+                        <span style={{ fontSize: 11, color: '#ca8a04', fontWeight: 600 }}>Last exchanged: {latestDate}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#94a3b8' }}>chevron_right</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {exchangeCount > 0 && (
+                    <span style={{ background: '#fef9c3', color: '#ca8a04', fontWeight: 700, fontSize: 11, padding: '3px 8px', borderRadius: 20 }}>{exchangeCount}x</span>
+                  )}
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#94a3b8' }}>chevron_right</span>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
+
 
 // ─── LEVEL 2: Room Grid List ──────────────────────────────────────
 function RoomListView({ onBack, onAddRoom }) {
@@ -363,12 +329,19 @@ function RoomListView({ onBack, onAddRoom }) {
           ))}
         </div>
 
-        {/* Filter pills */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          {[{ id: 'all', label: 'All Rooms' }, { id: 'occupied', label: 'Occupied' }, { id: 'vacated', label: 'Vacated' }].map(f => (
-            <button key={f.id} onClick={() => setFilter(f.id)}
-              style={{ padding: '7px 16px', borderRadius: 20, fontWeight: 600, fontSize: 13, cursor: 'pointer', border: filter === f.id ? 'none' : '1px solid #cbd5e1', background: filter === f.id ? cyan : 'white', color: filter === f.id ? 'white' : '#64748b', fontFamily: 'inherit' }}>
-              {f.label}
+        {/* Action pills */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
+          {[
+            { label: 'Add\nRoom',      icon: 'add_home',  action: onAddRoom,                                        active: false },
+            { label: 'Complete\nRoom', icon: 'home',       action: () => setFilter(f => f === 'occupied' ? 'all' : 'occupied'), active: filter === 'occupied' },
+            { label: 'Pending\nRoom',  icon: 'search',     action: () => setFilter(f => f === 'vacated'  ? 'all' : 'vacated'),  active: filter === 'vacated'  },
+          ].map((pill, i) => (
+            <button key={i} onClick={pill.action}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: pill.active ? '#ecfeff' : 'white', border: pill.active ? `1.5px solid ${cyan}` : '1px solid #e2e8f0', borderRadius: 14, padding: '14px 8px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', fontFamily: 'inherit' }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: pill.active ? cyan : '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="material-symbols-outlined" style={{ color: pill.active ? 'white' : cyan, fontSize: 22 }}>{pill.icon}</span>
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 600, color: pill.active ? cyan : '#1e293b', textAlign: 'center', whiteSpace: 'pre-line', lineHeight: 1.3 }}>{pill.label}</span>
             </button>
           ))}
         </div>
