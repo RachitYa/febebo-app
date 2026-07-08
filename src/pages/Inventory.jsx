@@ -37,7 +37,7 @@ const STAFF_ALLOTTED = [
   { name: 'Gloves',         icon: 'back_hand',         qty: 3 },
   { name: 'Mop',            icon: 'cleaning_services', qty: 2 },
   { name: 'Broom',          icon: 'cleaning',          qty: 1 },
-  { name: 'Bucket',         icon: 'water_bucket',      qty: 2 },
+  { name: 'Bucket',         icon: 'opacity',      qty: 2 },
   { name: 'Cleaning Spray', icon: 'soap',              qty: 3 },
   { name: 'Safety Shoes',   icon: 'hiking',            qty: 1 },
   { name: 'Dustpan',        icon: 'delete_sweep',      qty: 1 },
