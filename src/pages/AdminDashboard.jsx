@@ -12,7 +12,7 @@ export default function AdminDashboard() {
     { id: 'account',   label: 'Account',   desc: 'Ledgers',       icon: 'account_balance_wallet', gradient: 'linear-gradient(135deg,#0ea5e9,#0891b2)' },
     { id: 'inventory', label: 'Inventory', desc: 'Stock',          icon: 'inventory_2',            gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
     { id: 'vendor',    label: 'Vendor',    desc: 'Suppliers',      icon: 'local_shipping',         gradient: 'linear-gradient(135deg,#8b5cf6,#7c3aed)' },
-    { id: 'room',      label: 'Room',      desc: 'Spaces',         icon: 'meeting_room',           gradient: 'linear-gradient(135deg,#10b981,#059669)' },
+    { id: 'room',      label: 'Seats',     desc: 'Spaces',         icon: 'meeting_room',           gradient: 'linear-gradient(135deg,#10b981,#059669)' },
     { id: 'user',      label: 'Users',     desc: 'Tenants',        icon: 'groups',                 gradient: 'linear-gradient(135deg,#f59e0b,#d97706)' },
     { id: 'staff',     label: 'Staff',     desc: 'HR & Pay',       icon: 'badge',                  gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)' },
     { id: 'work',      label: 'Tasks',     desc: 'Maintenance',    icon: 'task_alt',               gradient: 'linear-gradient(135deg,#64748b,#475569)' },
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
         {[
           { icon: 'dashboard',           label: 'Dashboard',    path: '/admin-dashboard' },
           { icon: 'people',              label: 'Tenants',      path: '/manage-tenants' },
-          { icon: 'meeting_room',        label: 'Rooms',        path: '/manage-rooms' },
+          { icon: 'meeting_room',        label: 'Seats',        path: '/manage-rooms' },
           { icon: 'badge',               label: 'Staff',        path: '/manage-staff' },
           { icon: 'account_balance_wallet', label: 'Accounts',  path: '/manage-account' },
           { icon: 'pending_actions',     label: 'Request Box',  path: '/request-box' },
