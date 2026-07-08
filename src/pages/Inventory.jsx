@@ -136,6 +136,149 @@ const MODULES = [
   { id: 'kitchen-report',    label: 'Kitchen\nReport',    icon: 'bar_chart',    gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)' },
 ];
 
+// ─── Item image map (Unsplash) ────────────────────────────────────
+const ITEM_IMAGES = {
+  'Bed':            'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=400&h=260&fit=crop',
+  'Mattress':       'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=260&fit=crop',
+  'Bedsheet':       'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=260&fit=crop',
+  'Pillow':         'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400&h=260&fit=crop',
+  'Chair':          'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&h=260&fit=crop',
+  'Almirah':        'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=260&fit=crop',
+  'Kettle':         'https://images.unsplash.com/photo-1544731612-de7f96afe55f?w=400&h=260&fit=crop',
+  'Table':          'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=260&fit=crop',
+  'T.V':            'https://images.unsplash.com/photo-1593359677879-a4bb92f4834f?w=400&h=260&fit=crop',
+  'Uniform':        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=260&fit=crop',
+  'ID Card':        'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400&h=260&fit=crop',
+  'Apron':          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=260&fit=crop',
+  'Gloves':         'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=260&fit=crop',
+  'Mop':            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=260&fit=crop',
+  'Broom':          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=260&fit=crop',
+  'Bucket':         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=260&fit=crop',
+  'Cleaning Spray': 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?w=400&h=260&fit=crop',
+  'Safety Shoes':   'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=260&fit=crop',
+  'Dustpan':        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=260&fit=crop',
+  'Pillow Cover':   'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400&h=260&fit=crop',
+};
+const DEFAULT_IMG = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=260&fit=crop';
+
+// ─── Sample exchange history per item name ────────────────────────
+const EXCHANGE_HISTORY = {
+  'Pillow':       [{ date: '8 Jul 2025', note: 'Pillow exchanged — old one torn' }, { date: '2 Mar 2025', note: 'Pillow exchanged — stain' }],
+  'Bedsheet':     [{ date: '5 Jul 2025', note: 'Bedsheet exchanged — requested by tenant' }, { date: '10 Jan 2025', note: 'Bedsheet exchanged — wear & tear' }],
+  'Pillow Cover': [{ date: '8 Jul 2025', note: 'Pillow cover exchanged — faded color' }],
+  'Mattress':     [{ date: '1 Jun 2025', note: 'Mattress exchanged — sagging issue' }],
+  'Uniform':      [{ date: '15 Jun 2025', note: 'Uniform replaced — annual refresh' }],
+  'Gloves':       [{ date: '20 Jun 2025', note: 'Gloves replaced — worn out' }, { date: '5 Apr 2025', note: 'Gloves replaced — torn' }],
+};
+
+// ─── Item Detail View (image + exchange list) ─────────────────────
+function ItemDetailView({ item, person, onBack, onQtyChange }) {
+  const [showAddExchange, setShowAddExchange] = useState(false);
+  const [exchangeNote, setExchangeNote] = useState('');
+  const [extraExchanges, setExtraExchanges] = useState([]);
+  const baseHistory = EXCHANGE_HISTORY[item.name] || [];
+  const allHistory = [...extraExchanges, ...baseHistory];
+
+  const handleAddExchange = () => {
+    if (!exchangeNote.trim()) return;
+    const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    setExtraExchanges(prev => [{ date: today, note: exchangeNote.trim() }, ...prev]);
+    setExchangeNote('');
+    setShowAddExchange(false);
+  };
+
+  return (
+    <div style={BASE}>
+      <Header title={item.name} onBack={onBack} action={<SaveBtn />} />
+      <div style={{ padding: 16 }}>
+        {/* Item image */}
+        <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
+          <img
+            src={ITEM_IMAGES[item.name] || DEFAULT_IMG}
+            alt={item.name}
+            style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }}
+            onError={e => { e.target.src = DEFAULT_IMG; }}
+          />
+          <div style={{ background: 'white', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 22, color: '#0891b2' }}>{item.icon}</span>
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: 0 }}>{item.name}</p>
+                {person && <p style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>Allotted to {person.name}</p>}
+              </div>
+            </div>
+            {/* Typeable quantity */}
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: 11, color: '#94a3b8', margin: '0 0 4px' }}>Quantity</p>
+              <input
+                type="number" min="0"
+                value={item.qty}
+                onChange={e => onQtyChange(parseInt(e.target.value) || 0)}
+                style={{ width: 64, padding: '8px 10px', border: '1.5px solid #0891b2', borderRadius: 10, fontSize: 16, fontWeight: 700, color: '#0f172a', textAlign: 'center', outline: 'none', fontFamily: 'inherit' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Exchange History */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: 0 }}>Exchange History</p>
+          <button onClick={() => setShowAddExchange(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#ecfeff', border: '1.5px solid #a5f3fc', borderRadius: 8, padding: '6px 12px', color: '#0891b2', fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span> Add
+          </button>
+        </div>
+
+        {/* Add exchange form */}
+        {showAddExchange && (
+          <div style={{ background: 'white', borderRadius: 14, border: '1.5px solid #0891b2', padding: 16, marginBottom: 14 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', margin: '0 0 8px' }}>Log Exchange</p>
+            <textarea
+              value={exchangeNote}
+              onChange={e => setExchangeNote(e.target.value)}
+              placeholder={`Reason for ${item.name} exchange...`}
+              rows={3}
+              style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 14, fontFamily: 'inherit', outline: 'none', resize: 'none', boxSizing: 'border-box', color: '#0f172a' }}
+            />
+            <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+              <button onClick={() => setShowAddExchange(false)}
+                style={{ flex: 1, padding: '10px', border: '1px solid #e2e8f0', borderRadius: 10, background: 'white', color: '#64748b', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+              <button onClick={handleAddExchange}
+                style={{ flex: 2, padding: '10px', border: 'none', borderRadius: 10, background: '#0891b2', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Save Exchange</button>
+            </div>
+          </div>
+        )}
+
+        {allHistory.length === 0 ? (
+          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '28px 16px', textAlign: 'center' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 40, color: '#cbd5e1', display: 'block', marginBottom: 8 }}>history</span>
+            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>No exchanges yet</p>
+          </div>
+        ) : (
+          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            {allHistory.map((ex, i) => (
+              <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 16px', borderBottom: i < allHistory.length - 1 ? '1px solid #f1f5f9' : 'none', alignItems: 'flex-start' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#ca8a04' }}>swap_horiz</span>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: '0 0 3px' }}>{ex.note}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 13, color: '#94a3b8' }}>calendar_today</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8' }}>{ex.date}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Shared Components ────────────────────────────────────────────
 const BASE = { maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 };
 
@@ -174,10 +317,12 @@ function Fab({ onClick }) {
   );
 }
 
-function ItemRow({ item, idx, total, onQtyChange, clickable, onClick }) {
+// ItemRow — no +/- buttons, typeable qty, always clickable
+function ItemRow({ item, idx, total, onQtyChange, onClick, bedClickable, onBedClick }) {
   return (
-    <div onClick={clickable ? onClick : undefined}
-      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 16px', borderBottom: idx < total - 1 ? '1px solid #f1f5f9' : 'none', cursor: clickable ? 'pointer' : 'default', background: clickable ? undefined : 'white' }}
+    <div
+      onClick={bedClickable ? onBedClick : onClick}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 16px', borderBottom: idx < total - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 36, height: 36, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -186,20 +331,36 @@ function ItemRow({ item, idx, total, onQtyChange, clickable, onClick }) {
         <span style={{ fontSize: 15, fontWeight: 600, color: '#1e293b' }}>{item.name}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {onQtyChange && (
-          <button onClick={e => { e.stopPropagation(); onQtyChange(-1); }} style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid #0891b2', background: 'white', color: '#0891b2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>remove</span>
-          </button>
-        )}
-        <div style={{ width: 44, height: 34, border: '1.5px solid #0891b2', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15, color: '#0f172a' }}>
-          {item.qty}
-        </div>
-        {onQtyChange && (
-          <button onClick={e => { e.stopPropagation(); onQtyChange(1); }} style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid #0891b2', background: 'white', color: '#0891b2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>add</span>
-          </button>
-        )}
-        {clickable && <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#94a3b8' }}>chevron_right</span>}
+        {/* Typeable quantity box — stops propagation so parent click still goes to detail */}
+        <input
+          type="number" min="0"
+          value={item.qty}
+          onClick={e => e.stopPropagation()}
+          onChange={e => { e.stopPropagation(); onQtyChange && onQtyChange(parseInt(e.target.value) || 0); }}
+          style={{ width: 50, padding: '6px 8px', border: '1.5px solid #0891b2', borderRadius: 8, fontSize: 15, fontWeight: 700, color: '#0f172a', textAlign: 'center', outline: 'none', fontFamily: 'inherit', background: 'white' }}
+        />
+        <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#94a3b8' }}>chevron_right</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Person card (shared) ─────────────────────────────────────────
+function PersonCard({ person, isUser }) {
+  const rows = isUser
+    ? [{ icon: 'phone', text: person.phone }, { icon: 'bed', text: person.bed }, { icon: 'meeting_room', text: person.room }]
+    : [{ icon: 'badge', text: person.empId }, { icon: 'person', text: person.role }, { icon: 'phone', text: person.phone }];
+  return (
+    <div style={{ background: '#0891b2', borderRadius: 16, padding: '16px', display: 'flex', gap: 14, alignItems: 'center', marginBottom: 16 }}>
+      <img src={person.img} alt={person.name} style={{ width: 70, height: 70, borderRadius: 12, objectFit: 'cover', border: '3px solid rgba(255,255,255,0.3)' }} />
+      <div>
+        <p style={{ fontWeight: 700, fontSize: 16, color: 'white', margin: '0 0 4px' }}>{person.name}</p>
+        {rows.map((r, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>{r.icon}</span>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>{r.text}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -208,25 +369,33 @@ function ItemRow({ item, idx, total, onQtyChange, clickable, onClick }) {
 // ─── Allotted Inventory (User) ─────────────────────────────────────
 function UserAllottedView({ person, onBack }) {
   const [items, setItems] = useState(USER_ALLOTTED.map(i => ({ ...i })));
-  const update = (idx, d) => setItems(p => p.map((it, i) => i === idx ? { ...it, qty: Math.max(0, it.qty + d) } : it));
+  const [selectedItem, setSelectedItem] = useState(null);
+  const updateQty = (idx, val) => setItems(p => p.map((it, i) => i === idx ? { ...it, qty: Math.max(0, val) } : it));
+
+  if (selectedItem !== null) {
+    const idx = selectedItem;
+    return (
+      <ItemDetailView
+        item={items[idx]}
+        person={person}
+        onBack={() => setSelectedItem(null)}
+        onQtyChange={val => updateQty(idx, val)}
+      />
+    );
+  }
+
   return (
     <div style={BASE}>
       <Header title="Allotted Inventory" onBack={onBack} action={<SaveBtn />} />
       <div style={{ padding: 16 }}>
-        <div style={{ background: '#0891b2', borderRadius: 16, padding: '16px', display: 'flex', gap: 14, alignItems: 'center', marginBottom: 16 }}>
-          <img src={person.img} alt={person.name} style={{ width: 70, height: 70, borderRadius: 12, objectFit: 'cover', border: '3px solid rgba(255,255,255,0.3)' }} />
-          <div>
-            <p style={{ fontWeight: 700, fontSize: 16, color: 'white', margin: '0 0 4px' }}>{person.name}</p>
-            {[{ icon: 'phone', text: person.phone }, { icon: 'bed', text: person.bed }, { icon: 'meeting_room', text: person.room }].map((r, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>{r.icon}</span>
-                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>{r.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <PersonCard person={person} isUser />
         <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-          {items.map((item, idx) => <ItemRow key={item.name} item={item} idx={idx} total={items.length} onQtyChange={d => update(idx, d)} />)}
+          {items.map((item, idx) => (
+            <ItemRow key={item.name} item={item} idx={idx} total={items.length}
+              onQtyChange={val => updateQty(idx, val)}
+              onClick={() => setSelectedItem(idx)}
+            />
+          ))}
         </div>
         <Fab />
       </div>
@@ -234,28 +403,36 @@ function UserAllottedView({ person, onBack }) {
   );
 }
 
-// ─── Allotted Inventory (Staff) — different items ──────────────────
+// ─── Allotted Inventory (Staff) ────────────────────────────────────
 function StaffAllottedView({ person, onBack }) {
   const [items, setItems] = useState(STAFF_ALLOTTED.map(i => ({ ...i })));
-  const update = (idx, d) => setItems(p => p.map((it, i) => i === idx ? { ...it, qty: Math.max(0, it.qty + d) } : it));
+  const [selectedItem, setSelectedItem] = useState(null);
+  const updateQty = (idx, val) => setItems(p => p.map((it, i) => i === idx ? { ...it, qty: Math.max(0, val) } : it));
+
+  if (selectedItem !== null) {
+    const idx = selectedItem;
+    return (
+      <ItemDetailView
+        item={items[idx]}
+        person={person}
+        onBack={() => setSelectedItem(null)}
+        onQtyChange={val => updateQty(idx, val)}
+      />
+    );
+  }
+
   return (
     <div style={BASE}>
       <Header title="Allotted Inventory" onBack={onBack} action={<SaveBtn />} />
       <div style={{ padding: 16 }}>
-        <div style={{ background: '#0891b2', borderRadius: 16, padding: '16px', display: 'flex', gap: 14, alignItems: 'center', marginBottom: 16 }}>
-          <img src={person.img} alt={person.name} style={{ width: 70, height: 70, borderRadius: 12, objectFit: 'cover', border: '3px solid rgba(255,255,255,0.3)' }} />
-          <div>
-            <p style={{ fontWeight: 700, fontSize: 16, color: 'white', margin: '0 0 4px' }}>{person.name}</p>
-            {[{ icon: 'badge', text: person.empId }, { icon: 'person', text: person.role }, { icon: 'phone', text: person.phone }].map((r, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>{r.icon}</span>
-                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>{r.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <PersonCard person={person} isUser={false} />
         <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-          {items.map((item, idx) => <ItemRow key={item.name} item={item} idx={idx} total={items.length} onQtyChange={d => update(idx, d)} />)}
+          {items.map((item, idx) => (
+            <ItemRow key={item.name} item={item} idx={idx} total={items.length}
+              onQtyChange={val => updateQty(idx, val)}
+              onClick={() => setSelectedItem(idx)}
+            />
+          ))}
         </div>
         <Fab />
       </div>
