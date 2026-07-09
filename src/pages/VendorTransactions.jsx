@@ -39,6 +39,23 @@ const MONTHLY_DATA = [
   'July 2025','August 2025','September 2025','October 2025','November 2025','December 2025',
 ].map(m => ({ month: m, amount: '25,000' }));
 
+const DAILY_TRANSACTIONS = Array.from({ length: 15 }, (_, i) => ({
+  date: `${i + 1} January 2025`,
+  amount: '5,300',
+  mode: 'Cash',
+  status: i % 3 === 0 ? 'Pending' : 'Paid'
+}));
+
+const RECEIPT_DETAILS = [
+  { item: 'Garam Masala', qty: '50', unit: 'gm', price: 100 },
+  { item: 'Rice', qty: '5', unit: 'kg', price: 250 },
+  { item: 'Dal', qty: '2', unit: 'kg', price: 280 },
+  { item: 'Ghee', qty: '4', unit: 'kg', price: 1200 },
+  { item: 'Jeera', qty: '200', unit: 'gm', price: 150 },
+  { item: 'Poha', qty: '3', unit: 'kg', price: 150 },
+];
+
+
 // ─── Purchase Modal (per vendor) — multi-item ────────────────────────
 function PurchaseModal({ vendor, onClose, onSave }) {
   const items = CATEGORY_ITEMS[vendor.category] || [];
@@ -187,6 +204,14 @@ export default function VendorTransactions() {
   const [activeCategory, setActiveCategory] = useState('Groceries');
   const [purchaseModalVendor, setPurchaseModalVendor] = useState(null);
   const [logs, setLogs] = useState([]);
+  
+  // Drill-down states
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  
+  // Filter states
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('All Payments');
 
   const handleAddCategory = () => {
     const newCat = window.prompt('Enter new category name:');
@@ -198,13 +223,129 @@ export default function VendorTransactions() {
 
   const filtered = VENDORS.filter(v => {
     const matchSearch = v.name.toLowerCase().includes(search.toLowerCase()) || v.store.toLowerCase().includes(search.toLowerCase());
-    return matchSearch && v.category === activeCategory;
+    const matchCat = v.category === activeCategory;
+    const matchStatus = filterStatus === 'All Payments' ? true : (filterStatus === 'Paid Payments' ? v.status === 'Paid' : v.status === 'Pending');
+    return matchSearch && matchCat && matchStatus;
   });
 
   const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   const total = MONTHLY_DATA.reduce((s, m) => s + parseInt(m.amount.replace(',', '')), 0);
 
-  // ── Detail View (monthly payment list) ──
+  // ── Detail View 3: Payment Details (Itemized Bill) ──
+  if (selectedDate) {
+    const totalReceipt = RECEIPT_DETAILS.reduce((s, r) => s + r.price, 0);
+    const paidReceipt = 2000;
+    const pendingReceipt = totalReceipt - paidReceipt;
+
+    return (
+      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+        <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
+          <button onClick={() => setSelectedDate(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0891b2', display: 'flex' }}>
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Payment Details</p>
+          <div style={{ width: 32 }} />
+        </div>
+
+        <div style={{ padding: 16 }}>
+          {/* Top Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+            <div style={{ background: 'white', border: '1px solid #bbf7d0', borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+              <span className="material-symbols-outlined" style={{ color: '#16a34a', fontSize: 20, marginBottom: 4 }}>check_circle</span>
+              <p style={{ fontSize: 14, fontWeight: 800, color: '#16a34a', margin: '0 0 2px' }}>₹ {paidReceipt.toLocaleString('en-IN')}</p>
+              <p style={{ fontSize: 10, fontWeight: 600, color: '#4ade80', margin: 0 }}>Paid Amount</p>
+            </div>
+            <div style={{ background: 'white', border: '1px solid #fecaca', borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+              <span className="material-symbols-outlined" style={{ color: '#ef4444', fontSize: 20, marginBottom: 4 }}>error</span>
+              <p style={{ fontSize: 14, fontWeight: 800, color: '#ef4444', margin: '0 0 2px' }}>₹ {pendingReceipt.toLocaleString('en-IN')}</p>
+              <p style={{ fontSize: 10, fontWeight: 600, color: '#f87171', margin: 0 }}>Pending Amount</p>
+            </div>
+            <div style={{ background: 'white', border: '1px solid #a5f3fc', borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+              <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 20, marginBottom: 4 }}>account_balance_wallet</span>
+              <p style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', margin: '0 0 2px' }}>₹ {totalReceipt.toLocaleString('en-IN')}</p>
+              <p style={{ fontSize: 10, fontWeight: 600, color: '#0891b2', margin: 0 }}>Total Amount</p>
+            </div>
+          </div>
+
+          <div style={{ background: '#0891b2', padding: '10px 16px', borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
+            <p style={{ margin: 0, color: 'white', fontSize: 14, fontWeight: 700 }}>{selectedDate.replace('January', '01').replace(' 2025', '/2025').replace(' ', '/')}</p>
+          </div>
+          <div style={{ background: 'white', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, border: '1px solid #e2e8f0', borderTop: 'none', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {RECEIPT_DETAILS.map((r, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flex: 1 }}>
+                    <span style={{ fontSize: 14, color: '#475569', fontWeight: 500, width: '45%' }}>{r.item} <span style={{color: '#cbd5e1'}}>:</span></span>
+                    <span style={{ fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{r.qty}{r.unit}</span>
+                  </div>
+                  <span style={{ fontSize: 14, color: '#0f172a', fontWeight: 700 }}>₹ {r.price}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div style={{ borderTop: '1px dashed #cbd5e1', margin: '16px 0', paddingTop: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 15, color: '#0f172a', fontWeight: 700 }}>Total</span>
+                <span style={{ fontSize: 16, color: '#0f172a', fontWeight: 800 }}>₹ {totalReceipt.toLocaleString('en-IN')}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <span style={{ fontSize: 14, color: '#16a34a', fontWeight: 600 }}>Paid</span>
+                <span style={{ fontSize: 14, color: '#16a34a', fontWeight: 700 }}>₹ {paidReceipt.toLocaleString('en-IN')}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 14, color: '#ef4444', fontWeight: 600 }}>Pending</span>
+                <span style={{ fontSize: 14, color: '#ef4444', fontWeight: 700 }}>₹ {pendingReceipt.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Detail View 2: Vendor Transactions (Day List) ──
+  if (selectedMonth) {
+    return (
+      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+        <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
+          <button onClick={() => setSelectedMonth(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0891b2', display: 'flex' }}>
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Vendor Transaction</p>
+          <div style={{ width: 32 }} />
+        </div>
+
+        <div style={{ padding: 16 }}>
+          <div style={{ background: 'white', border: '1.5px solid #0891b2', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#0891b2', margin: 0 }}>Total Amount</p>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>₹ 2,000,000</p>
+          </div>
+
+          <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            {DAILY_TRANSACTIONS.map((txn, i) => (
+              <div key={i} onClick={() => setSelectedDate(txn.date)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < DAILY_TRANSACTIONS.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div style={{ background: '#ecfeff', padding: 8, borderRadius: 10, display: 'flex' }}>
+                    <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 18 }}>receipt_long</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>{txn.date}</p>
+                    <p style={{ fontSize: 12, color: '#64748b', margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-symbols-outlined" style={{fontSize: 14}}>payments</span> Payment Mode: {txn.mode}</p>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 15, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>₹ {txn.amount}</p>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: txn.status === 'Paid' ? '#16a34a' : '#ef4444' }}>{txn.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Detail View 1 (monthly payment list) ──
   if (selectedVendor) {
     return (
       <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
@@ -212,7 +353,7 @@ export default function VendorTransactions() {
           <button onClick={() => setSelectedVendor(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0891b2', display: 'flex' }}>
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
-          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Monthly Payments</p>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Monthly Payment List</p>
           <div style={{ width: 32 }} />
         </div>
 
@@ -251,12 +392,15 @@ export default function VendorTransactions() {
 
           <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             {MONTHLY_DATA.map((row, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < MONTHLY_DATA.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+              <div key={i} onClick={() => setSelectedMonth(row.month)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < MONTHLY_DATA.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 18 }}>calendar_month</span>
                   <span style={{ fontSize: 14, color: '#1e293b', fontWeight: 500 }}>{row.month}</span>
                 </div>
-                <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 14, fontWeight: 700, color: '#0f172a' }}>₹ {row.amount}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 14, fontWeight: 700, color: '#0f172a' }}>₹ {row.amount}</span>
+                  <span className="material-symbols-outlined" style={{ color: '#cbd5e1', fontSize: 18 }}>chevron_right</span>
+                </div>
               </div>
             ))}
           </div>
@@ -277,6 +421,18 @@ export default function VendorTransactions() {
       </div>
 
       <div style={{ padding: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#64748b', margin: 0 }}>Payment History</p>
+          <button onClick={() => setFilterOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid #cbd5e1', borderRadius: 20, padding: '6px 12px', fontSize: 13, fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}>
+            {filterStatus} <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#0891b2' }}>expand_more</span>
+          </button>
+        </div>
+
+        <div style={{ background: 'white', border: '1.5px solid #0891b2', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#0891b2', margin: 0 }}>Total Amount</p>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>₹ 2,000,000</p>
+        </div>
+
         {/* Search */}
         <div style={{ position: 'relative', marginBottom: 16 }}>
           <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
@@ -369,6 +525,39 @@ export default function VendorTransactions() {
           onClose={() => setPurchaseModalVendor(null)}
           onSave={(entry) => setLogs(prev => [entry, ...prev])}
         />
+      )}
+
+      {/* Filter Bottom Sheet */}
+      {filterOpen && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', zIndex: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(3px)' }}
+          onClick={e => { if (e.target === e.currentTarget) setFilterOpen(false); }}>
+          <div style={{ background: 'white', width: '100%', maxWidth: 480, borderRadius: '24px 24px 0 0', padding: '24px', animation: 'slideUp 0.3s ease-out' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#0f172a' }}>Filter by</h2>
+              <button onClick={() => setFilterOpen(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#64748b' }}>close</span>
+              </button>
+            </div>
+            
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#64748b', marginBottom: 12 }}>Payment Status</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+              {['All Payments', 'Paid Payments', 'Pending Payments'].map(status => (
+                <label key={status} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${filterStatus === status ? '#0891b2' : '#cbd5e1'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {filterStatus === status && <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0891b2' }} />}
+                  </div>
+                  <span style={{ fontSize: 15, fontWeight: 500, color: '#0f172a' }}>{status}</span>
+                  <input type="radio" name="paymentStatus" checked={filterStatus === status} onChange={() => setFilterStatus(status)} style={{ display: 'none' }} />
+                </label>
+              ))}
+            </div>
+            
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button onClick={() => setFilterOpen(false)} style={{ flex: 1, padding: '14px', background: 'white', border: '1.5px solid #cbd5e1', borderRadius: 12, fontSize: 15, fontWeight: 700, color: '#475569', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => setFilterOpen(false)} style={{ flex: 1, padding: '14px', background: '#0891b2', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, color: 'white', cursor: 'pointer', boxShadow: '0 4px 12px rgba(8,145,178,0.2)' }}>Apply</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
