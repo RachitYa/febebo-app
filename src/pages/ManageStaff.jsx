@@ -83,7 +83,11 @@ export default function ManageStaff() {
             </div>
           ) : (
             filteredStaff.map(s => (
-              <div key={s.id} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+              <div 
+                key={s.id} 
+                onClick={() => navigate(`/staff/${s.id}`, { state: { staff: s } })}
+                style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}
+              >
                 <img src={s.img} alt={s.name} style={{ width: 100, height: 120, borderRadius: 12, objectFit: 'cover' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 4 }}>
                   <p style={{ fontWeight: 600, fontSize: 16, color: '#000', margin: 0 }}>{s.name}</p>

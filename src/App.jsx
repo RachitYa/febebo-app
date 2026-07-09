@@ -25,6 +25,7 @@ import Leave from './pages/Leave';
 import Subscription from './pages/Subscription';
 import PriceMenu from './pages/PriceMenu';
 import UserProfile from './pages/UserProfile';
+import StaffProfile from './pages/StaffProfile';
 
 // Redirect helper
 const RootRedirect = () => {
@@ -52,6 +53,7 @@ function AppRoutes() {
       <Route path="/manage-tenants" element={<AdminRoute><ManageTenants /></AdminRoute>} />
       <Route path="/user/:id" element={<AdminRoute><UserProfile /></AdminRoute>} />
       <Route path="/manage-staff" element={<AdminRoute><ManageStaff /></AdminRoute>} />
+      <Route path="/staff/:id" element={<AdminRoute><StaffProfile /></AdminRoute>} />
       <Route path="/staff-attendance" element={<AdminRoute><StaffAttendance /></AdminRoute>} />
       <Route path="/staff-work" element={<AdminRoute><StaffWork /></AdminRoute>} />
       <Route path="/manage-account" element={<AdminRoute><ManageAccount /></AdminRoute>} />
