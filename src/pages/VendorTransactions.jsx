@@ -39,112 +39,136 @@ const MONTHLY_DATA = [
   'July 2025','August 2025','September 2025','October 2025','November 2025','December 2025',
 ].map(m => ({ month: m, amount: '25,000' }));
 
-// ─── Purchase Modal (per vendor) ─────────────────────────────────────
+// ─── Purchase Modal (per vendor) — multi-item ────────────────────────
 function PurchaseModal({ vendor, onClose, onSave }) {
   const items = CATEGORY_ITEMS[vendor.category] || [];
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [item, setItem] = useState('');
-  const [qty, setQty] = useState('');
-  const [unit, setUnit] = useState('kg');
-  const [price, setPrice] = useState('');
+
+  const emptyRow = () => ({ item: '', qty: '', unit: 'kg', price: '' });
+  const [rows, setRows] = useState([emptyRow()]);
+
+  const updateRow = (idx, field, value) => {
+    setRows(prev => prev.map((r, i) => i === idx ? { ...r, [field]: value } : r));
+  };
+
+  const addRow = () => setRows(prev => [...prev, emptyRow()]);
+  const removeRow = (idx) => setRows(prev => prev.filter((_, i) => i !== idx));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!item || !qty || !price) return;
-    onSave({ date, item, qty, unit, price, vendorId: vendor.id });
+    const valid = rows.filter(r => r.item && r.qty && r.price);
+    if (!valid.length) return;
+    valid.forEach(r => onSave({ date, ...r, vendorId: vendor.id }));
     onClose();
   };
+
+  const cyan2 = '#0891b2';
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', zIndex: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(3px)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{ background: 'white', width: '100%', maxWidth: 480, borderRadius: '20px 20px 0 0', padding: '24px 20px 32px', maxHeight: '88vh', overflowY: 'auto' }}>
+      <div style={{ background: 'white', width: '100%', maxWidth: 480, borderRadius: '20px 20px 0 0', padding: '20px 20px 32px', maxHeight: '90vh', overflowY: 'auto' }}>
         {/* Handle bar */}
-        <div style={{ width: 40, height: 4, background: '#e2e8f0', borderRadius: 99, margin: '0 auto 20px' }} />
+        <div style={{ width: 40, height: 4, background: '#e2e8f0', borderRadius: 99, margin: '0 auto 16px' }} />
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <div>
-            <p style={{ fontWeight: 700, fontSize: 17, color: '#0f172a', margin: '0 0 2px' }}>Log Purchase</p>
-            <p style={{ fontSize: 12, color: '#0891b2', fontWeight: 600, margin: 0 }}>{vendor.name} · {vendor.store}</p>
+            <p style={{ fontWeight: 700, fontSize: 17, color: '#0f172a', margin: '0 0 2px' }}>Log Daily Purchase</p>
+            <p style={{ fontSize: 12, color: cyan2, fontWeight: 600, margin: 0 }}>{vendor.name} · {vendor.store}</p>
           </div>
           <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', borderRadius: 8, padding: 6, display: 'flex' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#64748b' }}>close</span>
           </button>
         </div>
 
+        {/* Date picker */}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>Date</label>
+          <div style={{ position: 'relative' }}>
+            <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: cyan2, fontSize: 18, pointerEvents: 'none' }}>calendar_today</span>
+            <input type="date" value={date} onChange={e => setDate(e.target.value)}
+              style={{ width: '100%', padding: '11px 12px 11px 40px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: '#0f172a' }} />
+          </div>
+        </div>
+
+        {/* Column headers */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 70px 26px', gap: 6, marginBottom: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', paddingLeft: 4 }}>ITEM</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textAlign: 'center' }}>QTY / UNIT</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textAlign: 'right', paddingRight: 4 }}>PRICE (₹)</span>
+          <span />
+        </div>
+
         <form onSubmit={handleSubmit}>
-          {/* Date */}
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>Date</label>
-            <div style={{ position: 'relative' }}>
-              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 18, pointerEvents: 'none' }}>calendar_today</span>
-              <input type="date" value={date} onChange={e => setDate(e.target.value)} required
-                style={{ width: '100%', padding: '12px 12px 12px 40px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: '#0f172a' }} />
-            </div>
-          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
+            {rows.map((row, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {/* Item dropdown */}
+                <div style={{ flex: 1, position: 'relative' }}>
+                  {items.length > 0 ? (
+                    <select value={row.item} onChange={e => updateRow(idx, 'item', e.target.value)}
+                      style={{ width: '100%', padding: '10px 28px 10px 10px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', appearance: 'none', background: 'white', color: row.item ? '#0f172a' : '#94a3b8', cursor: 'pointer' }}>
+                      <option value="">Select item…</option>
+                      {items.map(i => <option key={i} value={i}>{i}</option>)}
+                    </select>
+                  ) : (
+                    <input value={row.item} onChange={e => updateRow(idx, 'item', e.target.value)} placeholder="Item name"
+                      style={{ width: '100%', padding: '10px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                  )}
+                  <span className="material-symbols-outlined" style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 16, pointerEvents: 'none' }}>expand_more</span>
+                </div>
 
-          {/* Item dropdown */}
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>Item</label>
-            {items.length > 0 ? (
-              <div style={{ position: 'relative' }}>
-                <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 18, pointerEvents: 'none' }}>shopping_basket</span>
-                <select value={item} onChange={e => setItem(e.target.value)} required
-                  style={{ width: '100%', padding: '12px 12px 12px 40px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', appearance: 'none', background: 'white', color: item ? '#0f172a' : '#94a3b8', cursor: 'pointer' }}>
-                  <option value="">Select item...</option>
-                  {items.map(i => <option key={i} value={i}>{i}</option>)}
-                </select>
-                <span className="material-symbols-outlined" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 18, pointerEvents: 'none' }}>expand_more</span>
-              </div>
-            ) : (
-              <div style={{ position: 'relative' }}>
-                <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 18, pointerEvents: 'none' }}>shopping_basket</span>
-                <input value={item} onChange={e => setItem(e.target.value)} placeholder="Enter item name" required
-                  style={{ width: '100%', padding: '12px 12px 12px 40px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 15, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-            )}
-          </div>
+                {/* Qty + unit toggle */}
+                <div style={{ width: 90, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <input type="number" min="0" step="0.1" value={row.qty} onChange={e => updateRow(idx, 'qty', e.target.value)} placeholder="0"
+                    style={{ width: '100%', padding: '6px 8px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, textAlign: 'center', fontWeight: 700, outline: 'none', boxSizing: 'border-box' }} />
+                  <div style={{ display: 'flex', borderRadius: 8, border: `1.5px solid ${cyan2}`, overflow: 'hidden' }}>
+                    {['kg', 'g'].map(u => (
+                      <button key={u} type="button" onClick={() => updateRow(idx, 'unit', u)}
+                        style={{ flex: 1, padding: '4px 0', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 12, fontFamily: 'inherit', background: row.unit === u ? cyan2 : 'white', color: row.unit === u ? 'white' : cyan2, transition: 'all 0.15s' }}>
+                        {u}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-          {/* Quantity + Kg/g toggle */}
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>Quantity</label>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              {/* Quantity input */}
-              <div style={{ position: 'relative', flex: 1 }}>
-                <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 18, pointerEvents: 'none' }}>scale</span>
-                <input
-                  type="number" min="0" step="0.1"
-                  value={qty} onChange={e => setQty(e.target.value)}
-                  placeholder="0"
-                  required
-                  style={{ width: '100%', padding: '12px 12px 12px 40px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 16, fontFamily: 'inherit', fontWeight: 600, outline: 'none', boxSizing: 'border-box', color: '#0f172a' }}
-                />
-              </div>
-              {/* Kg / g toggle */}
-              <div style={{ display: 'flex', borderRadius: 10, border: '1.5px solid #0891b2', overflow: 'hidden', flexShrink: 0 }}>
-                {['kg', 'g'].map(u => (
-                  <button key={u} type="button" onClick={() => setUnit(u)}
-                    style={{ padding: '12px 18px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, fontFamily: 'inherit', background: unit === u ? '#0891b2' : 'white', color: unit === u ? 'white' : '#0891b2', transition: 'all 0.15s' }}>
-                    {u}
+                {/* Price */}
+                <div style={{ width: 70, position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', color: cyan2, fontWeight: 700, fontSize: 13, pointerEvents: 'none' }}>₹</span>
+                  <input type="number" min="0" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="0"
+                    style={{ width: '100%', padding: '10px 6px 10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', fontWeight: 700, outline: 'none', boxSizing: 'border-box', color: '#0f172a' }} />
+                </div>
+
+                {/* Remove row */}
+                {rows.length > 1 ? (
+                  <button type="button" onClick={() => removeRow(idx)} style={{ background: '#fee2e2', border: 'none', borderRadius: 8, padding: 5, cursor: 'pointer', display: 'flex', flexShrink: 0 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#ef4444' }}>remove</span>
                   </button>
-                ))}
+                ) : <div style={{ width: 26 }} />}
               </div>
-            </div>
+            ))}
           </div>
 
-          {/* Price */}
-          <div style={{ marginBottom: 28 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>Price (₹)</label>
-            <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontWeight: 700, fontSize: 16, pointerEvents: 'none' }}>₹</span>
-              <input type="number" min="0" value={price} onChange={e => setPrice(e.target.value)} placeholder="0" required
-                style={{ width: '100%', padding: '12px 12px 12px 32px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 16, fontFamily: 'inherit', fontWeight: 600, outline: 'none', boxSizing: 'border-box', color: '#0f172a' }} />
+          {/* Add more row */}
+          <button type="button" onClick={addRow}
+            style={{ width: '100%', padding: '10px', background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: 10, color: '#64748b', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+            Add More Items
+          </button>
+
+          {/* Total preview */}
+          {rows.some(r => r.price) && (
+            <div style={{ background: '#ecfeff', border: '1px solid #a5f3fc', borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <span style={{ fontSize: 13, color: '#0e7490', fontWeight: 600 }}>Total ({rows.filter(r => r.price).length} items)</span>
+              <span style={{ fontSize: 16, fontWeight: 800, color: '#0891b2' }}>
+                ₹ {rows.reduce((s, r) => s + (parseFloat(r.price) || 0), 0).toLocaleString('en-IN')}
+              </span>
             </div>
-          </div>
+          )}
 
           <button type="submit"
             style={{ width: '100%', padding: '16px', background: 'linear-gradient(135deg,#0891b2,#0e7490)', color: 'white', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px rgba(8,145,178,0.3)' }}>
-            Save Purchase
+            Save All Purchases
           </button>
         </form>
       </div>

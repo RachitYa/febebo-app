@@ -203,9 +203,7 @@ function RoomPreviewView({ profile, user, onBack }) {
 }
 
 // ─── MAIN DETAILS VIEW ────────────────────────────────────
-function UserDetailsView({ user, onBack, onReceipt, onHistory }) {
-  const [subView, setSubView] = useState(null); // 'inventory' | 'meter' | 'room'
-
+function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubView }) {
   // Look up the rich profile by user.id, fallback to DEFAULT
   const profile = USER_PROFILES[user?.id] || DEFAULT_PROFILE;
   const rent = profile.rent;
@@ -563,16 +561,19 @@ export default function UserProfile() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = location.state?.user || { id: 1, name: 'Rajeev Kumar', phone: '+91 9234567681', room: 15, bed: 3 };
-  const [view, setView] = useState('details');
+  const [view, setView] = useState('details'); // 'details' | 'history' | 'receipt'
+  const [subView, setSubView] = useState(null); // 'inventory' | 'meter' | 'room'
 
   const goBack = () => {
-    if (view === 'details') navigate(-1);
-    else setView('details');
+    // Priority: close subView first, then go up a view level, then navigate away
+    if (subView) { setSubView(null); return; }
+    if (view !== 'details') { setView('details'); return; }
+    navigate(-1);
   };
 
   return (
     <div style={BASE}>
-      {view === 'details' && <UserDetailsView user={user} onBack={goBack} onReceipt={() => setView('receipt')} onHistory={() => setView('history')} />}
+      {view === 'details' && <UserDetailsView user={user} onBack={goBack} onReceipt={() => setView('receipt')} onHistory={() => setView('history')} subView={subView} setSubView={setSubView} />}
       {view === 'history' && <PaymentHistoryView onBack={goBack} />}
       {view === 'receipt' && <ReceiptView user={user} onBack={goBack} />}
     </div>
