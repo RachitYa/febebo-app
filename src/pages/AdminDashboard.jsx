@@ -182,7 +182,7 @@ export default function AdminDashboard() {
 
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', marginBottom: 28 }}>
           {DUES.map((d, i) => (
-            <div key={i} onClick={() => navigate('/manage-tenants')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 18px', borderBottom: i < DUES.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
+            <div key={i} onClick={() => navigate(`/user/${d.id || i+1}`, { state: { user: { id: d.id || i+1, name: d.name, room: d.room, img: d.img, pending: parseInt((d.amount || '0').replace(/,/g, '')) } } })} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 18px', borderBottom: i < DUES.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 44, height: 44, borderRadius: '50%', overflow: 'hidden', background: d.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color: 'white' }}>
                   {d.img ? <img src={d.img} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : d.initials}

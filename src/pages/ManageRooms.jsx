@@ -218,12 +218,11 @@ function UserInventoryView({ user, onBack }) {
 
 // ─── LEVEL 3: Room Detail — Residents + Items tabs ────────────────
 function RoomDetailView({ room, onBack }) {
+  const navigate = useNavigate();
   const [tab, setTab] = useState('residents');
-  const [selectedUser, setSelectedUser] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const residents = USERS_DATA.filter(u => room.residentIds.includes(u.id));
 
-  if (selectedUser) return <UserInventoryView user={selectedUser} onBack={() => setSelectedUser(null)} />;
   if (selectedItem !== null) {
     return <ItemDetailView item={ROOM_ITEMS_DATA[selectedItem]} roomNo={`Room No. ${room.roomNo}`} onBack={() => setSelectedItem(null)} />;
   }
@@ -271,7 +270,7 @@ function RoomDetailView({ room, onBack }) {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {residents.map(user => (
-                <div key={user.id} onClick={() => setSelectedUser(user)}
+                <div key={user.id} onClick={() => navigate(`/user/${user.id}`, { state: { user } })}
                   style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 12, display: 'flex', gap: 12, alignItems: 'center', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   <img src={user.img} alt={user.name} style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>

@@ -24,6 +24,7 @@ import RequestBox from './pages/RequestBox';
 import Leave from './pages/Leave';
 import Subscription from './pages/Subscription';
 import PriceMenu from './pages/PriceMenu';
+import UserProfile from './pages/UserProfile';
 
 // Redirect helper
 const RootRedirect = () => {
@@ -49,6 +50,7 @@ function AppRoutes() {
       <Route path="/create-pg-profile" element={<AdminRoute><CreatePGProfile /></AdminRoute>} />
       <Route path="/manage-rooms" element={<AdminRoute><ManageRooms /></AdminRoute>} />
       <Route path="/manage-tenants" element={<AdminRoute><ManageTenants /></AdminRoute>} />
+      <Route path="/user/:id" element={<AdminRoute><UserProfile /></AdminRoute>} />
       <Route path="/manage-staff" element={<AdminRoute><ManageStaff /></AdminRoute>} />
       <Route path="/staff-attendance" element={<AdminRoute><StaffAttendance /></AdminRoute>} />
       <Route path="/staff-work" element={<AdminRoute><StaffWork /></AdminRoute>} />

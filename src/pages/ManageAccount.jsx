@@ -158,7 +158,7 @@ export default function ManageAccount() {
           ) : (
             <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               {currentData.map((t, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 16px', borderBottom: i < currentData.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                <div key={i} onClick={() => navigate(`/user/${t.id || i+1}`, { state: { user: { id: t.id || i+1, name: t.name, room: t.room, img: t.img, pending: rentTab === 'pending' ? parseInt((t.amount || '0').replace(/,/g, '')) : 0, token: parseInt((t.amount || '0').replace(/,/g, '')) } } })} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 16px', borderBottom: i < currentData.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 44, height: 44, borderRadius: '50%', background: t.color || '#0891b2', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
                       {t.initials}
