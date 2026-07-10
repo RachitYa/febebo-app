@@ -195,6 +195,7 @@ export default function ManageAccount() {
   // Staff Account drill-down state
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [selectedStaffMonth, setSelectedStaffMonth] = useState(null);
+  const [selectedStaffTransaction, setSelectedStaffTransaction] = useState(null);
 
   // User filters
   const [fromDate, setFromDate] = useState('2025-01-01');
@@ -210,6 +211,7 @@ export default function ManageAccount() {
       setSelectedUserMonth(null);
       setSelectedStaff(null);
       setSelectedStaffMonth(null);
+      setSelectedStaffTransaction(null);
       return;
     }
   };
@@ -328,6 +330,63 @@ export default function ManageAccount() {
     );
   }
 
+  // ── STAFF ACCOUNT: Receipt / Day view ──────────────────────────────────────
+  if (activeModule === 'staff-account' && selectedStaff && selectedStaffMonth && selectedStaffTransaction) {
+    const total = selectedStaffTransaction.amount;
+    const pendingAmt = 0;
+    return (
+      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+        <SubHeader title="Paid Successfully" onBack={() => setSelectedStaffTransaction(null)} color="#0891b2" />
+        <div style={{ padding: '16px' }}>
+          <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* User info */}
+            <div>
+              <p style={{ fontWeight: 700, fontSize: 20, margin: '0 0 8px', color: '#0f172a' }}>{selectedStaff.name}</p>
+              <p style={{ fontSize: 14, color: '#0f172a', margin: 0, fontWeight: 500 }}>Payment: {selectedStaffTransaction.payMode}</p>
+            </div>
+            
+            <div style={{ borderTop: '1px solid #cbd5e1' }} />
+            
+            {/* Received By */}
+            <div>
+              <p style={{ fontSize: 13, color: '#0f172a', margin: '0 0 6px', fontWeight: 600 }}>Payment by</p>
+              <p style={{ fontWeight: 700, fontSize: 18, color: '#0f172a', margin: '0 0 6px', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                {selectedStaffTransaction.payer} <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>Manager</span>
+              </p>
+              <p style={{ fontSize: 14, color: '#0f172a', margin: 0, fontWeight: 500 }}>Payment: {selectedStaffTransaction.payMode}</p>
+            </div>
+
+            <div style={{ borderTop: '1px solid #cbd5e1' }} />
+            
+            {/* Items list */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '4px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 15, color: '#334155', fontWeight: 500 }}>{selectedStaffTransaction.type.split(',')[0].replace('/Paid', '')} :</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>₹ {selectedStaffTransaction.amount.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #cbd5e1' }} />
+            
+            {/* Total + pending */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: 18, color: '#0f172a' }}>Total</span>
+                <span style={{ fontWeight: 700, fontSize: 18, color: '#0f172a' }}>₹ {total.toLocaleString('en-IN')}</span>
+              </div>
+              {pendingAmt > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 600, fontSize: 16, color: '#ef4444' }}>Pending</span>
+                  <span style={{ fontWeight: 600, fontSize: 16, color: '#ef4444' }}>₹ {pendingAmt.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── STAFF ACCOUNT: Day-wise transaction view ───────────────────────────────
   if (activeModule === 'staff-account' && selectedStaff && selectedStaffMonth) {
     const days = [
@@ -340,7 +399,7 @@ export default function ManageAccount() {
         <SubHeader title="Staff Transaction" onBack={() => setSelectedStaffMonth(null)} color="#0891b2" />
         <div style={{ padding: '16px' }}>
           {days.map((d, i) => (
-            <div key={i} style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: '12px 14px', marginBottom: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div key={i} onClick={() => setSelectedStaffTransaction(d)} style={{ cursor: 'pointer', background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: '12px 14px', marginBottom: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
