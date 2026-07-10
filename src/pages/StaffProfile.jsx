@@ -101,6 +101,7 @@ export default function StaffProfile() {
           <InfoRow label="PAN No." value="ABCDE1234F" />
           <InfoRow label="Marital Status" value="Single" />
           <InfoRow label="Permanent Address" value="H.No 45, Govindpuri, New Delhi – 110019" />
+          <InfoRow label="Corresponding Address" value="Flat 3B, Kailash Colony, New Delhi – 110048" />
         </Accordion>
 
         {/* Parents Details */}
@@ -110,7 +111,7 @@ export default function StaffProfile() {
           <InfoRow label="Mother's Name" value="Sunita Devi" />
           <InfoRow label="Mother's Phone" value="+91 9812345671" />
           <InfoRow label="Father's Occupation" value="Farmer" />
-          <InfoRow label="Home Address" value="Village Rampur, Dist. Saharanpur, UP" />
+          <InfoRow label="Home Address" value="Village Rampur, Dist. Saharanpur, UP – 247001" />
         </Accordion>
 
         {/* Relative Details */}

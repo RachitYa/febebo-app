@@ -13,11 +13,11 @@ const ROOMS_DATA = [
 ];
 
 const USER_PROFILES = {
-  1: { name: 'Rajeev Kumar', dob: '12 Aug 1999', email: 'rajeev.kumar@gmail.com', aadhar: '2345 6789 0123', address: '22, MG Road, Lajpat Nagar, New Delhi - 110024', college: 'Delhi University', careerStatus: 'Student', fatherName: 'Suresh Kumar', fatherPhone: '+91 9988776655', motherName: 'Anita Kumar', motherPhone: '+91 9988776644', joiningDate: '25 Feb 2025', tentativeLeaving: '24 Feb 2026', roomNo: 15, bedNo: 3, rent: 10000, token: 5000, pending: 5000, securityAmt: 3000, meterUnit: 1240, meterRatePerUnit: 8, },
-  2: { name: 'Ravi Kumar', dob: '5 Mar 2000', email: 'ravi.kumar@gmail.com', aadhar: '3456 7890 1234', address: '45, Nehru Place, South Delhi - 110019', college: 'IIT Delhi', careerStatus: 'Student', fatherName: 'Rajesh Kumar', fatherPhone: '+91 9876543210', motherName: 'Sunita Kumar', motherPhone: '+91 9876543200', joiningDate: '1 Jan 2025', tentativeLeaving: '31 Dec 2025', roomNo: 16, bedNo: 1, rent: 9500, token: 4000, pending: 0, securityAmt: 3000, meterUnit: 980, meterRatePerUnit: 8, },
-  3: { name: 'Priya Sharma', dob: '22 Nov 1998', email: 'priya.sharma@gmail.com', aadhar: '4567 8901 2345', address: '7, Connaught Place, New Delhi - 110001', college: null, careerStatus: 'Working', companyName: 'TechSoft India Pvt. Ltd.', companyAddress: 'Sector 62, Noida, UP', fatherName: 'Dinesh Sharma', fatherPhone: '+91 9123456789', motherName: 'Kavita Sharma', motherPhone: '+91 9123456780', joiningDate: '10 Mar 2025', tentativeLeaving: '9 Mar 2026', roomNo: 12, bedNo: 2, rent: 11000, token: 6000, pending: 2500, securityAmt: 3000, meterUnit: 1520, meterRatePerUnit: 8, },
-  4: { name: 'Amit Verma', dob: '8 Jul 2001', email: 'amit.verma@gmail.com', aadhar: '5678 9012 3456', address: '33, Rohini Sector 4, New Delhi - 110085', college: 'Jamia Millia Islamia', careerStatus: 'Student', fatherName: 'Vikas Verma', fatherPhone: '+91 9012345678', motherName: 'Rekha Verma', motherPhone: '+91 9012345670', joiningDate: '15 Apr 2025', tentativeLeaving: '14 Apr 2026', roomNo: 17, bedNo: 1, rent: 8500, token: 3500, pending: 3500, securityAmt: 2500, meterUnit: 820, meterRatePerUnit: 8, },
-  5: { name: 'Sneha Kapoor', dob: '14 Feb 2000', email: 'sneha.kapoor@gmail.com', aadhar: '6789 0123 4567', address: '9, Vasant Kunj, New Delhi - 110070', college: null, careerStatus: 'Working', companyName: 'Infosys BPM Ltd.', companyAddress: 'Cyber City, Gurugram', fatherName: 'Arun Kapoor', fatherPhone: '+91 8901234567', motherName: 'Meena Kapoor', motherPhone: '+91 8901234560', joiningDate: '1 Jun 2025', tentativeLeaving: '31 May 2026', roomNo: 18, bedNo: 3, rent: 10500, token: 5500, pending: 1000, securityAmt: 3000, meterUnit: 1100, meterRatePerUnit: 8, },
+  1: { name: 'Rajeev Kumar', dob: '12 Aug 1999', email: 'rajeev.kumar@gmail.com', aadhar: '2345 6789 0123', address: '22, MG Road, Lajpat Nagar, New Delhi - 110024', permanentAddress: 'H.No 12, Ram Nagar, Aligarh, UP - 202001', correspondingAddress: '22, MG Road, Lajpat Nagar, New Delhi - 110024', college: 'Delhi University', careerStatus: 'Student', fatherName: 'Suresh Kumar', fatherPhone: '+91 9988776655', motherName: 'Anita Kumar', motherPhone: '+91 9988776644', parentsAddress: 'H.No 12, Ram Nagar, Aligarh, UP - 202001', joiningDate: '25 Feb 2025', tentativeLeaving: '24 Feb 2026', roomNo: 15, bedNo: 3, rent: 10000, token: 5000, pending: 5000, securityAmt: 3000, meterUnit: 1240, meterRatePerUnit: 8, },
+  2: { name: 'Ravi Kumar', dob: '5 Mar 2000', email: 'ravi.kumar@gmail.com', aadhar: '3456 7890 1234', address: '45, Nehru Place, South Delhi - 110019', permanentAddress: 'Village Govindpur, Dist. Varanasi, UP - 221001', correspondingAddress: '45, Nehru Place, South Delhi - 110019', college: 'IIT Delhi', careerStatus: 'Student', fatherName: 'Rajesh Kumar', fatherPhone: '+91 9876543210', motherName: 'Sunita Kumar', motherPhone: '+91 9876543200', parentsAddress: 'Village Govindpur, Dist. Varanasi, UP - 221001', joiningDate: '1 Jan 2025', tentativeLeaving: '31 Dec 2025', roomNo: 16, bedNo: 1, rent: 9500, token: 4000, pending: 0, securityAmt: 3000, meterUnit: 980, meterRatePerUnit: 8, },
+  3: { name: 'Priya Sharma', dob: '22 Nov 1998', email: 'priya.sharma@gmail.com', aadhar: '4567 8901 2345', address: '7, Connaught Place, New Delhi - 110001', permanentAddress: 'B-14, Shastri Nagar, Jaipur, Rajasthan - 302016', correspondingAddress: '7, Connaught Place, New Delhi - 110001', college: null, careerStatus: 'Working', companyName: 'TechSoft India Pvt. Ltd.', companyAddress: 'Sector 62, Noida, UP', fatherName: 'Dinesh Sharma', fatherPhone: '+91 9123456789', motherName: 'Kavita Sharma', motherPhone: '+91 9123456780', parentsAddress: 'B-14, Shastri Nagar, Jaipur, Rajasthan - 302016', joiningDate: '10 Mar 2025', tentativeLeaving: '9 Mar 2026', roomNo: 12, bedNo: 2, rent: 11000, token: 6000, pending: 2500, securityAmt: 3000, meterUnit: 1520, meterRatePerUnit: 8, },
+  4: { name: 'Amit Verma', dob: '8 Jul 2001', email: 'amit.verma@gmail.com', aadhar: '5678 9012 3456', address: '33, Rohini Sector 4, New Delhi - 110085', permanentAddress: 'Plot 5, Gandhi Nagar, Agra, UP - 282001', correspondingAddress: '33, Rohini Sector 4, New Delhi - 110085', college: 'Jamia Millia Islamia', careerStatus: 'Student', fatherName: 'Vikas Verma', fatherPhone: '+91 9012345678', motherName: 'Rekha Verma', motherPhone: '+91 9012345670', parentsAddress: 'Plot 5, Gandhi Nagar, Agra, UP - 282001', joiningDate: '15 Apr 2025', tentativeLeaving: '14 Apr 2026', roomNo: 17, bedNo: 1, rent: 8500, token: 3500, pending: 3500, securityAmt: 2500, meterUnit: 820, meterRatePerUnit: 8, },
+  5: { name: 'Sneha Kapoor', dob: '14 Feb 2000', email: 'sneha.kapoor@gmail.com', aadhar: '6789 0123 4567', address: '9, Vasant Kunj, New Delhi - 110070', permanentAddress: '23, Model Town, Ludhiana, Punjab - 141002', correspondingAddress: '9, Vasant Kunj, New Delhi - 110070', college: null, careerStatus: 'Working', companyName: 'Infosys BPM Ltd.', companyAddress: 'Cyber City, Gurugram', fatherName: 'Arun Kapoor', fatherPhone: '+91 8901234567', motherName: 'Meena Kapoor', motherPhone: '+91 8901234560', parentsAddress: '23, Model Town, Ludhiana, Punjab - 141002', joiningDate: '1 Jun 2025', tentativeLeaving: '31 May 2026', roomNo: 18, bedNo: 3, rent: 10500, token: 5500, pending: 1000, securityAmt: 3000, meterUnit: 1100, meterRatePerUnit: 8, },
 };
 
 const DEFAULT_PROFILE = USER_PROFILES[1];
@@ -185,7 +185,7 @@ function RoomPreviewView({ profile, user, onBack }) {
                 </div>
                 <span style={{ background: room.status === 'occupied' ? '#dcfce7' : '#f1f5f9', color: room.status === 'occupied' ? '#059669' : '#64748b', fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>{room.status === 'occupied' ? 'Occupied' : 'Vacated'}</span>
               </div>
-              <button onClick={() => navigate('/manage-rooms')} style={{ width: '100%', padding: '12px', background: cyan, color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+              <button onClick={() => navigate('/manage-rooms', { state: { openRoomId: room?.id } })} style={{ width: '100%', padding: '12px', background: cyan, color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
                 View Full Room Details →
               </button>
             </div>
@@ -260,7 +260,8 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
             ? <InfoRow label="College" value={profile.college} />
             : <InfoRow label="Company" value={profile.companyName} />
           }
-          <InfoRow label="Address" value={profile.address} last />
+          <InfoRow label="Permanent Address" value={profile.permanentAddress} />
+          <InfoRow label="Corresponding Address" value={profile.correspondingAddress} last />
         </Accordion>
 
         {/* ── Parents Details ── */}
@@ -270,7 +271,8 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
           <InfoRow label="Mobile" value={profile.fatherPhone} />
           <p style={{ fontSize: 12, fontWeight: 700, color: '#64748b', margin: '12px 0 4px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Mother</p>
           <InfoRow label="Name" value={profile.motherName} />
-          <InfoRow label="Mobile" value={profile.motherPhone} last />
+          <InfoRow label="Mobile" value={profile.motherPhone} />
+          <InfoRow label="Parents Address" value={profile.parentsAddress} last />
         </Accordion>
 
         {/* ── Date of Joining ── */}

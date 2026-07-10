@@ -268,7 +268,7 @@ export default function ManageAccount() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {USER_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
-              <div key={u.id} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+              <div key={u.id} onClick={() => navigate(`/user/${u.id}`, { state: { user: u } })} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
                 <img src={u.img} alt={u.name} style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 4 }}>
                   <p style={{ fontWeight: 600, fontSize: 16, color: '#000', margin: 0 }}>{u.name}</p>
@@ -303,7 +303,7 @@ export default function ManageAccount() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {STAFF_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
-              <div key={u.id} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+              <div key={u.id} onClick={() => navigate(`/staff/${u.id}`, { state: { staff: u } })} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
                 <img src={u.img} alt={u.name} style={{ width: 100, height: 120, borderRadius: 12, objectFit: 'cover' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 4 }}>
                   <p style={{ fontWeight: 600, fontSize: 16, color: '#000', margin: 0 }}>{u.name}</p>
