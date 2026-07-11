@@ -13,12 +13,18 @@ const ROOMS_DATA = [
 ];
 
 const USER_PROFILES = {
-  1: { name: 'Rajeev Kumar', dob: '12 Aug 1999', email: 'rajeev.kumar@gmail.com', aadhar: '2345 6789 0123', address: '22, MG Road, Lajpat Nagar, New Delhi - 110024', permanentAddress: 'H.No 12, Ram Nagar, Aligarh, UP - 202001', correspondingAddress: '22, MG Road, Lajpat Nagar, New Delhi - 110024', college: 'Delhi University', careerStatus: 'Student', fatherName: 'Suresh Kumar', fatherPhone: '+91 9988776655', motherName: 'Anita Kumar', motherPhone: '+91 9988776644', parentsAddress: 'H.No 12, Ram Nagar, Aligarh, UP - 202001', joiningDate: '25 Feb 2025', tentativeLeaving: '24 Feb 2026', roomNo: 15, bedNo: 3, rent: 10000, token: 5000, pending: 5000, securityAmt: 3000, meterUnit: 1240, meterRatePerUnit: 8, },
-  2: { name: 'Ravi Kumar', dob: '5 Mar 2000', email: 'ravi.kumar@gmail.com', aadhar: '3456 7890 1234', address: '45, Nehru Place, South Delhi - 110019', permanentAddress: 'Village Govindpur, Dist. Varanasi, UP - 221001', correspondingAddress: '45, Nehru Place, South Delhi - 110019', college: 'IIT Delhi', careerStatus: 'Student', fatherName: 'Rajesh Kumar', fatherPhone: '+91 9876543210', motherName: 'Sunita Kumar', motherPhone: '+91 9876543200', parentsAddress: 'Village Govindpur, Dist. Varanasi, UP - 221001', joiningDate: '1 Jan 2025', tentativeLeaving: '31 Dec 2025', roomNo: 16, bedNo: 1, rent: 9500, token: 4000, pending: 0, securityAmt: 3000, meterUnit: 980, meterRatePerUnit: 8, },
-  3: { name: 'Priya Sharma', dob: '22 Nov 1998', email: 'priya.sharma@gmail.com', aadhar: '4567 8901 2345', address: '7, Connaught Place, New Delhi - 110001', permanentAddress: 'B-14, Shastri Nagar, Jaipur, Rajasthan - 302016', correspondingAddress: '7, Connaught Place, New Delhi - 110001', college: null, careerStatus: 'Working', companyName: 'TechSoft India Pvt. Ltd.', companyAddress: 'Sector 62, Noida, UP', fatherName: 'Dinesh Sharma', fatherPhone: '+91 9123456789', motherName: 'Kavita Sharma', motherPhone: '+91 9123456780', parentsAddress: 'B-14, Shastri Nagar, Jaipur, Rajasthan - 302016', joiningDate: '10 Mar 2025', tentativeLeaving: '9 Mar 2026', roomNo: 12, bedNo: 2, rent: 11000, token: 6000, pending: 2500, securityAmt: 3000, meterUnit: 1520, meterRatePerUnit: 8, },
-  4: { name: 'Amit Verma', dob: '8 Jul 2001', email: 'amit.verma@gmail.com', aadhar: '5678 9012 3456', address: '33, Rohini Sector 4, New Delhi - 110085', permanentAddress: 'Plot 5, Gandhi Nagar, Agra, UP - 282001', correspondingAddress: '33, Rohini Sector 4, New Delhi - 110085', college: 'Jamia Millia Islamia', careerStatus: 'Student', fatherName: 'Vikas Verma', fatherPhone: '+91 9012345678', motherName: 'Rekha Verma', motherPhone: '+91 9012345670', parentsAddress: 'Plot 5, Gandhi Nagar, Agra, UP - 282001', joiningDate: '15 Apr 2025', tentativeLeaving: '14 Apr 2026', roomNo: 17, bedNo: 1, rent: 8500, token: 3500, pending: 3500, securityAmt: 2500, meterUnit: 820, meterRatePerUnit: 8, },
-  5: { name: 'Sneha Kapoor', dob: '14 Feb 2000', email: 'sneha.kapoor@gmail.com', aadhar: '6789 0123 4567', address: '9, Vasant Kunj, New Delhi - 110070', permanentAddress: '23, Model Town, Ludhiana, Punjab - 141002', correspondingAddress: '9, Vasant Kunj, New Delhi - 110070', college: null, careerStatus: 'Working', companyName: 'Infosys BPM Ltd.', companyAddress: 'Cyber City, Gurugram', fatherName: 'Arun Kapoor', fatherPhone: '+91 8901234567', motherName: 'Meena Kapoor', motherPhone: '+91 8901234560', parentsAddress: '23, Model Town, Ludhiana, Punjab - 141002', joiningDate: '1 Jun 2025', tentativeLeaving: '31 May 2026', roomNo: 18, bedNo: 3, rent: 10500, token: 5500, pending: 1000, securityAmt: 3000, meterUnit: 1100, meterRatePerUnit: 8, },
+  1: { type: 'current', bloodGroup: 'O+', schoolAddress: 'St. Xavier School, Delhi', name: 'Rajeev Kumar', dob: '12 Aug 1999', email: 'rajeev.kumar@gmail.com', aadhar: '2345 6789 0123', address: '22, MG Road, Lajpat Nagar, New Delhi - 110024', permanentAddress: 'H.No 12, Ram Nagar, Aligarh, UP - 202001', correspondingAddress: '22, MG Road, Lajpat Nagar, New Delhi - 110024', college: 'Delhi University', careerStatus: 'Student', fatherName: 'Suresh Kumar', fatherPhone: '+91 9988776655', motherName: 'Anita Kumar', motherPhone: '+91 9988776644', parentsAddress: 'H.No 12, Ram Nagar, Aligarh, UP - 202001', joiningDate: '25 Feb 2025', tentativeLeaving: '24 Feb 2026', roomNo: 15, bedNo: 3, rent: 10000, token: 5000, pending: 5000, securityAmt: 3000, meterUnit: 1240, meterRatePerUnit: 8, },
+  2: { type: 'current', bloodGroup: 'B+', schoolAddress: 'DPS RK Puram, Delhi', name: 'Ravi Kumar', dob: '5 Mar 2000', email: 'ravi.kumar@gmail.com', aadhar: '3456 7890 1234', address: '45, Nehru Place, South Delhi - 110019', permanentAddress: 'Village Govindpur, Dist. Varanasi, UP - 221001', correspondingAddress: '45, Nehru Place, South Delhi - 110019', college: 'IIT Delhi', careerStatus: 'Student', fatherName: 'Rajesh Kumar', fatherPhone: '+91 9876543210', motherName: 'Sunita Kumar', motherPhone: '+91 9876543200', parentsAddress: 'Village Govindpur, Dist. Varanasi, UP - 221001', joiningDate: '1 Jan 2025', tentativeLeaving: '31 Dec 2025', roomNo: 16, bedNo: 1, rent: 9500, token: 4000, pending: 0, securityAmt: 3000, meterUnit: 980, meterRatePerUnit: 8, },
+  3: { type: 'upcoming', dateOfJoining: '20 Jul 2025', dateOfTokenAmount: '01 Jul 2025', name: 'Priya Sharma', dob: '22 Nov 1998', email: 'priya.sharma@gmail.com', aadhar: '4567 8901 2345', address: '7, Connaught Place, New Delhi - 110001', permanentAddress: 'B-14, Shastri Nagar, Jaipur, Rajasthan - 302016', correspondingAddress: '7, Connaught Place, New Delhi - 110001', college: null, careerStatus: 'Working', companyName: 'TechSoft India Pvt. Ltd.', companyAddress: 'Sector 62, Noida, UP', fatherName: 'Dinesh Sharma', fatherPhone: '+91 9123456789', motherName: 'Kavita Sharma', motherPhone: '+91 9123456780', parentsAddress: 'B-14, Shastri Nagar, Jaipur, Rajasthan - 302016', joiningDate: '20 Jul 2025', tentativeLeaving: '19 Jul 2026', roomNo: 12, bedNo: 2, rent: 11000, token: 6000, pending: 2500, securityAmt: 3000, meterUnit: 1520, meterRatePerUnit: 8, },
+  4: { type: 'notice_period', dateOfLeaving: '15 Aug 2025', name: 'Amit Verma', dob: '8 Jul 2001', email: 'amit.verma@gmail.com', aadhar: '5678 9012 3456', address: '33, Rohini Sector 4, New Delhi - 110085', permanentAddress: 'Plot 5, Gandhi Nagar, Agra, UP - 282001', correspondingAddress: '33, Rohini Sector 4, New Delhi - 110085', college: 'Jamia Millia Islamia', careerStatus: 'Student', fatherName: 'Vikas Verma', fatherPhone: '+91 9012345678', motherName: 'Rekha Verma', motherPhone: '+91 9012345670', parentsAddress: 'Plot 5, Gandhi Nagar, Agra, UP - 282001', joiningDate: '15 Apr 2025', tentativeLeaving: '15 Aug 2025', roomNo: 17, bedNo: 1, rent: 8500, token: 3500, pending: 3500, securityAmt: 2500, meterUnit: 820, meterRatePerUnit: 8, },
+  5: { type: 'current', bloodGroup: 'AB+', schoolAddress: 'Mount Carmel School, Delhi', name: 'Sneha Kapoor', dob: '14 Feb 2000', email: 'sneha.kapoor@gmail.com', aadhar: '6789 0123 4567', address: '9, Vasant Kunj, New Delhi - 110070', permanentAddress: '23, Model Town, Ludhiana, Punjab - 141002', correspondingAddress: '9, Vasant Kunj, New Delhi - 110070', college: null, careerStatus: 'Working', companyName: 'Infosys BPM Ltd.', companyAddress: 'Cyber City, Gurugram', fatherName: 'Arun Kapoor', fatherPhone: '+91 8901234567', motherName: 'Meena Kapoor', motherPhone: '+91 8901234560', parentsAddress: '23, Model Town, Ludhiana, Punjab - 141002', joiningDate: '1 Jun 2025', tentativeLeaving: '31 May 2026', roomNo: 18, bedNo: 3, rent: 10500, token: 5500, pending: 1000, securityAmt: 3000, meterUnit: 1100, meterRatePerUnit: 8, },
 };
+
+const VISITOR_HISTORY = [
+  { name: 'Suresh Kumar', number: '+91 9988776655', relation: 'Father', address: 'H.No 12, Ram Nagar, Aligarh, UP', purpose: 'Casual Visit', timeIn: '10:00 AM', timeOut: '05:00 PM', date: '2025-06-25' },
+  { name: 'Ramesh Singh', number: '+91 9811223344', relation: 'Uncle', address: '44, Karol Bagh, Delhi', purpose: 'Dropping luggage', timeIn: '08:30 AM', timeOut: '09:15 AM', date: '2025-05-12' },
+  { name: 'Anita Kumar', number: '+91 9988776644', relation: 'Mother', address: 'H.No 12, Ram Nagar, Aligarh, UP', purpose: 'Medical checkup', timeIn: '11:00 AM', timeOut: '06:30 PM', date: '2025-04-05' },
+];
 
 const DEFAULT_PROFILE = USER_PROFILES[1];
 
@@ -202,6 +208,48 @@ function RoomPreviewView({ profile, user, onBack }) {
   );
 }
 
+// ─── SUB-VIEW: VISITOR HISTORY ────────────────────────────
+function VisitorHistoryView({ user, onBack }) {
+  const sortedHistory = [...VISITOR_HISTORY].sort((a, b) => new Date(b.date) - new Date(a.date));
+  return (
+    <>
+      <Header title="Visitor History" onBack={onBack} center={false} />
+      <div style={{ padding: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {sortedHistory.map((v, i) => (
+            <div key={i} style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, borderBottom: '1px solid #f1f5f9', paddingBottom: 12 }}>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', margin: '0 0 2px' }}>{v.name}</p>
+                  <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>{v.relation} · {v.number}</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', background: '#f1f5f9', padding: '4px 8px', borderRadius: 6 }}>{new Date(v.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, color: cyan }}>location_on</span>
+                  <span style={{ fontSize: 13, color: '#475569' }}>{v.address}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, color: cyan }}>info</span>
+                  <span style={{ fontSize: 13, color: '#475569' }}>{v.purpose}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, color: cyan }}>schedule</span>
+                  <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>{v.timeIn} - {v.timeOut}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── MAIN DETAILS VIEW ────────────────────────────────────
 function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubView }) {
   // Look up the rich profile by user.id, fallback to DEFAULT
@@ -216,6 +264,7 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
   if (subView === 'inventory') return <InventoryDetailView user={user} onBack={() => setSubView(null)} />;
   if (subView === 'meter') return <MeterHistoryView profile={profile} onBack={() => setSubView(null)} />;
   if (subView === 'room') return <RoomPreviewView profile={profile} user={user} onBack={() => setSubView(null)} />;
+  if (subView === 'visitor_history') return <VisitorHistoryView user={user} onBack={() => setSubView(null)} />;
 
   return (
     <>
@@ -261,7 +310,13 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
             : <InfoRow label="Company" value={profile.companyName} />
           }
           <InfoRow label="Permanent Address" value={profile.permanentAddress} />
-          <InfoRow label="Corresponding Address" value={profile.correspondingAddress} last />
+          <InfoRow label="Corresponding Address" value={profile.correspondingAddress} last={profile.type !== 'current'} />
+          {profile.type === 'current' && (
+            <>
+              <InfoRow label="Blood Group" value={profile.bloodGroup} />
+              <InfoRow label="School Address" value={profile.schoolAddress} last />
+            </>
+          )}
         </Accordion>
 
         {/* ── Parents Details ── */}
@@ -278,7 +333,13 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
         {/* ── Date of Joining ── */}
         <Accordion title="Date of Joining" icon="event" defaultOpen={false}>
           <InfoRow label="Joining Date" value={profile.joiningDate} />
-          <InfoRow label="Tentative Leaving" value={profile.tentativeLeaving} last />
+          {profile.type === 'upcoming' ? (
+            <InfoRow label="Token Amt Date" value={profile.dateOfTokenAmount} last />
+          ) : profile.type === 'notice_period' ? (
+            <InfoRow label="Date of Leaving" value={profile.dateOfLeaving} last />
+          ) : (
+            <InfoRow label="Tentative Leaving" value={profile.tentativeLeaving} last />
+          )}
         </Accordion>
 
         {/* ── Room Details — CLICKABLE ── */}
@@ -299,13 +360,16 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
         </Accordion>
 
         {/* ── User Status ── */}
-        <Accordion title="User Status" icon="how_to_reg" defaultOpen={false}>
-          <InfoRow label="Status" value="Active" />
-          <InfoRow label="Notice Period" value="Not Issued" last />
-        </Accordion>
+        {profile.type === 'current' && (
+          <Accordion title="User Status" icon="how_to_reg" defaultOpen={false}>
+            <InfoRow label="Status" value="Active" />
+            <InfoRow label="Notice Period" value="Not Issued" last />
+          </Accordion>
+        )}
 
         {/* ── Meter Unit Details — CLICKABLE to history ── */}
-        <Accordion title="Meter Unit Details" icon="electric_meter" defaultOpen={true}>
+        {profile.type !== 'upcoming' && (
+          <Accordion title="Meter Unit Details" icon="electric_meter" defaultOpen={true}>
           <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
             <div style={{ flex: 1, background: '#ecfeff', borderRadius: 10, padding: '12px', textAlign: 'center' }}>
               <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 4px' }}>This Month (June)</p>
@@ -323,21 +387,26 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
             View Monthly Consumption
           </button>
         </Accordion>
+        )}
 
         {/* ── Token Amount ── */}
-        <Accordion title="Token Amount" icon="payments" defaultOpen={false}>
-          <InfoRow label="Amount" value={`₹ ${token.toLocaleString()}`} />
-          <InfoRow label="Received by" value="Manager" last />
-        </Accordion>
+        {profile.type === 'upcoming' && (
+          <Accordion title="Token Amount" icon="payments" defaultOpen={false}>
+            <InfoRow label="Amount" value={`₹ ${token.toLocaleString()}`} />
+            <InfoRow label="Received by" value="Manager" last />
+          </Accordion>
+        )}
 
         {/* ── Pending Amount ── */}
-        <Accordion title="Pending Amount" icon="history" defaultOpen={false}>
-          <div style={{ textAlign: 'right', padding: '8px 0' }}>
-            <span style={{ fontSize: 18, color: pending > 0 ? '#ef4444' : '#16a34a', fontWeight: 800 }}>
-              {pending > 0 ? `₹ ${pending.toLocaleString()}` : '✓ All Clear'}
-            </span>
-          </div>
-        </Accordion>
+        {profile.type !== 'upcoming' && (
+          <Accordion title="Pending Amount" icon="history" defaultOpen={false}>
+            <div style={{ textAlign: 'right', padding: '8px 0' }}>
+              <span style={{ fontSize: 18, color: pending > 0 ? '#ef4444' : '#16a34a', fontWeight: 800 }}>
+                {pending > 0 ? `₹ ${pending.toLocaleString()}` : '✓ All Clear'}
+              </span>
+            </div>
+          </Accordion>
+        )}
 
         {/* ── Rent / Security ── */}
         <Accordion title="Rent / Security Amount" icon="bed" defaultOpen={true}>
@@ -351,18 +420,8 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
           </div>
         </Accordion>
 
-        {/* ── Visitor Details ── */}
-        <Accordion title="Visitor Details" icon="badge" defaultOpen={false}>
-          <div style={{ position: 'relative' }}>
-            <span className="material-symbols-outlined" style={{ position: 'absolute', right: 0, top: 0, background: cyan, color: 'white', borderRadius: '50%', padding: 6, fontSize: 16 }}>edit</span>
-            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 8, fontSize: 13, color: '#64748b' }}>
-              <span>Name</span><span style={{ color: cyan, fontWeight: 600 }}>: {profile.fatherName}</span>
-              <span>Number</span><span style={{ color: cyan, fontWeight: 600 }}>: {profile.fatherPhone}</span>
-              <span>Religion</span><span style={{ color: cyan, fontWeight: 600 }}>: Hindu</span>
-              <span>Address</span><span style={{ color: cyan, fontWeight: 600 }}>: {profile.address.split(',').slice(0,2).join(',')}</span>
-            </div>
-          </div>
-        </Accordion>
+        {/* ── Visitor Details — CLICKABLE ── */}
+        <Accordion title="Visitor Details" icon="badge" onHeaderClick={() => setSubView('visitor_history')} />
 
         {/* ── Police Verification ── */}
         <Accordion title="Police Verification" icon="local_police" defaultOpen={false}>
