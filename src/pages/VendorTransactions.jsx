@@ -34,34 +34,44 @@ const VENDORS = [
   { id: 6, name: 'Pintu Sahu',  store: 'Green Valley Farm',  phone: '+91 9456789012', amount: '3,000',  status: 'Pending', category: 'Vegetables' },
 ];
 
-const MONTHLY_DATA = [
+// ─── Dummy Initial State ──────────────────────────────────────────────
+const MONTHS_LIST = [
   'January 2025','February 2025','March 2025','April 2025','May 2025','June 2025',
-  'July 2025','August 2025','September 2025','October 2025','November 2025','December 2025',
-].map(m => ({ month: m, amount: '25,000' }));
-
-const DAILY_TRANSACTIONS = Array.from({ length: 15 }, (_, i) => ({
-  date: `${i + 1} January 2025`,
-  amount: '5,300',
-  mode: 'Cash',
-  status: i % 3 === 0 ? 'Pending' : 'Paid'
-}));
-
-const RECEIPT_DETAILS = [
-  { item: 'Garam Masala', qty: '50', unit: 'gm', price: 100 },
-  { item: 'Rice', qty: '5', unit: 'kg', price: 250 },
-  { item: 'Dal', qty: '2', unit: 'kg', price: 280 },
-  { item: 'Ghee', qty: '4', unit: 'kg', price: 1200 },
-  { item: 'Jeera', qty: '200', unit: 'gm', price: 150 },
-  { item: 'Poha', qty: '3', unit: 'kg', price: 150 },
+  'July 2025','August 2025','September 2025','October 2025','November 2025','December 2025'
 ];
 
+const INITIAL_VENDOR_DATA = {};
+VENDORS.forEach(v => {
+  INITIAL_VENDOR_DATA[v.id] = { months: {} };
+  MONTHS_LIST.forEach(m => {
+    INITIAL_VENDOR_DATA[v.id].months[m] = { totalAmount: 25000, days: {} };
+  });
+  
+  // Prep January dummy days
+  const janDays = {};
+  for (let i = 1; i <= 15; i++) {
+    const dStr = `${i} January 2025`;
+    janDays[dStr] = {
+      amount: 5300,
+      mode: 'Cash',
+      status: i % 3 === 0 ? 'Pending' : 'Paid',
+      items: [
+        { item: 'Garam Masala', qty: '50', unit: 'g', rate: 2, price: 100 },
+        { item: 'Rice', qty: '5', unit: 'kg', rate: 50, price: 250 },
+        { item: 'Dal', qty: '2', unit: 'kg', rate: 140, price: 280 },
+        { item: 'Ghee', qty: '4', unit: 'kg', rate: 300, price: 1200 },
+      ]
+    };
+  }
+  INITIAL_VENDOR_DATA[v.id].months['January 2025'].days = janDays;
+});
 
 // ─── Purchase Modal (per vendor) — multi-item ────────────────────────
 function PurchaseModal({ vendor, onClose, onSave }) {
   const items = CATEGORY_ITEMS[vendor.category] || [];
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
-  const emptyRow = () => ({ item: '', qty: '', unit: 'kg', price: '' });
+  const emptyRow = () => ({ item: '', qty: '', unit: 'kg', rate: '' });
   const [rows, setRows] = useState([emptyRow()]);
 
   const updateRow = (idx, field, value) => {
@@ -73,9 +83,14 @@ function PurchaseModal({ vendor, onClose, onSave }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const valid = rows.filter(r => r.item && r.qty && r.price);
+    const valid = rows.filter(r => r.item && r.qty && r.rate);
     if (!valid.length) return;
-    valid.forEach(r => onSave({ date, ...r, vendorId: vendor.id }));
+    
+    const itemsToSave = valid.map(r => ({
+      ...r,
+      price: parseFloat(r.qty) * parseFloat(r.rate)
+    }));
+    onSave({ date, items: itemsToSave, vendorId: vendor.id });
     onClose();
   };
 
@@ -109,61 +124,68 @@ function PurchaseModal({ vendor, onClose, onSave }) {
         </div>
 
         {/* Column headers */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 70px 26px', gap: 6, marginBottom: 6 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', paddingLeft: 4 }}>ITEM</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textAlign: 'center' }}>QTY / UNIT</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textAlign: 'right', paddingRight: 4 }}>PRICE (₹)</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 70px 70px 26px', gap: 6, marginBottom: 6 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', paddingLeft: 4 }}>ITEM</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textAlign: 'center' }}>QTY/UNIT</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textAlign: 'center' }}>RATE (₹)</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textAlign: 'right', paddingRight: 4 }}>TOTAL (₹)</span>
           <span />
         </div>
 
         <form onSubmit={handleSubmit}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
-            {rows.map((row, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                {/* Item dropdown */}
-                <div style={{ flex: 1, position: 'relative' }}>
-                  {items.length > 0 ? (
-                    <select value={row.item} onChange={e => updateRow(idx, 'item', e.target.value)}
-                      style={{ width: '100%', padding: '10px 28px 10px 10px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', appearance: 'none', background: 'white', color: row.item ? '#0f172a' : '#94a3b8', cursor: 'pointer' }}>
-                      <option value="">Select item…</option>
-                      {items.map(i => <option key={i} value={i}>{i}</option>)}
-                    </select>
-                  ) : (
-                    <input value={row.item} onChange={e => updateRow(idx, 'item', e.target.value)} placeholder="Item name"
-                      style={{ width: '100%', padding: '10px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
-                  )}
-                  <span className="material-symbols-outlined" style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 16, pointerEvents: 'none' }}>expand_more</span>
-                </div>
-
-                {/* Qty + unit toggle */}
-                <div style={{ width: 90, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <input type="number" min="0" step="0.1" value={row.qty} onChange={e => updateRow(idx, 'qty', e.target.value)} placeholder="0"
-                    style={{ width: '100%', padding: '6px 8px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, textAlign: 'center', fontWeight: 700, outline: 'none', boxSizing: 'border-box' }} />
-                  <div style={{ display: 'flex', borderRadius: 8, border: `1.5px solid ${cyan2}`, overflow: 'hidden' }}>
-                    {['kg', 'g'].map(u => (
-                      <button key={u} type="button" onClick={() => updateRow(idx, 'unit', u)}
-                        style={{ flex: 1, padding: '4px 0', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 12, fontFamily: 'inherit', background: row.unit === u ? cyan2 : 'white', color: row.unit === u ? 'white' : cyan2, transition: 'all 0.15s' }}>
-                        {u}
-                      </button>
-                    ))}
+            {rows.map((row, idx) => {
+              const rowTotal = (parseFloat(row.qty) || 0) * (parseFloat(row.rate) || 0);
+              return (
+                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 70px 70px 26px', gap: 6, alignItems: 'center' }}>
+                  {/* Item dropdown */}
+                  <div style={{ position: 'relative' }}>
+                    {items.length > 0 ? (
+                      <select value={row.item} onChange={e => updateRow(idx, 'item', e.target.value)}
+                        style={{ width: '100%', padding: '10px 24px 10px 8px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', appearance: 'none', background: 'white', color: row.item ? '#0f172a' : '#94a3b8', cursor: 'pointer' }}>
+                        <option value="">Select item…</option>
+                        {items.map(i => <option key={i} value={i}>{i}</option>)}
+                      </select>
+                    ) : (
+                      <input value={row.item} onChange={e => updateRow(idx, 'item', e.target.value)} placeholder="Item name"
+                        style={{ width: '100%', padding: '10px 8px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                    )}
+                    <span className="material-symbols-outlined" style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 16, pointerEvents: 'none' }}>expand_more</span>
                   </div>
-                </div>
 
-                {/* Price */}
-                <div style={{ width: 70, position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', color: cyan2, fontWeight: 700, fontSize: 13, pointerEvents: 'none' }}>₹</span>
-                  <input type="number" min="0" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="0"
-                    style={{ width: '100%', padding: '10px 6px 10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', fontWeight: 700, outline: 'none', boxSizing: 'border-box', color: '#0f172a' }} />
-                </div>
+                  {/* Qty + unit dropdown */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <input type="number" min="0" step="0.1" value={row.qty} onChange={e => updateRow(idx, 'qty', e.target.value)} placeholder="Qty"
+                      style={{ width: '100%', padding: '6px 8px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, textAlign: 'center', fontWeight: 700, outline: 'none', boxSizing: 'border-box' }} />
+                    <select value={row.unit} onChange={e => updateRow(idx, 'unit', e.target.value)}
+                      style={{ width: '100%', padding: '4px', border: `1.5px solid ${cyan2}`, borderRadius: 8, fontSize: 11, fontWeight: 700, color: cyan2, background: 'white', outline: 'none', textAlign: 'center', appearance: 'none', cursor: 'pointer' }}>
+                      <option value="kg">kg</option>
+                      <option value="g">g</option>
+                      <option value="litre">litre</option>
+                      <option value="piece">piece</option>
+                    </select>
+                  </div>
 
-                {/* Remove row */}
-                {rows.length > 1 ? (
-                  <button type="button" onClick={() => removeRow(idx)} style={{ background: '#fee2e2', border: 'none', borderRadius: 8, padding: 5, cursor: 'pointer', display: 'flex', flexShrink: 0 }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#ef4444' }}>remove</span>
-                  </button>
-                ) : <div style={{ width: 26 }} />}
-              </div>
-            ))}
+                  {/* Rate */}
+                  <div style={{ position: 'relative' }}>
+                    <input type="number" min="0" value={row.rate} onChange={e => updateRow(idx, 'rate', e.target.value)} placeholder="Rate"
+                      style={{ width: '100%', padding: '10px 4px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', fontWeight: 700, outline: 'none', boxSizing: 'border-box', color: '#0f172a', textAlign: 'center' }} />
+                  </div>
+
+                  {/* Calculated Price */}
+                  <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 10, padding: '10px 4px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>{rowTotal > 0 ? rowTotal.toFixed(0) : '-'}</span>
+                  </div>
+
+                  {/* Remove row */}
+                  {rows.length > 1 ? (
+                    <button type="button" onClick={() => removeRow(idx)} style={{ background: '#fee2e2', border: 'none', borderRadius: 8, padding: 5, cursor: 'pointer', display: 'flex', flexShrink: 0 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#ef4444' }}>remove</span>
+                    </button>
+                  ) : <div />}
+                </div>
+              );
+            })}
           </div>
 
           {/* Add more row */}
@@ -174,11 +196,11 @@ function PurchaseModal({ vendor, onClose, onSave }) {
           </button>
 
           {/* Total preview */}
-          {rows.some(r => r.price) && (
+          {rows.some(r => r.qty && r.rate) && (
             <div style={{ background: '#ecfeff', border: '1px solid #a5f3fc', borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <span style={{ fontSize: 13, color: '#0e7490', fontWeight: 600 }}>Total ({rows.filter(r => r.price).length} items)</span>
+              <span style={{ fontSize: 13, color: '#0e7490', fontWeight: 600 }}>Total ({rows.filter(r => r.qty && r.rate).length} items)</span>
               <span style={{ fontSize: 16, fontWeight: 800, color: '#0891b2' }}>
-                ₹ {rows.reduce((s, r) => s + (parseFloat(r.price) || 0), 0).toLocaleString('en-IN')}
+                ₹ {rows.reduce((s, r) => s + ((parseFloat(r.qty) || 0) * (parseFloat(r.rate) || 0)), 0).toLocaleString('en-IN', {maximumFractionDigits: 0})}
               </span>
             </div>
           )}
@@ -203,7 +225,7 @@ export default function VendorTransactions() {
   const [categories, setCategories] = useState(['Groceries', 'Laundry', 'Vegetables', 'Dairy']);
   const [activeCategory, setActiveCategory] = useState('Groceries');
   const [purchaseModalVendor, setPurchaseModalVendor] = useState(null);
-  const [logs, setLogs] = useState([]);
+  const [vendorData, setVendorData] = useState(INITIAL_VENDOR_DATA);
   
   // Drill-down states
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -229,12 +251,17 @@ export default function VendorTransactions() {
   });
 
   const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-  const total = MONTHLY_DATA.reduce((s, m) => s + parseInt(m.amount.replace(',', '')), 0);
+  
+  const currentVendorData = selectedVendor ? vendorData[selectedVendor.id] : null;
+  const monthlyList = currentVendorData ? Object.keys(currentVendorData.months).map(m => ({ month: m, amount: currentVendorData.months[m].totalAmount })) : [];
+  const total = monthlyList.reduce((s, m) => s + m.amount, 0);
 
   // ── Detail View 3: Payment Details (Itemized Bill) ──
-  if (selectedDate) {
-    const totalReceipt = RECEIPT_DETAILS.reduce((s, r) => s + r.price, 0);
-    const paidReceipt = 2000;
+  if (selectedDate && selectedMonth && currentVendorData) {
+    const dayData = currentVendorData.months[selectedMonth].days[selectedDate] || { items: [], amount: 0, status: 'Pending' };
+    const receiptDetails = dayData.items;
+    const totalReceipt = receiptDetails.reduce((s, r) => s + r.price, 0);
+    const paidReceipt = dayData.status === 'Paid' ? totalReceipt : (totalReceipt > 2000 ? 2000 : 0);
     const pendingReceipt = totalReceipt - paidReceipt;
 
     return (
@@ -272,7 +299,7 @@ export default function VendorTransactions() {
           </div>
           <div style={{ background: 'white', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, border: '1px solid #e2e8f0', borderTop: 'none', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {RECEIPT_DETAILS.map((r, i) => (
+              {receiptDetails.map((r, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', flex: 1 }}>
                     <span style={{ fontSize: 14, color: '#475569', fontWeight: 500, width: '45%' }}>{r.item} <span style={{color: '#cbd5e1'}}>:</span></span>
@@ -304,7 +331,10 @@ export default function VendorTransactions() {
   }
 
   // ── Detail View 2: Vendor Transactions (Day List) ──
-  if (selectedMonth) {
+  if (selectedMonth && currentVendorData) {
+    const monthData = currentVendorData.months[selectedMonth];
+    const dailyList = Object.keys(monthData.days).map(d => ({ date: d, ...monthData.days[d] }));
+    
     return (
       <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
         <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
@@ -318,12 +348,12 @@ export default function VendorTransactions() {
         <div style={{ padding: 16 }}>
           <div style={{ background: 'white', border: '1.5px solid #0891b2', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <p style={{ fontSize: 14, fontWeight: 600, color: '#0891b2', margin: 0 }}>Total Amount</p>
-            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>₹ 2,000,000</p>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>₹ {monthData.totalAmount.toLocaleString('en-IN')}</p>
           </div>
 
           <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            {DAILY_TRANSACTIONS.map((txn, i) => (
-              <div key={i} onClick={() => setSelectedDate(txn.date)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < DAILY_TRANSACTIONS.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
+            {dailyList.map((txn, i) => (
+              <div key={i} onClick={() => setSelectedDate(txn.date)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < dailyList.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                   <div style={{ background: '#ecfeff', padding: 8, borderRadius: 10, display: 'flex' }}>
                     <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 18 }}>receipt_long</span>
@@ -334,7 +364,7 @@ export default function VendorTransactions() {
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 15, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>₹ {txn.amount}</p>
+                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 15, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>₹ {txn.amount.toLocaleString('en-IN')}</p>
                   <span style={{ fontSize: 11, fontWeight: 700, color: txn.status === 'Paid' ? '#16a34a' : '#ef4444' }}>{txn.status}</span>
                 </div>
               </div>
@@ -359,14 +389,24 @@ export default function VendorTransactions() {
 
         <div style={{ padding: 16 }}>
           {/* Vendor chip */}
-          <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            <div style={{ width: 46, height: 46, borderRadius: 12, background: 'linear-gradient(135deg,#0891b2,#0e7490)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 22, color: 'white' }}>store</span>
+          <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 12, background: 'linear-gradient(135deg,#0891b2,#0e7490)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 22, color: 'white' }}>store</span>
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 2px' }}>{selectedVendor.name}</p>
+                <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{selectedVendor.store}</p>
+              </div>
             </div>
-            <div>
-              <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 2px' }}>{selectedVendor.name}</p>
-              <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{selectedVendor.store}</p>
-            </div>
+            <button
+              onClick={() => setPurchaseModalVendor(selectedVendor)}
+              style={{ padding: '8px 12px', background: '#ecfeff', border: '1.5px solid #a5f3fc', borderRadius: 10, color: '#0891b2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 700, fontSize: 12 }}
+              title="Log Daily Purchase"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
+              Add
+            </button>
           </div>
 
           <p style={{ fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 10 }}>Filter By</p>
@@ -391,14 +431,14 @@ export default function VendorTransactions() {
           </div>
 
           <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            {MONTHLY_DATA.map((row, i) => (
-              <div key={i} onClick={() => setSelectedMonth(row.month)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < MONTHLY_DATA.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
+            {monthlyList.map((row, i) => (
+              <div key={i} onClick={() => setSelectedMonth(row.month)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < monthlyList.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 18 }}>calendar_month</span>
                   <span style={{ fontSize: 14, color: '#1e293b', fontWeight: 500 }}>{row.month}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 14, fontWeight: 700, color: '#0f172a' }}>₹ {row.amount}</span>
+                  <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 14, fontWeight: 700, color: '#0f172a' }}>₹ {row.amount.toLocaleString('en-IN')}</span>
                   <span className="material-symbols-outlined" style={{ color: '#cbd5e1', fontSize: 18 }}>chevron_right</span>
                 </div>
               </div>
@@ -482,48 +522,47 @@ export default function VendorTransactions() {
                     <span style={{ fontSize: 12, fontWeight: 600, color: v.status === 'Paid' ? '#059669' : '#e11d48', background: v.status === 'Paid' ? '#dcfce7' : '#fee2e2', padding: '3px 10px', borderRadius: 20 }}>{v.status}</span>
                   </div>
                 </div>
-
-                {/* Per-vendor Log Purchase button */}
-                <div style={{ borderTop: '1px solid #f1f5f9', padding: '10px 16px' }}>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setPurchaseModalVendor(v); }}
-                    style={{ width: '100%', padding: '10px', background: '#ecfeff', border: '1.5px solid #a5f3fc', borderRadius: 10, color: '#0891b2', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'all 0.2s' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
-                    Log Daily Purchase
-                  </button>
-                </div>
               </div>
             ))
           )}
         </div>
 
-        {/* Recent purchase logs */}
-        {logs.filter(l => VENDORS.find(v => v.id === l.vendorId)?.category === activeCategory).length > 0 && (
-          <div style={{ marginTop: 20 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 10 }}>Recent Logs — {activeCategory}</p>
-            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-              {logs.filter(l => VENDORS.find(v => v.id === l.vendorId)?.category === activeCategory).map((log, i, arr) => (
-                <div key={i} style={{ padding: '12px 16px', borderBottom: i < arr.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <p style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', margin: '0 0 2px' }}>{log.item}</p>
-                      <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>{fmtDate(log.date)} · {log.qty}{log.unit}</p>
-                    </div>
-                    <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 14, color: '#0891b2' }}>₹ {parseInt(log.price).toLocaleString('en-IN')}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Per-vendor Purchase Modal */}
+      {/* Modals */}
       {purchaseModalVendor && (
         <PurchaseModal
           vendor={purchaseModalVendor}
           onClose={() => setPurchaseModalVendor(null)}
-          onSave={(entry) => setLogs(prev => [entry, ...prev])}
+          onSave={(data) => {
+            const { date, items, vendorId } = data;
+            setVendorData(prev => {
+              const newData = JSON.parse(JSON.stringify(prev)); // Deep copy for simplicity
+              const vData = newData[vendorId];
+              
+              const d = new Date(date);
+              const monthName = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+              const dateString = `${d.getDate()} ${monthName}`; // format matching dummy data (e.g., '1 January 2025')
+              
+              if (!vData.months[monthName]) {
+                vData.months[monthName] = { totalAmount: 0, days: {} };
+              }
+              
+              const monthData = vData.months[monthName];
+              if (!monthData.days[dateString]) {
+                monthData.days[dateString] = { amount: 0, mode: 'Cash', status: 'Pending', items: [] };
+              }
+              
+              const dayData = monthData.days[dateString];
+              const totalNewPrice = items.reduce((s, it) => s + it.price, 0);
+              
+              dayData.items.push(...items);
+              dayData.amount += totalNewPrice;
+              monthData.totalAmount += totalNewPrice;
+              
+              return newData;
+            });
+          }}
         />
       )}
 
