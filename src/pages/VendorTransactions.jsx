@@ -253,7 +253,9 @@ export default function VendorTransactions() {
   const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   
   const currentVendorData = selectedVendor ? vendorData[selectedVendor.id] : null;
-  const monthlyList = currentVendorData ? Object.keys(currentVendorData.months).map(m => ({ month: m, amount: currentVendorData.months[m].totalAmount })) : [];
+  const monthlyList = currentVendorData ? Object.keys(currentVendorData.months)
+    .sort((a, b) => new Date(b) - new Date(a))
+    .map(m => ({ month: m, amount: currentVendorData.months[m].totalAmount })) : [];
   const total = monthlyList.reduce((s, m) => s + m.amount, 0);
 
   // ── Detail View 3: Payment Details (Itemized Bill) ──
@@ -333,7 +335,9 @@ export default function VendorTransactions() {
   // ── Detail View 2: Vendor Transactions (Day List) ──
   if (selectedMonth && currentVendorData) {
     const monthData = currentVendorData.months[selectedMonth];
-    const dailyList = Object.keys(monthData.days).map(d => ({ date: d, ...monthData.days[d] }));
+    const dailyList = Object.keys(monthData.days)
+      .sort((a, b) => new Date(b) - new Date(a))
+      .map(d => ({ date: d, ...monthData.days[d] }));
     
     return (
       <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
