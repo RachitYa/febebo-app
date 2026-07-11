@@ -444,7 +444,45 @@ export default function VendorTransactions() {
               </div>
             ))}
           </div>
+          </div>
         </div>
+
+        {/* Purchase Modal */}
+        {purchaseModalVendor && (
+          <PurchaseModal
+            vendor={purchaseModalVendor}
+            onClose={() => setPurchaseModalVendor(null)}
+            onSave={(data) => {
+              const { date, items, vendorId } = data;
+              setVendorData(prev => {
+                const newData = JSON.parse(JSON.stringify(prev)); // Deep copy for simplicity
+                const vData = newData[vendorId];
+                
+                const d = new Date(date);
+                const monthName = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+                const dateString = `${d.getDate()} ${monthName}`; // format matching dummy data (e.g., '1 January 2025')
+                
+                if (!vData.months[monthName]) {
+                  vData.months[monthName] = { totalAmount: 0, days: {} };
+                }
+                
+                const monthData = vData.months[monthName];
+                if (!monthData.days[dateString]) {
+                  monthData.days[dateString] = { amount: 0, mode: 'Cash', status: 'Pending', items: [] };
+                }
+                
+                const dayData = monthData.days[dateString];
+                const totalNewPrice = items.reduce((s, it) => s + it.price, 0);
+                
+                dayData.items.push(...items);
+                dayData.amount += totalNewPrice;
+                monthData.totalAmount += totalNewPrice;
+                
+                return newData;
+              });
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -529,44 +567,7 @@ export default function VendorTransactions() {
 
       </div>
 
-      {/* Modals */}
-      {purchaseModalVendor && (
-        <PurchaseModal
-          vendor={purchaseModalVendor}
-          onClose={() => setPurchaseModalVendor(null)}
-          onSave={(data) => {
-            const { date, items, vendorId } = data;
-            setVendorData(prev => {
-              const newData = JSON.parse(JSON.stringify(prev)); // Deep copy for simplicity
-              const vData = newData[vendorId];
-              
-              const d = new Date(date);
-              const monthName = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
-              const dateString = `${d.getDate()} ${monthName}`; // format matching dummy data (e.g., '1 January 2025')
-              
-              if (!vData.months[monthName]) {
-                vData.months[monthName] = { totalAmount: 0, days: {} };
-              }
-              
-              const monthData = vData.months[monthName];
-              if (!monthData.days[dateString]) {
-                monthData.days[dateString] = { amount: 0, mode: 'Cash', status: 'Pending', items: [] };
-              }
-              
-              const dayData = monthData.days[dateString];
-              const totalNewPrice = items.reduce((s, it) => s + it.price, 0);
-              
-              dayData.items.push(...items);
-              dayData.amount += totalNewPrice;
-              monthData.totalAmount += totalNewPrice;
-              
-              return newData;
-            });
-          }}
-        />
-      )}
-
-      {/* Filter Bottom Sheet */}
+      </div>      {/* Filter Bottom Sheet */}
       {filterOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', zIndex: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(3px)' }}
           onClick={e => { if (e.target === e.currentTarget) setFilterOpen(false); }}>
