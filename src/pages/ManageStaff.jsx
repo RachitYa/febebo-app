@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const MOCK_STAFF = [
   { id: 1, name: 'Amit Sharma', empId: '#1001', role: 'HR', email: 'amit@hotel.com', phone: '+91 9876543210', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&h=150&fit=crop' },
@@ -17,7 +17,8 @@ const MOCK_STAFF = [
 
 export default function ManageStaff() {
   const navigate = useNavigate();
-  const [mainMenu, setMainMenu] = useState('profiles'); // 'profiles' | 'work'
+  const location = useLocation();
+  const [mainMenu, setMainMenu] = useState(location.state?.mainMenu || 'profiles'); // 'profiles' | 'work'
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('list');
   const [showAddModal, setShowAddModal] = useState(false);

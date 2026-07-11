@@ -18,7 +18,7 @@ export default function StaffWorkDetails() {
     staffId: staff.id.toString(),
     staffName: staff.name,
     role: staff.role,
-    onBack: () => navigate(-1),
+    onBack: () => navigate('/manage-staff', { state: { mainMenu: 'work' } }),
   };
 
   if (cat === 'A') return <TimelineView {...commonProps} />;
