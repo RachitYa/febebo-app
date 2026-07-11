@@ -1,64 +1,41 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DESIGN TOKENS
-// ─────────────────────────────────────────────────────────────────────────────
-const T = {
-  bg:          '#0f1117',
-  card:        '#1a1d27',
-  cardBorder:  '#2a2d3a',
-  surface:     '#22253a',
-  text:        '#f1f5f9',
-  textSub:     '#94a3b8',
-  textMuted:   '#64748b',
-  white:       '#ffffff',
-
-  // Accent palette
-  blue:     '#38bdf8',
-  blueDark: '#0284c7',
-  blueBg:   'rgba(56,189,248,0.1)',
-
-  green:     '#34d399',
-  greenDark: '#059669',
-  greenBg:   'rgba(52,211,153,0.12)',
-
-  red:     '#f87171',
-  redDark: '#e11d48',
-  redBg:   'rgba(248,113,113,0.12)',
-
-  amber:     '#fbbf24',
-  amberDark: '#d97706',
-  amberBg:   'rgba(251,191,36,0.12)',
-
-  purple:     '#a78bfa',
-  purpleDark: '#7c3aed',
-  purpleBg:   'rgba(167,139,250,0.12)',
-
-  indigo:     '#818cf8',
-  indigoDark: '#4f46e5',
-  indigoBg:   'rgba(129,140,248,0.12)',
-
-  teal:     '#2dd4bf',
-  tealDark: '#0891b2',
-  tealBg:   'rgba(45,212,191,0.12)',
+// ─── App-consistent design tokens ─────────────────────────────────────────────
+const C = {
+  bg:         '#f1f5f9',
+  white:      '#ffffff',
+  primary:    '#0891b2',
+  primaryDark:'#0e7490',
+  primaryBg:  '#ecfeff',
+  primaryBdr: '#a5f3fc',
+  text:       '#0f172a',
+  textSub:    '#334155',
+  muted:      '#64748b',
+  border:     '#e2e8f0',
+  success:    '#059669',
+  successBg:  '#ecfdf5',
+  warn:       '#d97706',
+  warnBg:     '#fffbeb',
+  danger:     '#e11d48',
+  dangerBg:   '#fff1f2',
+  indigo:     '#4f46e5',
+  indigoBg:   '#eef2ff',
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DUMMY DATA
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── DATA ─────────────────────────────────────────────────────────────────────
 const ROLES = [
-  { id: 'hr',          label: 'HR',              icon: 'manage_accounts',    accent: T.blue,   accentDark: T.blueDark,   bg: T.blueBg,   category: 'A',       grad: 'linear-gradient(135deg,#0284c7,#0369a1)' },
-  { id: 'manager',     label: 'Manager',          icon: 'supervisor_account', accent: T.purple, accentDark: T.purpleDark, bg: T.purpleBg, category: 'A',       grad: 'linear-gradient(135deg,#7c3aed,#6d28d9)' },
-  { id: 'sales',       label: 'Sales Manager',    icon: 'query_stats',        accent: T.green,  accentDark: T.greenDark,  bg: T.greenBg,  category: 'A',       grad: 'linear-gradient(135deg,#059669,#047857)' },
-  { id: 'purchase',    label: 'Purchase Manager', icon: 'shopping_bag',       accent: T.teal,   accentDark: T.tealDark,   bg: T.tealBg,   category: 'D',       grad: 'linear-gradient(135deg,#0891b2,#0e7490)' },
-  { id: 'cook',        label: 'Cook',             icon: 'restaurant',         accent: T.red,    accentDark: T.redDark,    bg: T.redBg,    category: 'B_cook',  grad: 'linear-gradient(135deg,#e11d48,#be123c)' },
-  { id: 'cleaner',     label: 'Cleaner',          icon: 'mop',                accent: T.teal,   accentDark: T.tealDark,   bg: T.tealBg,   category: 'B_clean', grad: 'linear-gradient(135deg,#0891b2,#0e7490)' },
-  { id: 'helper',      label: 'Helper',           icon: 'handyman',           accent: T.amber,  accentDark: T.amberDark,  bg: T.amberBg,  category: 'A',       grad: 'linear-gradient(135deg,#d97706,#b45309)' },
-  { id: 'plumber',     label: 'Plumber',          icon: 'plumbing',           accent: T.indigo, accentDark: T.indigoDark, bg: T.indigoBg, category: 'C',       grad: 'linear-gradient(135deg,#4f46e5,#4338ca)' },
-  { id: 'electrician', label: 'Electrician',      icon: 'electric_bolt',      accent: T.amber,  accentDark: T.amberDark,  bg: T.amberBg,  category: 'C',       grad: 'linear-gradient(135deg,#d97706,#b45309)' },
-  { id: 'carpenter',   label: 'Carpenter',        icon: 'carpenter',          accent: T.green,  accentDark: T.greenDark,  bg: T.greenBg,  category: 'C',       grad: 'linear-gradient(135deg,#059669,#047857)' },
-  { id: 'ro',          label: 'RO Waterboy',      icon: 'water_drop',         accent: T.blue,   accentDark: T.blueDark,   bg: T.blueBg,   category: 'C',       grad: 'linear-gradient(135deg,#0284c7,#0369a1)' },
+  { id: 'hr',          label: 'HR',              icon: 'manage_accounts',    category: 'A'       },
+  { id: 'manager',     label: 'Manager',          icon: 'supervisor_account', category: 'A'       },
+  { id: 'sales',       label: 'Sales Manager',    icon: 'query_stats',        category: 'A'       },
+  { id: 'purchase',    label: 'Purchase Manager', icon: 'shopping_bag',       category: 'D'       },
+  { id: 'cook',        label: 'Cook',             icon: 'restaurant',         category: 'B_cook'  },
+  { id: 'cleaner',     label: 'Cleaner',          icon: 'mop',                category: 'B_clean' },
+  { id: 'helper',      label: 'Helper',           icon: 'handyman',           category: 'A'       },
+  { id: 'plumber',     label: 'Plumber',          icon: 'plumbing',           category: 'C'       },
+  { id: 'electrician', label: 'Electrician',      icon: 'electric_bolt',      category: 'C'       },
+  { id: 'carpenter',   label: 'Carpenter',        icon: 'carpenter',          category: 'C'       },
+  { id: 'ro',          label: 'RO Waterboy',      icon: 'water_drop',         category: 'C'       },
 ];
 
 const STAFF_MEMBERS = {
@@ -66,8 +43,8 @@ const STAFF_MEMBERS = {
   manager:     [{ id: 'm1',  name: 'Vikram Sharma',    joined: 'Mar 2023', phone: '9123456789' }],
   sales:       [{ id: 's1',  name: 'Anita Rao',        joined: 'Jul 2023', phone: '9988776655' }],
   purchase:    [{ id: 'p1',  name: 'Rajan Verma',      joined: 'Feb 2024', phone: '9090909090' }],
-  cook:        [{ id: 'c1',  name: 'Ramesh Yadav',     joined: 'Jun 2022', phone: '9871234560' }, { id: 'c2', name: 'Sunita Devi',    joined: 'Nov 2023', phone: '9812345670' }],
-  cleaner:     [{ id: 'cl1', name: 'Mohan Das',        joined: 'Apr 2023', phone: '9933221100' }, { id: 'cl2', name: 'Lakshmi B.',   joined: 'Sep 2023', phone: '9900112233' }],
+  cook:        [{ id: 'c1',  name: 'Ramesh Yadav',     joined: 'Jun 2022', phone: '9871234560' }, { id: 'c2', name: 'Sunita Devi', joined: 'Nov 2023', phone: '9812345670' }],
+  cleaner:     [{ id: 'cl1', name: 'Mohan Das',        joined: 'Apr 2023', phone: '9933221100' }, { id: 'cl2', name: 'Lakshmi B.', joined: 'Sep 2023', phone: '9900112233' }],
   helper:      [{ id: 'he1', name: 'Suresh Kumar',     joined: 'Jan 2023', phone: '9777888999' }],
   plumber:     [{ id: 'pl1', name: 'Dinesh Patel',     joined: 'May 2022', phone: '9444555666' }],
   electrician: [{ id: 'el1', name: 'Raj Electricals',  joined: 'Oct 2023', phone: '9333444555' }],
@@ -80,22 +57,22 @@ const TIMELINE_LOGS = {
     { id: 1, date: '2026-07-11', time: '10:30 AM', text: 'Interviewed 2 candidates for Cook position. Shortlisted 1.', pinned: true },
     { id: 2, date: '2026-07-10', time: '03:00 PM', text: 'Completed onboarding paperwork for new helper Suresh Kumar.', pinned: false },
     { id: 3, date: '2026-07-09', time: '11:00 AM', text: 'Salary processed for all staff for June 2026.', pinned: false },
-    { id: 4, date: '2026-07-07', time: '02:15 PM', text: 'Posted job listing for Electrician on Naukri. Awaiting responses.', pinned: false },
+    { id: 4, date: '2026-07-07', time: '02:15 PM', text: 'Posted job listing for Electrician on Naukri.', pinned: false },
   ],
   m1:  [
     { id: 1, date: '2026-07-11', time: '09:00 AM', text: 'Reviewed daily occupancy — 28/32 rooms occupied (87.5%). One tenant left today.', pinned: true },
     { id: 2, date: '2026-07-10', time: '06:00 PM', text: 'Conducted evening inspection of floors 1 & 2. All rooms clean.', pinned: false },
-    { id: 3, date: '2026-07-09', time: '10:00 AM', text: 'Resolved dispute between tenants in Room 104 and 105. Noise issue.', pinned: false },
+    { id: 3, date: '2026-07-09', time: '10:00 AM', text: 'Resolved dispute between tenants in Room 104 and 105.', pinned: false },
   ],
   s1:  [
     { id: 1, date: '2026-07-11', time: '11:00 AM', text: 'Handled 5 enquiries. 2 converted to site visits tomorrow.', pinned: true },
-    { id: 2, date: '2026-07-10', time: '04:30 PM', text: 'Follow-up call with Riya Sharma — double occupancy room. Quoted ₹6,500/month.', pinned: false },
+    { id: 2, date: '2026-07-10', time: '04:30 PM', text: 'Follow-up call with Riya Sharma — double occupancy, quoted ₹6,500/month.', pinned: false },
     { id: 3, date: '2026-07-08', time: '01:00 PM', text: 'Updated listing on NoBroker and MagicBricks with new photos.', pinned: false },
   ],
   he1: [
     { id: 1, date: '2026-07-11', time: '08:30 AM', text: 'Helped move furniture from Room 201 to 203 for new tenant.', pinned: false },
-    { id: 2, date: '2026-07-10', time: '12:00 PM', text: 'Grocery run completed. Bought vegetables, oil, and spices for kitchen.', pinned: false },
-    { id: 3, date: '2026-07-09', time: '03:00 PM', text: 'Assisted Ramesh (Cook) with dish washing after lunch.', pinned: false },
+    { id: 2, date: '2026-07-10', time: '12:00 PM', text: 'Grocery run — vegetables, oil, spices for kitchen.', pinned: false },
+    { id: 3, date: '2026-07-09', time: '03:00 PM', text: 'Assisted Cook with dish washing after lunch.', pinned: false },
   ],
 };
 
@@ -104,10 +81,10 @@ const COOK_DATA = {
     todayMenu: { breakfast: 'Poha + Chai', lunch: 'Dal Tadka, Jeera Rice, Roti', dinner: 'Rajma, Rice, Sabzi' },
     rating: 4.2, totalReviews: 38,
     reviews: [
-      { id: 1, tenant: 'Ravi Gupta',  room: '102', date: '2026-07-11', rating: 5, text: 'Lunch was amazing today! Dal was perfect.' },
-      { id: 2, tenant: 'Priya S.',    room: '204', date: '2026-07-11', rating: 3, text: 'Dinner sabzi was a bit bland today.' },
-      { id: 3, tenant: 'Anil K.',     room: '301', date: '2026-07-10', rating: 4, text: 'Breakfast poha was good. More quantity please!' },
-      { id: 4, tenant: 'Sneha R.',    room: '105', date: '2026-07-10', rating: 5, text: 'Everything was great. Keep it up!' },
+      { id: 1, tenant: 'Ravi Gupta', room: '102', date: '2026-07-11', rating: 5, text: 'Lunch was amazing today! Dal was perfect.' },
+      { id: 2, tenant: 'Priya S.',   room: '204', date: '2026-07-11', rating: 3, text: 'Dinner sabzi was a bit bland today.' },
+      { id: 3, tenant: 'Anil K.',    room: '301', date: '2026-07-10', rating: 4, text: 'Breakfast poha was good. More quantity please!' },
+      { id: 4, tenant: 'Sneha R.',   room: '105', date: '2026-07-10', rating: 5, text: 'Everything was great. Keep it up!' },
     ],
   },
   c2: {
@@ -122,324 +99,298 @@ const COOK_DATA = {
 
 const CLEANER_DATA = {
   cl1: { assignedRooms: [
-    { room: '101', cleanedAt: '08:15 AM', studentStatus: 'Approved',  studentName: 'Ravi Gupta' },
-    { room: '102', cleanedAt: '09:00 AM', studentStatus: 'Rejected',  studentName: 'Priya S.',   rejectionNote: 'Bathroom not cleaned properly' },
-    { room: '103', cleanedAt: '09:45 AM', studentStatus: 'Pending',   studentName: 'Anil K.' },
-    { room: '104', cleanedAt: '10:30 AM', studentStatus: 'Approved',  studentName: 'Sneha R.' },
+    { room: '101', cleanedAt: '08:15 AM', studentStatus: 'Approved', studentName: 'Ravi Gupta' },
+    { room: '102', cleanedAt: '09:00 AM', studentStatus: 'Rejected', studentName: 'Priya S.',  rejectionNote: 'Bathroom not cleaned properly' },
+    { room: '103', cleanedAt: '09:45 AM', studentStatus: 'Pending',  studentName: 'Anil K.' },
+    { room: '104', cleanedAt: '10:30 AM', studentStatus: 'Approved', studentName: 'Sneha R.' },
   ]},
   cl2: { assignedRooms: [
-    { room: '201', cleanedAt: '08:30 AM', studentStatus: 'Approved',  studentName: 'Mohit J.' },
-    { room: '202', cleanedAt: '09:15 AM', studentStatus: 'Pending',   studentName: 'Diya P.' },
-    { room: '203', cleanedAt: '10:00 AM', studentStatus: 'Rejected',  studentName: 'Rahul V.',   rejectionNote: 'Floor still wet and dusty' },
+    { room: '201', cleanedAt: '08:30 AM', studentStatus: 'Approved', studentName: 'Mohit J.' },
+    { room: '202', cleanedAt: '09:15 AM', studentStatus: 'Pending',  studentName: 'Diya P.' },
+    { room: '203', cleanedAt: '10:00 AM', studentStatus: 'Rejected', studentName: 'Rahul V.', rejectionNote: 'Floor still wet and dusty' },
   ]},
 };
 
 const TICKET_DATA = {
   pl1: [
-    { id: 1, issue: 'Leaking tap in bathroom',    room: '104', date: '2026-07-11', status: 'In Progress', priority: 'High',   note: 'Ordered new washer' },
-    { id: 2, issue: 'Drainage blocked',            room: '202', date: '2026-07-10', status: 'Resolved',    priority: 'High',   note: 'Cleared blockage, all good now' },
-    { id: 3, issue: 'WC flush not working',        room: '301', date: '2026-07-09', status: 'Pending',     priority: 'Medium', note: '' },
+    { id: 1, issue: 'Leaking tap in bathroom',   room: '104', date: '2026-07-11', status: 'In Progress', priority: 'High',   note: 'Ordered new washer' },
+    { id: 2, issue: 'Drainage blocked',           room: '202', date: '2026-07-10', status: 'Resolved',    priority: 'High',   note: 'Cleared blockage, all good now' },
+    { id: 3, issue: 'WC flush not working',       room: '301', date: '2026-07-09', status: 'Pending',     priority: 'Medium', note: '' },
   ],
   el1: [
-    { id: 1, issue: 'Fan speed fluctuating',       room: '205', date: '2026-07-11', status: 'Pending',     priority: 'Medium', note: '' },
-    { id: 2, issue: 'Switch board sparking',       room: '103', date: '2026-07-10', status: 'Resolved',    priority: 'High',   note: 'Replaced faulty switch' },
-    { id: 3, issue: 'Power socket not working',    room: '308', date: '2026-07-08', status: 'In Progress', priority: 'Medium', note: 'Coming with tools tomorrow' },
+    { id: 1, issue: 'Fan speed fluctuating',      room: '205', date: '2026-07-11', status: 'Pending',     priority: 'Medium', note: '' },
+    { id: 2, issue: 'Switch board sparking',      room: '103', date: '2026-07-10', status: 'Resolved',    priority: 'High',   note: 'Replaced faulty switch' },
+    { id: 3, issue: 'Power socket not working',   room: '308', date: '2026-07-08', status: 'In Progress', priority: 'Medium', note: 'Coming with tools tomorrow' },
   ],
   ca1: [
-    { id: 1, issue: 'Cupboard door hinge broken',  room: '107', date: '2026-07-11', status: 'Pending',     priority: 'Low',    note: '' },
-    { id: 2, issue: 'Study table leg cracked',     room: '201', date: '2026-07-09', status: 'Resolved',    priority: 'Medium', note: 'Fixed with new leg' },
+    { id: 1, issue: 'Cupboard door hinge broken', room: '107', date: '2026-07-11', status: 'Pending',     priority: 'Low',    note: '' },
+    { id: 2, issue: 'Study table leg cracked',    room: '201', date: '2026-07-09', status: 'Resolved',    priority: 'Medium', note: 'Fixed with new leg' },
   ],
   r1: [
-    { id: 1, issue: 'RO filter change due',        room: 'Common (G)',  date: '2026-07-11', status: 'Pending',     priority: 'High',   note: '' },
-    { id: 2, issue: 'Water dispenser leaking',     room: 'Common (1F)', date: '2026-07-10', status: 'Resolved',    priority: 'Medium', note: 'Replaced seal' },
-    { id: 3, issue: 'TDS levels high',             room: 'Common (2F)', date: '2026-07-08', status: 'In Progress', priority: 'High',   note: 'Ordered new membrane filter' },
+    { id: 1, issue: 'RO filter change due',       room: 'Common (G)',  date: '2026-07-11', status: 'Pending',     priority: 'High',   note: '' },
+    { id: 2, issue: 'Water dispenser leaking',    room: 'Common (1F)', date: '2026-07-10', status: 'Resolved',    priority: 'Medium', note: 'Replaced seal' },
+    { id: 3, issue: 'TDS levels high',            room: 'Common (2F)', date: '2026-07-08', status: 'In Progress', priority: 'High',   note: 'Ordered new membrane filter' },
   ],
 };
 
 const PURCHASE_LOG = {
   p1: [
-    { id: 1, date: '2026-07-11', item: 'Basmati Rice',         qty: 25, unit: 'kg',    rate: 65,  total: 1625, vendor: 'Sharma Traders',   category: 'Grocery'  },
-    { id: 2, date: '2026-07-10', item: 'Cooking Oil',          qty: 10, unit: 'litre', rate: 120, total: 1200, vendor: 'Sharma Traders',   category: 'Grocery'  },
-    { id: 3, date: '2026-07-09', item: 'Cleaning Liquid',      qty: 5,  unit: 'litre', rate: 85,  total: 425,  vendor: 'Clean Depot',      category: 'Cleaning' },
-    { id: 4, date: '2026-07-08', item: 'Toilet Paper (bulk)',  qty: 50, unit: 'piece', rate: 12,  total: 600,  vendor: 'Clean Depot',      category: 'Cleaning' },
-    { id: 5, date: '2026-07-07', item: 'Onions',               qty: 15, unit: 'kg',    rate: 30,  total: 450,  vendor: 'Vegetable Mandi',  category: 'Grocery'  },
+    { id: 1, date: '2026-07-11', item: 'Basmati Rice',        qty: 25, unit: 'kg',    rate: 65,  total: 1625, vendor: 'Sharma Traders',  category: 'Grocery'  },
+    { id: 2, date: '2026-07-10', item: 'Cooking Oil',         qty: 10, unit: 'litre', rate: 120, total: 1200, vendor: 'Sharma Traders',  category: 'Grocery'  },
+    { id: 3, date: '2026-07-09', item: 'Cleaning Liquid',     qty: 5,  unit: 'litre', rate: 85,  total: 425,  vendor: 'Clean Depot',     category: 'Cleaning' },
+    { id: 4, date: '2026-07-08', item: 'Toilet Paper (bulk)', qty: 50, unit: 'piece', rate: 12,  total: 600,  vendor: 'Clean Depot',     category: 'Cleaning' },
+    { id: 5, date: '2026-07-07', item: 'Onions',              qty: 15, unit: 'kg',    rate: 30,  total: 450,  vendor: 'Vegetable Mandi', category: 'Grocery'  },
   ],
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SHARED COMPONENTS
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── SHARED UI ─────────────────────────────────────────────────────────────────
 
-const Page = ({ children }) => (
-  <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: T.bg, fontFamily: "'Hanken Grotesk', sans-serif", paddingBottom: 40 }}>
-    {children}
-  </div>
-);
-
-const TopBar = ({ title, onBack, grad }) => (
-  <div style={{ background: grad || 'linear-gradient(135deg,#1a1d27,#22253a)', padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, zIndex: 30 }}>
-    <button onClick={onBack} style={{ width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
-      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back_ios_new</span>
+const TopBar = ({ title, subtitle, onBack }) => (
+  <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', gap: 14, position: 'sticky', top: 0, zIndex: 20 }}>
+    <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex', alignItems: 'center', padding: 0 }}>
+      <span className="material-symbols-outlined" style={{ fontSize: 22 }}>arrow_back_ios_new</span>
     </button>
-    <p style={{ fontSize: 18, fontWeight: 800, color: '#fff', margin: 0, flex: 1, letterSpacing: 0.2 }}>{title}</p>
+    <div style={{ flex: 1 }}>
+      <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.2 }}>{title}</p>
+      {subtitle && <p style={{ fontSize: 13, color: C.muted, margin: 0, marginTop: 2 }}>{subtitle}</p>}
+    </div>
   </div>
 );
 
-const Pill = ({ label, color, bg }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 700, padding: '4px 11px', borderRadius: 99, background: bg || 'rgba(255,255,255,0.08)', color: color || T.textSub, letterSpacing: 0.4 }}>
-    {label}
-  </span>
-);
+const statusMap = {
+  Approved:     { color: C.success, bg: C.successBg },
+  Resolved:     { color: C.success, bg: C.successBg },
+  'In Progress':{ color: C.indigo,  bg: C.indigoBg  },
+  Pending:      { color: C.warn,    bg: C.warnBg    },
+  Rejected:     { color: C.danger,  bg: C.dangerBg  },
+  High:         { color: C.danger,  bg: C.dangerBg  },
+  Medium:       { color: C.warn,    bg: C.warnBg    },
+  Low:          { color: C.muted,   bg: '#f1f5f9'   },
+};
 
-const statusStyle = (s) => ({
-  Approved:    { color: T.green,  bg: T.greenBg  },
-  Resolved:    { color: T.green,  bg: T.greenBg  },
-  'In Progress':{ color: T.indigo, bg: T.indigoBg },
-  Pending:     { color: T.amber,  bg: T.amberBg  },
-  Rejected:    { color: T.red,    bg: T.redBg    },
-  High:        { color: T.red,    bg: T.redBg    },
-  Medium:      { color: T.amber,  bg: T.amberBg  },
-  Low:         { color: T.textSub, bg: 'rgba(148,163,184,0.1)' },
-}[s] || { color: T.textSub, bg: 'rgba(255,255,255,0.06)' });
-
-const StatusChip = ({ label }) => {
-  const { color, bg } = statusStyle(label);
-  return <Pill label={label} color={color} bg={bg} />;
+const Chip = ({ label }) => {
+  const s = statusMap[label] || { color: C.muted, bg: '#f1f5f9' };
+  return (
+    <span style={{ fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 20, background: s.bg, color: s.color, letterSpacing: 0.3, display: 'inline-block' }}>
+      {label}
+    </span>
+  );
 };
 
 const Card = ({ children, style = {} }) => (
-  <div style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 20, padding: 20, ...style }}>
+  <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: 18, ...style }}>
     {children}
   </div>
 );
 
-const SectionLabel = ({ text }) => (
-  <p style={{ fontSize: 13, fontWeight: 700, color: T.textMuted, margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: 1 }}>{text}</p>
+const SectionTitle = ({ text }) => (
+  <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '24px 0 12px 0' }}>{text}</p>
 );
 
-const StatTile = ({ label, value, color, bg }) => (
-  <div style={{ flex: 1, background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 16, padding: '16px 12px', textAlign: 'center' }}>
-    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 30, fontWeight: 800, color: color, margin: '0 0 4px' }}>{value}</p>
-    <p style={{ fontSize: 12, fontWeight: 700, color: color, margin: 0, opacity: 0.8, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</p>
+const StatRow = ({ items }) => (
+  <div style={{ display: 'flex', gap: 12 }}>
+    {items.map(s => (
+      <div key={s.label} style={{ flex: 1, background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px 10px', textAlign: 'center' }}>
+        <p style={{ fontSize: 28, fontWeight: 800, color: s.color, margin: '0 0 3px', fontFamily: "'Bricolage Grotesque',sans-serif" }}>{s.value}</p>
+        <p style={{ fontSize: 12, fontWeight: 700, color: s.color, margin: 0, textTransform: 'uppercase', letterSpacing: 0.4 }}>{s.label}</p>
+      </div>
+    ))}
   </div>
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TIMELINE VIEW  (HR / Manager / Sales / Helper)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── TIMELINE VIEW  (HR / Manager / Sales / Helper) ──────────────────────────
 export function TimelineView({ staffId, staffName, role, onBack }) {
   const [note, setNote] = useState('');
   const logs = TIMELINE_LOGS[staffId] || Object.values(TIMELINE_LOGS)[0] || [];
 
   return (
-    <Page>
-      <TopBar title={staffName} onBack={onBack} grad="linear-gradient(135deg,#0f172a,#1e293b)" />
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      <TopBar title={staffName} subtitle={role} onBack={onBack} />
 
-      <div style={{ padding: '20px 20px 0' }}>
-        {/* Profile banner */}
-        <div style={{ background: 'linear-gradient(135deg,#1e2d4a,#1a2235)', border: `1px solid ${T.cardBorder}`, borderRadius: 20, padding: 20, marginBottom: 20, display: 'flex', gap: 16, alignItems: 'center' }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: T.blueBg, border: `2px solid ${T.blue}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 28, color: T.blue }}>person</span>
-          </div>
-          <div>
-            <p style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: '0 0 4px' }}>{staffName}</p>
-            <Pill label={role} color={T.blue} bg={T.blueBg} />
-          </div>
-        </div>
-
+      <div style={{ padding: '0 16px' }}>
         {/* Note box */}
-        <Card style={{ marginBottom: 20 }}>
-          <SectionLabel text="Leave an instruction" />
+        <SectionTitle text="Leave an instruction" />
+        <Card>
           <textarea value={note} onChange={e => setNote(e.target.value)}
-            placeholder="Type a message or task for this staff member…"
-            style={{ width: '100%', minHeight: 88, background: T.surface, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 14, fontSize: 15, fontFamily: 'inherit', color: T.text, resize: 'vertical', outline: 'none', boxSizing: 'border-box' }} />
+            placeholder="Type a task or message for this staff member…"
+            style={{ width: '100%', minHeight: 80, background: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', color: C.text, resize: 'vertical', outline: 'none', boxSizing: 'border-box' }} />
           <button onClick={() => setNote('')}
-            style={{ marginTop: 12, width: '100%', padding: '14px 0', background: T.blueDark, border: 'none', borderRadius: 12, color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px rgba(2,132,199,0.35)' }}>
+            style={{ marginTop: 12, width: '100%', padding: '13px 0', background: C.primary, border: 'none', borderRadius: 10, color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
             Send Note
           </button>
         </Card>
 
-        <SectionLabel text="Recent activity" />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+        <SectionTitle text="Recent activity" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {logs.map(log => (
-            <div key={log.id} style={{ background: log.pinned ? 'linear-gradient(135deg,#1a2d4a,#1a1d27)' : T.card, border: `1px solid ${log.pinned ? T.blue : T.cardBorder}`, borderRadius: 18, padding: 18, position: 'relative' }}>
+            <Card key={log.id} style={{ borderLeft: log.pinned ? `4px solid ${C.primary}` : `1px solid ${C.border}`, padding: 16 }}>
               {log.pinned && (
-                <div style={{ position: 'absolute', top: 14, right: 14 }}>
-                  <Pill label="📌 Pinned" color={T.blue} bg={T.blueBg} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 14, color: C.primary }}>push_pin</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: C.primary }}>Pinned</span>
                 </div>
               )}
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 10 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 16, color: T.textMuted }}>schedule</span>
-                <span style={{ fontSize: 13, color: T.textMuted, fontWeight: 600 }}>{log.date} · {log.time}</span>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 15, color: C.muted }}>schedule</span>
+                <span style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>{log.date} · {log.time}</span>
               </div>
-              <p style={{ fontSize: 16, color: T.text, margin: 0, lineHeight: 1.65, fontWeight: 500 }}>{log.text}</p>
-            </div>
+              <p style={{ fontSize: 15, color: C.text, margin: 0, lineHeight: 1.6 }}>{log.text}</p>
+            </Card>
           ))}
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COOK VIEW
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── COOK VIEW ────────────────────────────────────────────────────────────────
 export function CookView({ staffId, staffName, onBack }) {
   const data = COOK_DATA[staffId] || Object.values(COOK_DATA)[0];
-  if (!data) return <Page><p style={{ color: T.textSub, padding: 32, textAlign: 'center' }}>No data.</p></Page>;
+  if (!data) return null;
   const { todayMenu, rating, totalReviews, reviews } = data;
 
   return (
-    <Page>
-      <TopBar title={staffName} onBack={onBack} grad="linear-gradient(135deg,#9f1239,#e11d48)" />
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      <TopBar title={staffName} subtitle="Cook" onBack={onBack} />
 
-      <div style={{ padding: '20px 20px 0' }}>
-        {/* Rating hero */}
-        <div style={{ background: 'linear-gradient(135deg,#3b0a1a,#1f0511)', border: '1px solid #5b1a2a', borderRadius: 24, padding: 24, marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ padding: '0 16px' }}>
+        {/* Rating summary */}
+        <SectionTitle text="Overall rating" />
+        <Card style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{ textAlign: 'center', minWidth: 80 }}>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 44, fontWeight: 900, color: C.text, margin: 0, lineHeight: 1 }}>{rating}</p>
+            <p style={{ fontSize: 13, color: C.muted, margin: '4px 0 0', fontWeight: 600 }}>out of 5</p>
+          </div>
           <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#f87171', textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 8px' }}>Overall Rating</p>
-            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 52, fontWeight: 900, color: '#fff', margin: '0 0 10px', letterSpacing: -2 }}>
-              {rating}<span style={{ fontSize: 22, color: '#f87171', fontWeight: 600 }}>/5</span>
-            </p>
-            <div style={{ display: 'flex', gap: 3, marginBottom: 10 }}>
+            <div style={{ display: 'flex', gap: 3, marginBottom: 8 }}>
               {[1,2,3,4,5].map(i => (
-                <span key={i} className="material-symbols-outlined" style={{ fontSize: 20, color: i <= Math.round(rating) ? '#fde68a' : 'rgba(255,255,255,0.15)' }}>star</span>
+                <span key={i} className="material-symbols-outlined" style={{ fontSize: 22, color: i <= Math.round(rating) ? '#f59e0b' : C.border }}>star</span>
               ))}
             </div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: 0, fontWeight: 600 }}>{totalReviews} student reviews</p>
+            <p style={{ fontSize: 14, color: C.muted, margin: 0, fontWeight: 600 }}>{totalReviews} student reviews</p>
           </div>
-          <span className="material-symbols-outlined" style={{ fontSize: 90, color: 'rgba(248,113,113,0.12)' }}>restaurant</span>
-        </div>
+        </Card>
 
-        {/* Menu */}
-        <SectionLabel text="Today's menu" />
-        <Card style={{ marginBottom: 20, padding: 0, overflow: 'hidden' }}>
+        {/* Today's Menu */}
+        <SectionTitle text="Today's menu" />
+        <Card style={{ padding: 0, overflow: 'hidden' }}>
           {[
             { meal: 'Breakfast', icon: 'free_breakfast', item: todayMenu.breakfast },
-            { meal: 'Lunch',     icon: 'lunch_dining',   item: todayMenu.lunch     },
-            { meal: 'Dinner',    icon: 'dinner_dining',  item: todayMenu.dinner    },
+            { meal: 'Lunch',     icon: 'lunch_dining',   item: todayMenu.lunch },
+            { meal: 'Dinner',    icon: 'dinner_dining',  item: todayMenu.dinner },
           ].map((m, i, arr) => (
-            <div key={m.meal} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderBottom: i < arr.length - 1 ? `1px solid ${T.cardBorder}` : 'none' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: T.redBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 22, color: T.red }}>{m.icon}</span>
+            <div key={m.meal} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20, color: C.primary }}>{m.icon}</span>
               </div>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 800, color: T.red, margin: '0 0 3px', textTransform: 'uppercase', letterSpacing: 0.6 }}>{m.meal}</p>
-                <p style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: 0 }}>{m.item}</p>
+                <p style={{ fontSize: 12, fontWeight: 800, color: C.primary, margin: '0 0 2px', textTransform: 'uppercase', letterSpacing: 0.5 }}>{m.meal}</p>
+                <p style={{ fontSize: 15, fontWeight: 700, color: C.text, margin: 0 }}>{m.item}</p>
               </div>
             </div>
           ))}
         </Card>
 
         {/* Reviews */}
-        <SectionLabel text="Recent feedback" />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+        <SectionTitle text="Student feedback" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {reviews.map(r => (
-            <Card key={r.id} style={{ padding: 18 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+            <Card key={r.id} style={{ padding: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                 <div>
-                  <p style={{ fontSize: 16, fontWeight: 800, color: T.text, margin: '0 0 4px' }}>{r.tenant} <span style={{ color: T.textMuted, fontWeight: 500, fontSize: 14 }}>Rm {r.room}</span></p>
+                  <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{r.tenant} <span style={{ color: C.muted, fontWeight: 500, fontSize: 13 }}>· Rm {r.room}</span></p>
                   <div style={{ display: 'flex', gap: 2 }}>
                     {[1,2,3,4,5].map(i => (
-                      <span key={i} className="material-symbols-outlined" style={{ fontSize: 16, color: i <= r.rating ? '#fbbf24' : 'rgba(255,255,255,0.1)' }}>star</span>
+                      <span key={i} className="material-symbols-outlined" style={{ fontSize: 15, color: i <= r.rating ? '#f59e0b' : C.border }}>star</span>
                     ))}
                   </div>
                 </div>
-                <span style={{ fontSize: 13, color: T.textMuted, fontWeight: 600 }}>{r.date}</span>
+                <span style={{ fontSize: 13, color: C.muted }}>{r.date}</span>
               </div>
-              <p style={{ fontSize: 15, color: T.textSub, margin: 0, lineHeight: 1.6, fontStyle: 'italic' }}>"{r.text}"</p>
+              <p style={{ fontSize: 14, color: C.textSub, margin: 0, lineHeight: 1.6, fontStyle: 'italic' }}>"{r.text}"</p>
             </Card>
           ))}
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CLEANER VIEW
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── CLEANER VIEW ─────────────────────────────────────────────────────────────
 export function CleanerView({ staffId, staffName, onBack }) {
   const data = CLEANER_DATA[staffId] || Object.values(CLEANER_DATA)[0];
   const [rooms, setRooms] = useState(data ? data.assignedRooms : []);
 
-  const override = (roomNum) => {
-    setRooms(prev => prev.map(r => r.room === roomNum ? { ...r, studentStatus: 'Approved' } : r));
+  const override = (roomNum) => setRooms(prev => prev.map(r => r.room === roomNum ? { ...r, studentStatus: 'Approved' } : r));
+
+  const cnt = {
+    Approved: rooms.filter(r => r.studentStatus === 'Approved').length,
+    Pending:  rooms.filter(r => r.studentStatus === 'Pending').length,
+    Rejected: rooms.filter(r => r.studentStatus === 'Rejected').length,
   };
 
-  const cnt = { A: rooms.filter(r => r.studentStatus === 'Approved').length, P: rooms.filter(r => r.studentStatus === 'Pending').length, R: rooms.filter(r => r.studentStatus === 'Rejected').length };
-
   return (
-    <Page>
-      <TopBar title={staffName} onBack={onBack} grad="linear-gradient(135deg,#0e7490,#0891b2)" />
-      <div style={{ padding: '20px 20px 0' }}>
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      <TopBar title={staffName} subtitle="Cleaner" onBack={onBack} />
+      <div style={{ padding: '0 16px' }}>
+        <SectionTitle text="Today's summary" />
+        <StatRow items={[
+          { label: 'Approved', value: cnt.Approved, color: C.success },
+          { label: 'Pending',  value: cnt.Pending,  color: C.warn    },
+          { label: 'Rejected', value: cnt.Rejected, color: C.danger  },
+        ]} />
 
-        {/* Stats */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-          <StatTile label="Approved" value={cnt.A} color={T.green} />
-          <StatTile label="Pending"  value={cnt.P} color={T.amber} />
-          <StatTile label="Rejected" value={cnt.R} color={T.red}   />
-        </div>
-
-        <SectionLabel text="Today's rooms" />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
-          {rooms.map(r => {
-            const ss = statusStyle(r.studentStatus);
-            return (
-              <Card key={r.room} style={{ padding: 18 }}>
-                {/* Room header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: T.tealBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 22, color: T.teal }}>door_front</span>
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 18, fontWeight: 800, color: T.text, margin: 0 }}>Room {r.room}</p>
-                      <p style={{ fontSize: 14, color: T.textMuted, margin: '3px 0 0', fontWeight: 500 }}>{r.studentName}</p>
-                    </div>
+        <SectionTitle text="Room status" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {rooms.map(r => (
+            <Card key={r.room} style={{ padding: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 22, color: C.primary }}>door_front</span>
                   </div>
-                  <StatusChip label={r.studentStatus} />
-                </div>
-
-                {/* Info row */}
-                <div style={{ display: 'flex', gap: 10, marginBottom: r.studentStatus === 'Rejected' ? 12 : 0 }}>
-                  <div style={{ flex: 1, background: T.surface, borderRadius: 12, padding: '12px 14px' }}>
-                    <p style={{ fontSize: 11, color: T.textMuted, margin: '0 0 5px', fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase' }}>Cleaned At</p>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 16, color: T.green }}>check_circle</span>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: T.text }}>{r.cleanedAt}</span>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, background: T.surface, borderRadius: 12, padding: '12px 14px' }}>
-                    <p style={{ fontSize: 11, color: T.textMuted, margin: '0 0 5px', fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase' }}>Student</p>
-                    <StatusChip label={r.studentStatus} />
+                  <div>
+                    <p style={{ fontSize: 17, fontWeight: 800, color: C.text, margin: 0 }}>Room {r.room}</p>
+                    <p style={{ fontSize: 13, color: C.muted, margin: '3px 0 0' }}>{r.studentName}</p>
                   </div>
                 </div>
+                <Chip label={r.studentStatus} />
+              </div>
 
-                {r.studentStatus === 'Rejected' && (
-                  <div style={{ background: T.redBg, border: `1px solid rgba(248,113,113,0.25)`, borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
-                    <p style={{ fontSize: 14, color: T.red, margin: 0, fontWeight: 600 }}>❌ {r.rejectionNote}</p>
+              <div style={{ display: 'flex', gap: 10, marginBottom: r.studentStatus === 'Rejected' ? 12 : 0 }}>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 10, padding: '10px 14px', border: `1px solid ${C.border}` }}>
+                  <p style={{ fontSize: 11, fontWeight: 800, color: C.muted, margin: '0 0 5px', letterSpacing: 0.5, textTransform: 'uppercase' }}>Cleaned At</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 15, color: C.success }}>check_circle</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{r.cleanedAt}</span>
                   </div>
-                )}
+                </div>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 10, padding: '10px 14px', border: `1px solid ${C.border}` }}>
+                  <p style={{ fontSize: 11, fontWeight: 800, color: C.muted, margin: '0 0 5px', letterSpacing: 0.5, textTransform: 'uppercase' }}>Student</p>
+                  <Chip label={r.studentStatus} />
+                </div>
+              </div>
 
-                {r.studentStatus !== 'Approved' && (
-                  <button onClick={() => override(r.room)}
-                    style={{ marginTop: 4, width: '100%', padding: '12px', background: T.greenBg, border: `1.5px solid ${T.green}`, borderRadius: 12, color: T.green, fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
-                    ✅ Override — Mark Approved
-                  </button>
-                )}
-              </Card>
-            );
-          })}
+              {r.studentStatus === 'Rejected' && (
+                <div style={{ background: C.dangerBg, borderRadius: 10, padding: '10px 14px', marginBottom: 12, border: `1px solid #fecaca` }}>
+                  <p style={{ fontSize: 14, color: C.danger, margin: 0, fontWeight: 600 }}>Issue: {r.rejectionNote}</p>
+                </div>
+              )}
+              {r.studentStatus !== 'Approved' && (
+                <button onClick={() => override(r.room)}
+                  style={{ width: '100%', padding: '12px', background: C.successBg, border: `1.5px solid ${C.success}`, borderRadius: 10, color: C.success, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', marginTop: 4 }}>
+                  ✅ Override — Mark Approved
+                </button>
+              )}
+            </Card>
+          ))}
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TICKET VIEW  (Plumber / Electrician / Carpenter / RO)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── TICKET VIEW  (Plumber / Electrician / Carpenter / RO) ──────────────────
 export function TicketView({ staffId, staffName, role, onBack }) {
   const [tickets, setTickets] = useState(TICKET_DATA[staffId] || Object.values(TICKET_DATA)[0] || []);
   const [filter, setFilter] = useState('All');
@@ -450,78 +401,72 @@ export function TicketView({ staffId, staffName, role, onBack }) {
   const filtered = filter === 'All' ? tickets : tickets.filter(t => t.status === filter);
 
   return (
-    <Page>
-      <TopBar title={staffName} onBack={onBack} grad="linear-gradient(135deg,#312e81,#4f46e5)" />
-      <div style={{ padding: '20px 20px 0' }}>
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      <TopBar title={staffName} subtitle={role} onBack={onBack} />
+      <div style={{ padding: '0 16px' }}>
 
-        {/* Stats */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-          <StatTile label="Pending"  value={cnt.Pending}        color={T.amber} />
-          <StatTile label="Active"   value={cnt['In Progress']} color={T.indigo} />
-          <StatTile label="Done"     value={cnt.Resolved}       color={T.green} />
-        </div>
+        <SectionTitle text="Summary" />
+        <StatRow items={[
+          { label: 'Pending',  value: cnt.Pending,           color: C.warn    },
+          { label: 'Active',   value: cnt['In Progress'],    color: C.indigo  },
+          { label: 'Done',     value: cnt.Resolved,          color: C.success },
+        ]} />
 
-        {/* Filter pills */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20, overflowX: 'auto', paddingBottom: 4 }}>
+        {/* Filter tabs */}
+        <div style={{ display: 'flex', gap: 8, margin: '20px 0 16px', overflowX: 'auto', paddingBottom: 4 }}>
           {tabs.map(t => {
             const active = t === filter;
             return (
               <button key={t} onClick={() => setFilter(t)}
-                style={{ whiteSpace: 'nowrap', padding: '9px 18px', borderRadius: 99, fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all .2s', fontFamily: 'inherit', border: active ? 'none' : `1px solid ${T.cardBorder}`, background: active ? T.indigoDark : 'transparent', color: active ? '#fff' : T.textSub, boxShadow: active ? '0 4px 14px rgba(79,70,229,0.35)' : 'none' }}>
+                style={{ whiteSpace: 'nowrap', padding: '8px 16px', borderRadius: 20, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', border: active ? 'none' : `1px solid ${C.border}`, background: active ? C.primary : C.white, color: active ? '#fff' : C.muted, transition: 'all .15s' }}>
                 {t} ({cnt[t] ?? 0})
               </button>
             );
           })}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
-          {filtered.map(t => {
-            const ps = statusStyle(t.priority);
-            const ss = statusStyle(t.status);
-            return (
-              <Card key={t.id} style={{ padding: 18 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-                  <p style={{ fontSize: 17, fontWeight: 800, color: T.text, margin: 0, lineHeight: 1.4, flex: 1 }}>{t.issue}</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end', flexShrink: 0 }}>
-                    <StatusChip label={t.status} />
-                    <StatusChip label={t.priority} />
-                  </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {filtered.map(t => (
+            <Card key={t.id} style={{ padding: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
+                <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.4, flex: 1 }}>{t.issue}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'flex-end', flexShrink: 0 }}>
+                  <Chip label={t.status} />
+                  <Chip label={t.priority} />
                 </div>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: t.note ? 12 : 0 }}>
-                  <Pill label={`Rm ${t.room}`} color={T.indigo} bg={T.indigoBg} />
-                  <span style={{ fontSize: 13, color: T.textMuted, fontWeight: 500 }}>{t.date}</span>
+              </div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: t.note ? 12 : 0 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.primary, background: C.primaryBg, padding: '3px 8px', borderRadius: 6 }}>Rm {t.room}</span>
+                <span style={{ fontSize: 13, color: C.muted }}>{t.date}</span>
+              </div>
+              {t.note && (
+                <div style={{ background: C.bg, borderRadius: 8, padding: '10px 12px', border: `1px solid ${C.border}`, marginTop: 10, marginBottom: 4 }}>
+                  <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>📌 {t.note}</p>
                 </div>
-                {t.note && (
-                  <div style={{ background: T.surface, borderRadius: 10, padding: '10px 14px', marginBottom: 14 }}>
-                    <p style={{ fontSize: 14, color: T.textSub, margin: 0 }}>📌 {t.note}</p>
-                  </div>
-                )}
-                {t.status !== 'Resolved' && (
-                  <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-                    {t.status === 'Pending' && (
-                      <button onClick={() => update(t.id, 'In Progress')}
-                        style={{ flex: 1, padding: '11px', background: T.indigoBg, border: `1.5px solid ${T.indigo}`, borderRadius: 12, color: T.indigo, fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        Start Progress
-                      </button>
-                    )}
-                    <button onClick={() => update(t.id, 'Resolved')}
-                      style={{ flex: 1, padding: '11px', background: T.greenBg, border: `1.5px solid ${T.green}`, borderRadius: 12, color: T.green, fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
-                      Mark Done ✅
+              )}
+              {t.status !== 'Resolved' && (
+                <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                  {t.status === 'Pending' && (
+                    <button onClick={() => update(t.id, 'In Progress')}
+                      style={{ flex: 1, padding: '11px', background: C.indigoBg, border: `1.5px solid ${C.indigo}`, borderRadius: 10, color: C.indigo, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Start Progress
                     </button>
-                  </div>
-                )}
-              </Card>
-            );
-          })}
+                  )}
+                  <button onClick={() => update(t.id, 'Resolved')}
+                    style={{ flex: 1, padding: '11px', background: C.successBg, border: `1.5px solid ${C.success}`, borderRadius: 10, color: C.success, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    Mark Done ✅
+                  </button>
+                </div>
+              )}
+            </Card>
+          ))}
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PURCHASE MANAGER VIEW
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── PURCHASE MANAGER VIEW ────────────────────────────────────────────────────
 export function PurchaseManagerView({ staffId, staffName, onBack }) {
   const logs = PURCHASE_LOG[staffId] || Object.values(PURCHASE_LOG)[0] || [];
   const total = logs.reduce((s, l) => s + l.total, 0);
@@ -530,105 +475,103 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
   const filtered = filter === 'All' ? logs : logs.filter(l => l.category === filter);
 
   return (
-    <Page>
-      <TopBar title={staffName} onBack={onBack} grad="linear-gradient(135deg,#134e4a,#0f766e)" />
-      <div style={{ padding: '20px 20px 0' }}>
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      <TopBar title={staffName} subtitle="Purchase Manager" onBack={onBack} />
+      <div style={{ padding: '0 16px' }}>
 
-        {/* Spend hero */}
-        <div style={{ background: 'linear-gradient(135deg,#0d3b37,#0a2e2b)', border: '1px solid #1a5f5a', borderRadius: 24, padding: 24, marginBottom: 20 }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: T.teal, textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 8px' }}>Total Spent this Week</p>
-          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 44, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: -2 }}>
-            ₹ {total.toLocaleString('en-IN')}
-          </p>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', margin: 0, fontWeight: 600 }}>{logs.length} purchases logged</p>
+        {/* Spend summary */}
+        <SectionTitle text="This week's spend" />
+        <div style={{ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, borderRadius: 16, padding: '20px 22px', marginBottom: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: 600, margin: '0 0 6px' }}>Total Purchases</p>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 36, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: -1 }}>₹ {total.toLocaleString('en-IN')}</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0 }}>{logs.length} entries this week</p>
+          </div>
+          <span className="material-symbols-outlined" style={{ fontSize: 56, color: 'rgba(255,255,255,0.15)' }}>shopping_bag</span>
         </div>
 
-        {/* Category filter */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20, overflowX: 'auto', paddingBottom: 4 }}>
-          {cats.map(c => {
-            const active = c === filter;
+        {/* Filter tabs */}
+        <div style={{ display: 'flex', gap: 8, margin: '20px 0 16px', overflowX: 'auto', paddingBottom: 4 }}>
+          {cats.map(cat => {
+            const active = cat === filter;
             return (
-              <button key={c} onClick={() => setFilter(c)}
-                style={{ whiteSpace: 'nowrap', padding: '9px 18px', borderRadius: 99, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', border: active ? 'none' : `1px solid ${T.cardBorder}`, background: active ? T.tealDark : 'transparent', color: active ? '#fff' : T.textSub, boxShadow: active ? '0 4px 14px rgba(8,145,178,0.4)' : 'none', transition: 'all .2s' }}>
-                {c}
+              <button key={cat} onClick={() => setFilter(cat)}
+                style={{ whiteSpace: 'nowrap', padding: '8px 16px', borderRadius: 20, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', border: active ? 'none' : `1px solid ${C.border}`, background: active ? C.primary : C.white, color: active ? '#fff' : C.muted, transition: 'all .15s' }}>
+                {cat}
               </button>
             );
           })}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 20, overflow: 'hidden', marginBottom: 20 }}>
+        {/* Log list */}
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden' }}>
           {filtered.map((log, i) => (
-            <div key={log.id} style={{ padding: '16px 20px', borderBottom: i < filtered.length - 1 ? `1px solid ${T.cardBorder}` : 'none' }}>
+            <div key={log.id} style={{ padding: '14px 18px', borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : 'none' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, paddingRight: 12 }}>
-                  <p style={{ fontSize: 17, fontWeight: 800, color: T.text, margin: '0 0 4px' }}>{log.item}</p>
-                  <p style={{ fontSize: 14, color: T.textMuted, margin: '0 0 8px', fontWeight: 500 }}>{log.vendor}</p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>{log.item}</p>
+                  <p style={{ fontSize: 13, color: C.muted, margin: '0 0 7px' }}>{log.vendor}</p>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span style={{ fontSize: 13, color: T.textMuted, fontWeight: 600 }}>{log.date}</span>
-                    <Pill label={log.category} color={T.teal} bg={T.tealBg} />
+                    <span style={{ fontSize: 13, color: C.muted }}>{log.date}</span>
+                    <span style={{ fontSize: 12, background: C.primaryBg, color: C.primary, padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>{log.category}</span>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: T.text, margin: '0 0 4px' }}>₹{log.total.toLocaleString('en-IN')}</p>
-                  <p style={{ fontSize: 13, color: T.textMuted, margin: 0, fontWeight: 500 }}>{log.qty} {log.unit} × ₹{log.rate}</p>
+                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 17, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>₹{log.total.toLocaleString('en-IN')}</p>
+                  <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>{log.qty} {log.unit} × ₹{log.rate}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STAFF MEMBER LIST
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── STAFF MEMBER LIST ────────────────────────────────────────────────────────
 function StaffMemberList({ role, onBack, onSelect }) {
   const members = STAFF_MEMBERS[role.id] || [];
   return (
-    <Page>
-      <TopBar title={role.label} onBack={onBack} grad={role.grad} />
-      <div style={{ padding: '20px 20px 0' }}>
-        <SectionLabel text={`${members.length} member${members.length !== 1 ? 's' : ''}`} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      <TopBar title={role.label} subtitle={`${members.length} member${members.length !== 1 ? 's' : ''}`} onBack={onBack} />
+      <div style={{ padding: '0 16px' }}>
+        <SectionTitle text="Team members" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {members.map(m => (
-            <div key={m.id} onClick={() => onSelect(m)}
-              style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 18, padding: 18, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+            <Card key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: 16 }} onClick={() => onSelect(m)}>
               <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: role.bg || T.blueBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 26, color: role.accent }}>{role.icon}</span>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 24, color: C.primary }}>{role.icon}</span>
                 </div>
                 <div>
-                  <p style={{ fontSize: 17, fontWeight: 800, color: T.text, margin: '0 0 4px' }}>{m.name}</p>
-                  <p style={{ fontSize: 14, color: T.textMuted, margin: 0, fontWeight: 500 }}>Since {m.joined} · {m.phone}</p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>{m.name}</p>
+                  <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Since {m.joined} · {m.phone}</p>
                 </div>
               </div>
-              <span className="material-symbols-outlined" style={{ color: T.textMuted, fontSize: 22 }}>chevron_right</span>
-            </div>
+              <span className="material-symbols-outlined" style={{ color: C.border, fontSize: 22 }}>chevron_right</span>
+            </Card>
           ))}
           {members.length === 0 && (
-            <div style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 18, padding: '48px 20px', textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 48, color: T.textMuted, display: 'block', marginBottom: 12 }}>person_off</span>
-              <p style={{ fontSize: 16, fontWeight: 600, color: T.textSub, margin: 0 }}>No staff assigned yet.</p>
-            </div>
+            <Card style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 44, color: C.border, display: 'block', marginBottom: 10 }}>person_off</span>
+              <p style={{ fontSize: 15, color: C.muted, margin: 0 }}>No staff assigned yet.</p>
+            </Card>
           )}
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ROLE GRID  (entry point)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── ROLE GRID  (main entry) ──────────────────────────────────────────────────
 export default function StaffWork() {
   const navigate = useNavigate();
   const [selRole,  setSelRole]  = useState(null);
   const [selStaff, setSelStaff] = useState(null);
 
   if (selRole && selStaff) {
-    const p = { staffId: selStaff.id, staffName: selStaff.name, role: selRole.label, onBack: () => setSelStaff(null) };
+    const p   = { staffId: selStaff.id, staffName: selStaff.name, role: selRole.label, onBack: () => setSelStaff(null) };
     const cat = selRole.category;
     if (cat === 'A')       return <TimelineView {...p} />;
     if (cat === 'B_cook')  return <CookView {...p} />;
@@ -642,29 +585,33 @@ export default function StaffWork() {
   }
 
   return (
-    <Page>
-      <TopBar title="Staff Work" onBack={() => navigate(-1)} grad="linear-gradient(135deg,#0f1117,#1a1d27)" />
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      {/* Header */}
+      <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', gap: 14, position: 'sticky', top: 0, zIndex: 20 }}>
+        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex', alignItems: 'center', padding: 0 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 22 }}>arrow_back_ios_new</span>
+        </button>
+        <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Staff Work</p>
+      </div>
 
-      <div style={{ padding: '20px 20px 0' }}>
-        <SectionLabel text="Select a role" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 20 }}>
+      <div style={{ padding: '0 16px' }}>
+        <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '20px 0 12px' }}>Select a Role</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {ROLES.map(role => {
             const count = (STAFF_MEMBERS[role.id] || []).length;
             return (
               <div key={role.id} onClick={() => setSelRole(role)}
-                style={{ background: T.card, border: `1px solid ${T.cardBorder}`, borderRadius: 20, padding: 20, cursor: 'pointer', transition: 'transform 0.15s', position: 'relative', overflow: 'hidden' }}>
-                {/* Accent top bar */}
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: role.grad }} />
-                <div style={{ width: 48, height: 48, borderRadius: 14, background: role.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 24, color: role.accent }}>{role.icon}</span>
+                style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: 18, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 22, color: C.primary }}>{role.icon}</span>
                 </div>
-                <p style={{ fontSize: 15, fontWeight: 800, color: T.text, margin: '0 0 4px' }}>{role.label}</p>
-                <p style={{ fontSize: 13, color: T.textMuted, margin: 0, fontWeight: 600 }}>{count} member{count !== 1 ? 's' : ''}</p>
+                <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>{role.label}</p>
+                <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
               </div>
             );
           })}
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
