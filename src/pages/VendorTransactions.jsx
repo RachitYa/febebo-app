@@ -445,7 +445,6 @@ export default function VendorTransactions() {
             ))}
           </div>
           </div>
-        </div>
 
         {/* Purchase Modal */}
         {purchaseModalVendor && (
@@ -566,8 +565,8 @@ export default function VendorTransactions() {
         </div>
 
       </div>
-
-      </div>      {/* Filter Bottom Sheet */}
+      
+      {/* Filter Bottom Sheet */}
       {filterOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', zIndex: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(3px)' }}
           onClick={e => { if (e.target === e.currentTarget) setFilterOpen(false); }}>
