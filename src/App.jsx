@@ -14,6 +14,7 @@ import ManageTenants from './pages/ManageTenants';
 import ManageStaff from './pages/ManageStaff';
 import StaffAttendance from './pages/StaffAttendance';
 import StaffWork from './pages/StaffWork';
+import StaffWorkDetails from './pages/StaffWorkDetails';
 import ManageAccount from './pages/ManageAccount';
 import VendorTransactions from './pages/VendorTransactions';
 import Reports from './pages/Reports';
@@ -56,6 +57,7 @@ function AppRoutes() {
       <Route path="/staff/:id" element={<AdminRoute><StaffProfile /></AdminRoute>} />
       <Route path="/staff-attendance" element={<AdminRoute><StaffAttendance /></AdminRoute>} />
       <Route path="/staff-work" element={<AdminRoute><StaffWork /></AdminRoute>} />
+      <Route path="/staff-work/:id" element={<AdminRoute><StaffWorkDetails /></AdminRoute>} />
       <Route path="/manage-account" element={<AdminRoute><ManageAccount /></AdminRoute>} />
       <Route path="/vendor-transactions" element={<AdminRoute><VendorTransactions /></AdminRoute>} />
       <Route path="/reports" element={<AdminRoute><Reports /></AdminRoute>} />
