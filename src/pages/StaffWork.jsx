@@ -191,9 +191,9 @@ const StatusBadge = ({ status }) => {
 };
 
 // ─── Category A: Timeline View ────────────────────────────────────────────────
-function TimelineView({ staffId, staffName, role, onBack }) {
+export function TimelineView({ staffId, staffName, role, onBack }) {
   const [newNote, setNewNote] = useState('');
-  const logs = TIMELINE_LOGS[staffId] || [];
+  const logs = TIMELINE_LOGS[staffId] || Object.values(TIMELINE_LOGS)[0] || [];
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 80 }}>
@@ -241,8 +241,8 @@ function TimelineView({ staffId, staffName, role, onBack }) {
 }
 
 // ─── Category B: Cook View ────────────────────────────────────────────────────
-function CookView({ staffId, staffName, onBack }) {
-  const data = COOK_DATA[staffId];
+export function CookView({ staffId, staffName, onBack }) {
+  const data = COOK_DATA[staffId] || Object.values(COOK_DATA)[0];
   if (!data) return <div style={{ padding: 32, textAlign: 'center', color: C.muted }}>No data found.</div>;
 
   const { todayMenu, rating, totalReviews, reviews } = data;
@@ -308,8 +308,8 @@ function CookView({ staffId, staffName, onBack }) {
 }
 
 // ─── Category B: Cleaner View ─────────────────────────────────────────────────
-function CleanerView({ staffId, staffName, onBack }) {
-  const data = CLEANER_DATA[staffId];
+export function CleanerView({ staffId, staffName, onBack }) {
+  const data = CLEANER_DATA[staffId] || Object.values(CLEANER_DATA)[0];
   const [rooms, setRooms] = useState(data ? data.assignedRooms : []);
 
   const overrideStatus = (roomNum, newStatus) => {
@@ -389,8 +389,8 @@ function CleanerView({ staffId, staffName, onBack }) {
 }
 
 // ─── Category C: Ticket View ──────────────────────────────────────────────────
-function TicketView({ staffId, staffName, role, onBack }) {
-  const [tickets, setTickets] = useState(TICKET_DATA[staffId] || []);
+export function TicketView({ staffId, staffName, role, onBack }) {
+  const [tickets, setTickets] = useState(TICKET_DATA[staffId] || Object.values(TICKET_DATA)[0] || []);
   const [filter, setFilter] = useState('All');
 
   const updateStatus = (id, status) => {
@@ -474,8 +474,8 @@ function TicketView({ staffId, staffName, role, onBack }) {
 }
 
 // ─── Category D: Purchase Manager View ───────────────────────────────────────
-function PurchaseManagerView({ staffId, staffName, onBack }) {
-  const logs = PURCHASE_LOG[staffId] || [];
+export function PurchaseManagerView({ staffId, staffName, onBack }) {
+  const logs = PURCHASE_LOG[staffId] || Object.values(PURCHASE_LOG)[0] || [];
   const totalSpent = logs.reduce((s, l) => s + l.total, 0);
   const [filter, setFilter] = useState('All');
   const cats = ['All', ...new Set(logs.map(l => l.category))];
