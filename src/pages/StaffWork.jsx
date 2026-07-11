@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom';
 
 // ─── Colour palette ──────────────────────────────────────────────────────────
 const C = {
-  bg: '#f1f5f9',
-  white: 'white',
-  primary: '#0891b2',
-  primaryLight: '#ecfeff',
-  primaryBorder: '#a5f3fc',
+  bg: '#f8fafc', // Softer white-gray
+  white: '#ffffff',
+  primary: '#0284c7', // deeper blue
+  primaryLight: '#e0f2fe',
+  primaryBorder: '#bae6fd',
   text: '#0f172a',
   muted: '#64748b',
   border: '#e2e8f0',
-  success: '#16a34a',
-  successBg: '#dcfce7',
+  success: '#059669',
+  successBg: '#d1fae5',
   warn: '#d97706',
   warnBg: '#fef3c7',
   danger: '#e11d48',
-  dangerBg: '#fee2e2',
+  dangerBg: '#ffe4e6',
   purple: '#7c3aed',
   purpleBg: '#ede9fe',
   indigo: '#4f46e5',
@@ -25,12 +25,12 @@ const C = {
 
 // ─── Dummy Data ───────────────────────────────────────────────────────────────
 const ROLES = [
-  { id: 'hr',        label: 'HR',               icon: 'manage_accounts',  color: '#0891b2', bg: '#ecfeff',  category: 'A' },
+  { id: 'hr',        label: 'HR',               icon: 'manage_accounts',  color: '#0284c7', bg: '#e0f2fe',  category: 'A' },
   { id: 'manager',   label: 'Manager',           icon: 'supervisor_account', color: '#7c3aed', bg: '#ede9fe',  category: 'A' },
   { id: 'sales',     label: 'Sales Manager',     icon: 'query_stats',       color: '#059669', bg: '#d1fae5',  category: 'A' },
   { id: 'purchase',  label: 'Purchase Manager',  icon: 'shopping_bag',      color: '#d97706', bg: '#fef3c7',  category: 'D' },
-  { id: 'cook',      label: 'Cook',              icon: 'restaurant',        color: '#e11d48', bg: '#fee2e2',  category: 'B_cook' },
-  { id: 'cleaner',   label: 'Cleaner',           icon: 'mop',               color: '#0e7490', bg: '#cffafe',  category: 'B_clean' },
+  { id: 'cook',      label: 'Cook',              icon: 'restaurant',        color: '#e11d48', bg: '#ffe4e6',  category: 'B_cook' },
+  { id: 'cleaner',   label: 'Cleaner',           icon: 'mop',               color: '#0891b2', bg: '#cffafe',  category: 'B_clean' },
   { id: 'helper',    label: 'Helper',            icon: 'handyman',          color: '#92400e', bg: '#fef3c7',  category: 'A' },
   { id: 'plumber',   label: 'Plumber',           icon: 'plumbing',          color: '#1d4ed8', bg: '#dbeafe',  category: 'C' },
   { id: 'electrician', label: 'Electrician',     icon: 'electric_bolt',     color: '#b45309', bg: '#fef9c3',  category: 'C' },
@@ -52,7 +52,6 @@ const STAFF_MEMBERS = {
   ro:         [{ id: 'r1', name: 'Anil Gupta',       joined: 'Dec 2023', phone: '9111222333' }],
 };
 
-// Category A: Timeline logs
 const TIMELINE_LOGS = {
   h1: [
     { id: 1, date: '2026-07-11', time: '10:30 AM', text: 'Interviewed 2 candidates for Cook position. Shortlisted 1.', pinned: true },
@@ -77,7 +76,6 @@ const TIMELINE_LOGS = {
   ],
 };
 
-// Category B: Cook
 const COOK_DATA = {
   c1: {
     todayMenu: { breakfast: 'Poha + Chai', lunch: 'Dal Tadka, Jeera Rice, Roti', dinner: 'Rajma, Rice, Sabzi' },
@@ -101,7 +99,6 @@ const COOK_DATA = {
   },
 };
 
-// Category B: Cleaner
 const CLEANER_DATA = {
   cl1: {
     assignedRooms: [
@@ -120,7 +117,6 @@ const CLEANER_DATA = {
   },
 };
 
-// Category C: Tickets
 const TICKET_DATA = {
   pl1: [
     { id: 1, issue: 'Leaking tap in bathroom', room: '104', date: '2026-07-11', status: 'In Progress', priority: 'High', note: 'Ordered new washer' },
@@ -143,7 +139,6 @@ const TICKET_DATA = {
   ],
 };
 
-// Category D: Purchase Log
 const PURCHASE_LOG = {
   p1: [
     { id: 1, date: '2026-07-11', item: 'Basmati Rice', qty: 25, unit: 'kg', rate: 65, total: 1625, vendor: 'Sharma Traders', category: 'Grocery' },
@@ -155,13 +150,13 @@ const PURCHASE_LOG = {
 };
 
 // ─── Helper Components ────────────────────────────────────────────────────────
-const Header = ({ title, onBack }) => (
-  <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 20 }}>
-    <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex' }}>
-      <span className="material-symbols-outlined">arrow_back</span>
+const Header = ({ title, onBack, bgGrad = 'linear-gradient(135deg, #0f172a, #1e293b)' }) => (
+  <div style={{ background: bgGrad, padding: '20px', display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, zIndex: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+    <button onClick={onBack} style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', border: 'none', cursor: 'pointer', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%' }}>
+      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back_ios_new</span>
     </button>
-    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: C.text, margin: 0, flex: 1, textAlign: 'center' }}>{title}</p>
-    <div style={{ width: 32 }} />
+    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 22, color: 'white', margin: 0, flex: 1, letterSpacing: 0.5 }}>{title}</p>
+    <div style={{ width: 40 }} />
   </div>
 );
 
@@ -169,10 +164,10 @@ const StarRating = ({ rating }) => {
   const stars = [];
   for (let i = 1; i <= 5; i++) {
     stars.push(
-      <span key={i} className="material-symbols-outlined" style={{ fontSize: 16, color: i <= Math.round(rating) ? '#f59e0b' : '#e2e8f0' }}>star</span>
+      <span key={i} className="material-symbols-outlined" style={{ fontSize: 22, color: i <= Math.round(rating) ? '#f59e0b' : '#e2e8f0' }}>star</span>
     );
   }
-  return <div style={{ display: 'flex', gap: 1 }}>{stars}</div>;
+  return <div style={{ display: 'flex', gap: 4 }}>{stars}</div>;
 };
 
 const StatusBadge = ({ status }) => {
@@ -187,7 +182,7 @@ const StatusBadge = ({ status }) => {
     'Low': { bg: '#f1f5f9', color: C.muted },
   };
   const s = map[status] || { bg: '#f1f5f9', color: C.muted };
-  return <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: s.bg, color: s.color }}>{status}</span>;
+  return <span style={{ fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 20, background: s.bg, color: s.color, letterSpacing: 0.3 }}>{status}</span>;
 };
 
 // ─── Category A: Timeline View ────────────────────────────────────────────────
@@ -197,41 +192,45 @@ export function TimelineView({ staffId, staffName, role, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 80 }}>
-      <Header title={`${staffName} — Work Log`} onBack={onBack} />
-      <div style={{ padding: 16 }}>
+      <Header title="Activity Timeline" onBack={onBack} bgGrad="linear-gradient(135deg, #0284c7, #0369a1)" />
+      <div style={{ padding: 20 }}>
         {/* Summary card */}
-        <div style={{ background: 'linear-gradient(135deg, #0891b2, #0e7490)', borderRadius: 16, padding: 20, marginBottom: 20, color: 'white' }}>
-          <p style={{ fontSize: 12, opacity: 0.8, margin: '0 0 4px' }}>{role}</p>
-          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 20, fontWeight: 800, margin: '0 0 8px' }}>{staffName}</p>
-          <p style={{ fontSize: 13, opacity: 0.9, margin: 0 }}>{logs.length} updates logged</p>
+        <div style={{ background: C.white, borderRadius: 20, padding: 20, marginBottom: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.04)', display: 'flex', gap: 16, alignItems: 'center' }}>
+          <div style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg, #0284c7, #0369a1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 32 }}>person</span>
+          </div>
+          <div>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 22, fontWeight: 800, margin: '0 0 4px', color: C.text }}>{staffName}</p>
+            <p style={{ fontSize: 15, color: C.primary, margin: 0, fontWeight: 600 }}>{role}</p>
+          </div>
         </div>
 
         {/* Admin reply box */}
-        <div style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 16, marginBottom: 20 }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: C.text, margin: '0 0 10px' }}>📝 Add Admin Note</p>
-          <textarea value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Type a note or instruction for this staff member..."
-            style={{ width: '100%', minHeight: 80, padding: '10px 12px', border: `1.5px solid ${C.border}`, borderRadius: 10, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box', color: C.text }} />
+        <div style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${C.border}`, padding: 20, marginBottom: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+          <p style={{ fontSize: 16, fontWeight: 700, color: C.text, margin: '0 0 12px' }}>📝 Leave an Instruction</p>
+          <textarea value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Type a message for this staff member..."
+            style={{ width: '100%', minHeight: 90, padding: '14px', border: `1.5px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box', color: C.text, backgroundColor: '#f8fafc' }} />
           <button
             onClick={() => setNewNote('')}
-            style={{ marginTop: 8, padding: '8px 20px', background: C.primary, border: 'none', borderRadius: 10, color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            style={{ marginTop: 12, width: '100%', padding: '14px', background: C.primary, border: 'none', borderRadius: 12, color: 'white', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(2,132,199,0.3)' }}>
             Send Note
           </button>
         </div>
 
-        <p style={{ fontSize: 13, fontWeight: 700, color: C.muted, marginBottom: 12 }}>Recent Activity</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <p style={{ fontSize: 16, fontWeight: 700, color: C.muted, marginBottom: 16, paddingLeft: 4 }}>Recent Activity</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {logs.map(log => (
-            <div key={log.id} style={{ background: C.white, borderRadius: 14, border: `1px solid ${log.pinned ? C.primaryBorder : C.border}`, padding: 16, position: 'relative' }}>
+            <div key={log.id} style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${log.pinned ? C.primaryBorder : C.border}`, padding: 20, position: 'relative', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
               {log.pinned && (
-                <div style={{ position: 'absolute', top: 12, right: 12, background: C.primaryLight, borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 700, color: C.primary, display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 12 }}>push_pin</span> Pinned
+                <div style={{ position: 'absolute', top: 16, right: 16, background: C.primaryLight, borderRadius: 20, padding: '4px 10px', fontSize: 12, fontWeight: 700, color: C.primary, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 14 }}>push_pin</span> Pinned
                 </div>
               )}
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 16, color: C.muted }}>schedule</span>
-                <span style={{ fontSize: 12, color: C.muted }}>{log.date} · {log.time}</span>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20, color: C.primary }}>schedule</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: C.muted }}>{log.date} at {log.time}</span>
               </div>
-              <p style={{ fontSize: 14, color: C.text, margin: 0, lineHeight: 1.6 }}>{log.text}</p>
+              <p style={{ fontSize: 16, color: C.text, margin: 0, lineHeight: 1.6, fontWeight: 500 }}>{log.text}</p>
             </div>
           ))}
         </div>
@@ -249,56 +248,56 @@ export function CookView({ staffId, staffName, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-      <Header title={`${staffName} — Cook`} onBack={onBack} />
-      <div style={{ padding: 16 }}>
+      <Header title={`${staffName} — Kitchen`} onBack={onBack} bgGrad="linear-gradient(135deg, #e11d48, #be123c)" />
+      <div style={{ padding: 20 }}>
         {/* Rating Summary */}
-        <div style={{ background: 'linear-gradient(135deg,#e11d48,#be123c)', borderRadius: 16, padding: 20, marginBottom: 20, color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: 'linear-gradient(135deg,#e11d48,#9f1239)', borderRadius: 24, padding: 24, marginBottom: 24, color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 8px 24px rgba(225,29,72,0.3)' }}>
           <div>
-            <p style={{ fontSize: 12, opacity: 0.8, margin: '0 0 4px' }}>Average Food Rating</p>
-            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 36, fontWeight: 800, margin: '0 0 4px' }}>{rating}</p>
-            <div style={{ display: 'flex', gap: 2 }}>
+            <p style={{ fontSize: 15, opacity: 0.9, margin: '0 0 6px', fontWeight: 600 }}>Overall Food Rating</p>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 48, fontWeight: 800, margin: '0 0 8px', letterSpacing: -1 }}>{rating}<span style={{fontSize: 24, opacity: 0.7}}>/5</span></p>
+            <div style={{ display: 'flex', gap: 4 }}>
               {[1,2,3,4,5].map(i => (
-                <span key={i} className="material-symbols-outlined" style={{ fontSize: 16, color: i <= Math.round(rating) ? '#fde68a' : 'rgba(255,255,255,0.3)' }}>star</span>
+                <span key={i} className="material-symbols-outlined" style={{ fontSize: 20, color: i <= Math.round(rating) ? '#fde68a' : 'rgba(255,255,255,0.2)' }}>star</span>
               ))}
             </div>
-            <p style={{ fontSize: 12, opacity: 0.7, margin: '6px 0 0' }}>{totalReviews} reviews</p>
+            <p style={{ fontSize: 14, opacity: 0.8, margin: '8px 0 0', fontWeight: 600 }}>{totalReviews} student reviews</p>
           </div>
-          <span className="material-symbols-outlined" style={{ fontSize: 64, opacity: 0.15 }}>restaurant</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 80, opacity: 0.15 }}>restaurant</span>
         </div>
 
         {/* Today's Menu */}
-        <p style={{ fontSize: 13, fontWeight: 700, color: C.muted, marginBottom: 10 }}>Today's Menu</p>
-        <div style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, overflow: 'hidden', marginBottom: 20 }}>
+        <p style={{ fontSize: 16, fontWeight: 700, color: C.muted, marginBottom: 16, paddingLeft: 4 }}>Today's Menu</p>
+        <div style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${C.border}`, overflow: 'hidden', marginBottom: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
           {[
             { meal: 'Breakfast', icon: 'free_breakfast', item: todayMenu.breakfast },
             { meal: 'Lunch', icon: 'lunch_dining', item: todayMenu.lunch },
             { meal: 'Dinner', icon: 'dinner_dining', item: todayMenu.dinner },
           ].map((m, i, arr) => (
-            <div key={m.meal} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-              <div style={{ background: '#fff1f2', borderRadius: 10, padding: 8, display: 'flex' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#e11d48' }}>{m.icon}</span>
+            <div key={m.meal} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderBottom: i < arr.length - 1 ? `1.5px solid ${C.border}` : 'none' }}>
+              <div style={{ background: '#ffe4e6', borderRadius: 12, padding: 12, display: 'flex' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 24, color: '#e11d48' }}>{m.icon}</span>
               </div>
               <div>
-                <p style={{ fontSize: 11, color: C.muted, margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{m.meal}</p>
-                <p style={{ fontSize: 14, color: C.text, fontWeight: 600, margin: '2px 0 0' }}>{m.item}</p>
+                <p style={{ fontSize: 13, color: '#e11d48', margin: 0, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>{m.meal}</p>
+                <p style={{ fontSize: 17, color: C.text, fontWeight: 700, margin: '4px 0 0' }}>{m.item}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Reviews */}
-        <p style={{ fontSize: 13, fontWeight: 700, color: C.muted, marginBottom: 10 }}>Student Reviews</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <p style={{ fontSize: 16, fontWeight: 700, color: C.muted, marginBottom: 16, paddingLeft: 4 }}>Recent Feedback</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {reviews.map(r => (
-            <div key={r.id} style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+            <div key={r.id} style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${C.border}`, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: C.text, margin: '0 0 2px' }}>{r.tenant} <span style={{ color: C.muted, fontWeight: 400, fontSize: 12 }}>Room {r.room}</span></p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{r.tenant} <span style={{ color: C.muted, fontWeight: 500, fontSize: 14 }}>— Room {r.room}</span></p>
                   <StarRating rating={r.rating} />
                 </div>
-                <span style={{ fontSize: 12, color: C.muted }}>{r.date}</span>
+                <span style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>{r.date}</span>
               </div>
-              <p style={{ fontSize: 13, color: C.muted, margin: 0, lineHeight: 1.5 }}>"{r.text}"</p>
+              <p style={{ fontSize: 15, color: C.text, margin: 0, lineHeight: 1.5 }}>"{r.text}"</p>
             </div>
           ))}
         </div>
@@ -324,60 +323,60 @@ export function CleanerView({ staffId, staffName, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-      <Header title={`${staffName} — Cleaning`} onBack={onBack} />
-      <div style={{ padding: 16 }}>
+      <Header title={`${staffName} — Cleaning`} onBack={onBack} bgGrad="linear-gradient(135deg, #0284c7, #0369a1)" />
+      <div style={{ padding: 20 }}>
         {/* Summary */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
           {[
             { label: 'Approved', count: counts.Approved, bg: C.successBg, color: C.success },
             { label: 'Pending', count: counts.Pending, bg: C.warnBg, color: C.warn },
             { label: 'Rejected', count: counts.Rejected, bg: C.dangerBg, color: C.danger },
           ].map(s => (
-            <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
-              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 24, fontWeight: 800, color: s.color, margin: '0 0 2px' }}>{s.count}</p>
-              <p style={{ fontSize: 11, fontWeight: 700, color: s.color, margin: 0, textTransform: 'uppercase' }}>{s.label}</p>
+            <div key={s.label} style={{ background: C.white, borderRadius: 16, border: `2px solid ${s.bg}`, padding: '16px 8px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 32, fontWeight: 800, color: s.color, margin: '0 0 4px' }}>{s.count}</p>
+              <p style={{ fontSize: 13, fontWeight: 800, color: s.color, margin: 0, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.label}</p>
             </div>
           ))}
         </div>
 
-        <p style={{ fontSize: 13, fontWeight: 700, color: C.muted, marginBottom: 10 }}>Room Status Board — Today</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <p style={{ fontSize: 16, fontWeight: 700, color: C.muted, marginBottom: 16, paddingLeft: 4 }}>Today's Room Status</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {rooms.map(r => (
-            <div key={r.room} style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <div style={{ width: 40, height: 40, background: C.primaryLight, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: C.primary }}>door_front</span>
+            <div key={r.room} style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${C.border}`, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div style={{ width: 48, height: 48, background: C.primaryLight, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 24, color: C.primary }}>door_front</span>
                   </div>
                   <div>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: C.text, margin: 0 }}>Room {r.room}</p>
-                    <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>{r.studentName}</p>
+                    <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Room {r.room}</p>
+                    <p style={{ fontSize: 14, color: C.muted, margin: '4px 0 0', fontWeight: 500 }}>Tenant: {r.studentName}</p>
                   </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 8, marginBottom: r.studentStatus === 'Rejected' ? 8 : 0 }}>
-                <div style={{ flex: 1, background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-                  <p style={{ fontSize: 10, color: C.muted, margin: '0 0 2px', fontWeight: 600 }}>STAFF</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: C.success }}>check_circle</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>Cleaned {r.cleanedAt}</span>
+              <div style={{ display: 'flex', gap: 12, marginBottom: r.studentStatus === 'Rejected' ? 12 : 0 }}>
+                <div style={{ flex: 1, background: '#f8fafc', borderRadius: 12, padding: '12px 14px', border: `1px solid ${C.border}` }}>
+                  <p style={{ fontSize: 12, color: C.muted, margin: '0 0 6px', fontWeight: 800, letterSpacing: 0.5 }}>STAFF STATUS</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 18, color: C.success }}>check_circle</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{r.cleanedAt}</span>
                   </div>
                 </div>
-                <div style={{ flex: 1, background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-                  <p style={{ fontSize: 10, color: C.muted, margin: '0 0 2px', fontWeight: 600 }}>STUDENT</p>
+                <div style={{ flex: 1, background: '#f8fafc', borderRadius: 12, padding: '12px 14px', border: `1px solid ${C.border}` }}>
+                  <p style={{ fontSize: 12, color: C.muted, margin: '0 0 6px', fontWeight: 800, letterSpacing: 0.5 }}>STUDENT STATUS</p>
                   <StatusBadge status={r.studentStatus} />
                 </div>
               </div>
               {r.studentStatus === 'Rejected' && (
-                <div style={{ background: C.dangerBg, borderRadius: 8, padding: '8px 10px', marginBottom: 10 }}>
-                  <p style={{ fontSize: 12, color: C.danger, margin: 0 }}>❌ {r.rejectionNote}</p>
+                <div style={{ background: C.dangerBg, borderRadius: 12, padding: '12px 16px', marginBottom: 12, border: `1px solid #fda4af` }}>
+                  <p style={{ fontSize: 14, color: C.danger, margin: 0, fontWeight: 600 }}>❌ Issue: {r.rejectionNote}</p>
                 </div>
               )}
               {/* Admin Override */}
               {r.studentStatus !== 'Approved' && (
                 <button onClick={() => overrideStatus(r.room, 'Approved')}
-                  style={{ width: '100%', padding: '8px', background: C.successBg, border: `1px solid ${C.success}`, borderRadius: 8, color: C.success, fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
-                  ✅ Admin Override — Mark as Approved
+                  style={{ width: '100%', padding: '14px', background: C.successBg, border: `1.5px solid ${C.success}`, borderRadius: 12, color: C.success, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: 'inherit', marginTop: 8 }}>
+                  ✅ Override to Approved
                 </button>
               )}
             </div>
@@ -402,65 +401,64 @@ export function TicketView({ staffId, staffName, role, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-      <Header title={`${staffName} — ${role}`} onBack={onBack} />
-      <div style={{ padding: 16 }}>
+      <Header title={`${staffName} — ${role}`} onBack={onBack} bgGrad="linear-gradient(135deg, #4f46e5, #3730a3)" />
+      <div style={{ padding: 20 }}>
         {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
           {[
             { label: 'Pending', count: counts.Pending, bg: C.warnBg, color: C.warn },
             { label: 'In Progress', count: counts['In Progress'], bg: C.indigoBg, color: C.indigo },
             { label: 'Resolved', count: counts.Resolved, bg: C.successBg, color: C.success },
           ].map(s => (
-            <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
-              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 24, fontWeight: 800, color: s.color, margin: '0 0 2px' }}>{s.count}</p>
-              <p style={{ fontSize: 10, fontWeight: 700, color: s.color, margin: 0, textTransform: 'uppercase' }}>{s.label}</p>
+            <div key={s.label} style={{ background: C.white, borderRadius: 16, border: `2px solid ${s.bg}`, padding: '16px 8px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 32, fontWeight: 800, color: s.color, margin: '0 0 4px' }}>{s.count}</p>
+              <p style={{ fontSize: 12, fontWeight: 800, color: s.color, margin: 0, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* Filter tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20, overflowX: 'auto', paddingBottom: 8 }}>
           {['All', 'Pending', 'In Progress', 'Resolved'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              style={{ whiteSpace: 'nowrap', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: filter === f ? 'none' : `1px solid ${C.border}`, background: filter === f ? C.primary : C.white, color: filter === f ? 'white' : C.muted, transition: 'all 0.2s' }}>
+              style={{ whiteSpace: 'nowrap', padding: '10px 20px', borderRadius: 24, fontSize: 15, fontWeight: 700, cursor: 'pointer', border: filter === f ? 'none' : `1.5px solid ${C.border}`, background: filter === f ? C.indigo : C.white, color: filter === f ? 'white' : C.muted, transition: 'all 0.2s', boxShadow: filter === f ? '0 4px 12px rgba(79,70,229,0.3)' : 'none' }}>
               {f} {counts[f] !== undefined ? `(${counts[f]})` : ''}
             </button>
           ))}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {filtered.map(t => (
-            <div key={t.id} style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <div style={{ flex: 1, paddingRight: 8 }}>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: C.text, margin: '0 0 4px' }}>{t.issue}</p>
+            <div key={t.id} style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${C.border}`, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                <div style={{ flex: 1, paddingRight: 12 }}>
+                  <p style={{ fontSize: 17, fontWeight: 800, color: C.text, margin: '0 0 6px', lineHeight: 1.4 }}>{t.issue}</p>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span style={{ fontSize: 12, color: C.muted }}>Room {t.room}</span>
-                    <span style={{ fontSize: 11, color: C.muted }}>·</span>
-                    <span style={{ fontSize: 12, color: C.muted }}>{t.date}</span>
+                    <span style={{ fontSize: 14, color: C.indigo, fontWeight: 700, background: C.indigoBg, padding: '2px 8px', borderRadius: 6 }}>Room {t.room}</span>
+                    <span style={{ fontSize: 14, color: C.muted, fontWeight: 500 }}>{t.date}</span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4, flexDirection: 'column', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: 8, flexDirection: 'column', alignItems: 'flex-end' }}>
                   <StatusBadge status={t.status} />
                   <StatusBadge status={t.priority} />
                 </div>
               </div>
               {t.note && (
-                <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px', marginBottom: 10 }}>
-                  <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>📌 {t.note}</p>
+                <div style={{ background: '#f8fafc', borderRadius: 12, padding: '12px 14px', marginBottom: 16, border: `1px solid ${C.border}` }}>
+                  <p style={{ fontSize: 14, color: C.muted, margin: 0, fontWeight: 500 }}>📌 {t.note}</p>
                 </div>
               )}
               {/* Admin Actions */}
               {t.status !== 'Resolved' && (
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 12 }}>
                   {t.status === 'Pending' && (
                     <button onClick={() => updateStatus(t.id, 'In Progress')}
-                      style={{ flex: 1, padding: '7px', background: C.indigoBg, border: `1px solid ${C.indigo}`, borderRadius: 8, color: C.indigo, fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      style={{ flex: 1, padding: '12px', background: C.indigoBg, border: `1.5px solid ${C.indigo}`, borderRadius: 12, color: C.indigo, fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
                       Mark In Progress
                     </button>
                   )}
                   <button onClick={() => updateStatus(t.id, 'Resolved')}
-                    style={{ flex: 1, padding: '7px', background: C.successBg, border: `1px solid ${C.success}`, borderRadius: 8, color: C.success, fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    style={{ flex: 1, padding: '12px', background: C.successBg, border: `1.5px solid ${C.success}`, borderRadius: 12, color: C.success, fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
                     Mark Resolved ✅
                   </button>
                 </div>
@@ -483,40 +481,40 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-      <Header title={`${staffName} — Purchases`} onBack={onBack} />
-      <div style={{ padding: 16 }}>
+      <Header title={`${staffName} — Purchases`} onBack={onBack} bgGrad="linear-gradient(135deg, #d97706, #92400e)" />
+      <div style={{ padding: 20 }}>
         {/* Total */}
-        <div style={{ background: 'linear-gradient(135deg,#d97706,#92400e)', borderRadius: 16, padding: 20, marginBottom: 20, color: 'white' }}>
-          <p style={{ fontSize: 12, opacity: 0.8, margin: '0 0 4px' }}>Total Spent (Recent)</p>
-          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 32, fontWeight: 800, margin: '0 0 4px' }}>₹ {totalSpent.toLocaleString('en-IN')}</p>
-          <p style={{ fontSize: 12, opacity: 0.7, margin: 0 }}>{logs.length} purchases logged</p>
+        <div style={{ background: 'linear-gradient(135deg,#d97706,#b45309)', borderRadius: 24, padding: 24, marginBottom: 24, color: 'white', boxShadow: '0 8px 24px rgba(217,119,6,0.3)' }}>
+          <p style={{ fontSize: 15, opacity: 0.9, margin: '0 0 6px', fontWeight: 600 }}>Total Spent (Recent)</p>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 44, fontWeight: 800, margin: '0 0 8px', letterSpacing: -1 }}>₹ {totalSpent.toLocaleString('en-IN')}</p>
+          <p style={{ fontSize: 14, opacity: 0.8, margin: 0, fontWeight: 500 }}>{logs.length} purchases logged this week</p>
         </div>
 
         {/* Category filter */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20, overflowX: 'auto', paddingBottom: 8 }}>
           {cats.map(cat => (
             <button key={cat} onClick={() => setFilter(cat)}
-              style={{ whiteSpace: 'nowrap', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: filter === cat ? 'none' : `1px solid ${C.border}`, background: filter === cat ? C.primary : C.white, color: filter === cat ? 'white' : C.muted, transition: 'all 0.2s' }}>
+              style={{ whiteSpace: 'nowrap', padding: '10px 20px', borderRadius: 24, fontSize: 15, fontWeight: 700, cursor: 'pointer', border: filter === cat ? 'none' : `1.5px solid ${C.border}`, background: filter === cat ? '#d97706' : C.white, color: filter === cat ? 'white' : C.muted, transition: 'all 0.2s', boxShadow: filter === cat ? '0 4px 12px rgba(217,119,6,0.3)' : 'none' }}>
               {cat}
             </button>
           ))}
         </div>
 
-        <div style={{ background: C.white, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden' }}>
+        <div style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${C.border}`, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
           {filtered.map((log, i) => (
-            <div key={log.id} style={{ padding: '14px 16px', borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+            <div key={log.id} style={{ padding: '16px 20px', borderBottom: i < filtered.length - 1 ? `1.5px solid ${C.border}` : 'none' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: C.text, margin: '0 0 4px' }}>{log.item}</p>
-                  <p style={{ fontSize: 12, color: C.muted, margin: '0 0 4px' }}>{log.vendor}</p>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: C.muted }}>{log.date}</span>
-                    <span style={{ fontSize: 11, background: C.warnBg, color: C.warn, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>{log.category}</span>
+                  <p style={{ fontSize: 17, fontWeight: 800, color: C.text, margin: '0 0 6px' }}>{log.item}</p>
+                  <p style={{ fontSize: 14, color: C.muted, margin: '0 0 8px', fontWeight: 500 }}>{log.vendor}</p>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>{log.date}</span>
+                    <span style={{ fontSize: 12, background: C.warnBg, color: C.warn, padding: '4px 10px', borderRadius: 20, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>{log.category}</span>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 15, color: C.text, margin: '0 0 4px' }}>₹{log.total.toLocaleString('en-IN')}</p>
-                  <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>{log.qty} {log.unit} × ₹{log.rate}</p>
+                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 18, color: C.text, margin: '0 0 6px' }}>₹{log.total.toLocaleString('en-IN')}</p>
+                  <p style={{ fontSize: 14, color: C.muted, margin: 0, fontWeight: 600 }}>{log.qty} {log.unit} × ₹{log.rate}</p>
                 </div>
               </div>
             </div>
@@ -532,28 +530,28 @@ function StaffMemberList({ role, onBack, onSelectStaff }) {
   const members = STAFF_MEMBERS[role.id] || [];
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-      <Header title={role.label} onBack={onBack} />
-      <div style={{ padding: 16 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: C.muted, marginBottom: 12 }}>{members.length} staff member{members.length !== 1 ? 's' : ''}</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <Header title={role.label} onBack={onBack} bgGrad={role.color} />
+      <div style={{ padding: 20 }}>
+        <p style={{ fontSize: 15, fontWeight: 700, color: C.muted, marginBottom: 16 }}>{members.length} staff member{members.length !== 1 ? 's' : ''}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {members.map(m => (
-            <div key={m.id} onClick={() => onSelectStaff(m)} style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 12, background: role.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 22, color: role.color }}>{role.icon}</span>
+            <div key={m.id} onClick={() => onSelectStaff(m)} style={{ background: C.white, borderRadius: 16, border: `1.5px solid ${C.border}`, padding: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: role.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 28, color: role.color }}>{role.icon}</span>
                 </div>
                 <div>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: C.text, margin: '0 0 2px' }}>{m.name}</p>
-                  <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>Since {m.joined} · {m.phone}</p>
+                  <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{m.name}</p>
+                  <p style={{ fontSize: 14, color: C.muted, margin: 0, fontWeight: 500 }}>Since {m.joined} · {m.phone}</p>
                 </div>
               </div>
-              <span className="material-symbols-outlined" style={{ color: '#cbd5e1', fontSize: 20 }}>chevron_right</span>
+              <span className="material-symbols-outlined" style={{ color: '#cbd5e1', fontSize: 24 }}>chevron_right</span>
             </div>
           ))}
           {members.length === 0 && (
-            <div style={{ background: C.white, borderRadius: 14, padding: '32px 16px', textAlign: 'center', color: C.muted, border: `1px solid ${C.border}` }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 40, display: 'block', marginBottom: 8, opacity: 0.4 }}>person_off</span>
-              No staff assigned to this role yet.
+            <div style={{ background: C.white, borderRadius: 16, padding: '40px 20px', textAlign: 'center', color: C.muted, border: `1.5px solid ${C.border}` }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 12, opacity: 0.4 }}>person_off</span>
+              <p style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>No staff assigned to this role yet.</p>
             </div>
           )}
         </div>
@@ -574,12 +572,13 @@ export default function StaffWork() {
     const commonProps = {
       staffId: selectedStaff.id,
       staffName: selectedStaff.name,
+      role: selectedRole.label,
       onBack: () => setSelectedStaff(null),
     };
-    if (cat === 'A') return <TimelineView {...commonProps} role={selectedRole.label} />;
+    if (cat === 'A') return <TimelineView {...commonProps} />;
     if (cat === 'B_cook') return <CookView {...commonProps} />;
     if (cat === 'B_clean') return <CleanerView {...commonProps} />;
-    if (cat === 'C') return <TicketView {...commonProps} role={selectedRole.label} />;
+    if (cat === 'C') return <TicketView {...commonProps} />;
     if (cat === 'D') return <PurchaseManagerView {...commonProps} />;
   }
 
@@ -597,27 +596,21 @@ export default function StaffWork() {
   // Role Grid
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-      <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
-        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex' }}>
-          <span className="material-symbols-outlined">arrow_back</span>
-        </button>
-        <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: C.text, margin: 0, flex: 1, textAlign: 'center' }}>Staff Work</p>
-        <div style={{ width: 32 }} />
-      </div>
+      <Header title="Staff Work" onBack={() => navigate(-1)} bgGrad="linear-gradient(135deg, #0f172a, #1e293b)" />
 
-      <div style={{ padding: 16 }}>
-        <p style={{ fontSize: 13, color: C.muted, fontWeight: 600, marginBottom: 16 }}>Select a role to view work activity</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div style={{ padding: 20 }}>
+        <p style={{ fontSize: 15, color: C.muted, fontWeight: 700, marginBottom: 20 }}>Select a role to view work activity</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           {ROLES.map(role => {
             const count = (STAFF_MEMBERS[role.id] || []).length;
             return (
               <div key={role.id} onClick={() => setSelectedRole(role)}
-                style={{ background: C.white, borderRadius: 16, border: `1px solid ${C.border}`, padding: 18, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: role.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 24, color: role.color }}>{role.icon}</span>
+                style={{ background: C.white, borderRadius: 20, border: `1.5px solid ${C.border}`, padding: 20, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: role.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 28, color: role.color }}>{role.icon}</span>
                 </div>
-                <p style={{ fontSize: 14, fontWeight: 700, color: C.text, margin: '0 0 4px' }}>{role.label}</p>
-                <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
+                <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 6px' }}>{role.label}</p>
+                <p style={{ fontSize: 14, color: C.muted, margin: 0, fontWeight: 600 }}>{count} member{count !== 1 ? 's' : ''}</p>
               </div>
             );
           })}
