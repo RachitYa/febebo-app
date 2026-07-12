@@ -400,14 +400,30 @@ export default function VendorTransactions() {
     });
   };
 
-  const onClearPending = ({ month, amtNow }) => {
-    if (!selectedVendor) return;
+  const onClearPending = (payInfo) => {
+    if (!selectedVendor || !payInfo.month) return;
     setVendorData(prev => {
       const newData = JSON.parse(JSON.stringify(prev));
-      const mData = newData[selectedVendor.id].months[month];
-      if (mData) mData.pendingAmount = Math.max(0, (mData.pendingAmount || 0) - amtNow);
+      const mData = newData[selectedVendor.id].months[payInfo.month];
+      if (mData) {
+        mData.pendingAmount = Math.max(0, (mData.pendingAmount || 0) - payInfo.amtNow);
+        
+        // Add a clearing entry so it shows in the transaction history
+        const d = new Date();
+        const dateKey = `${d.getDate()} ${payInfo.month} (Cleared-${d.getTime()})`;
+        mData.days[dateKey] = {
+           amount: payInfo.amtNow,
+           mode: payInfo.method,
+           status: 'Paid',
+           items: [{ item: 'Cleared Pending Balance', qty: '-', unit: '', rate: '-', price: payInfo.amtNow }],
+           senderUPI: payInfo.senderUPI || '',
+           receiverUPI: payInfo.receiverUPI || '',
+           toWhom: payInfo.toWhom || ''
+        };
+      }
       return newData;
     });
+    setPendingModal(null);
   };
 
   // ── Detail View 4: Item Analytics ──
@@ -655,7 +671,7 @@ export default function VendorTransactions() {
             totalAmt={monthPending}
             defaultToWhom={pendingModal.vendor?.name}
             defaultReceiverUPI={pendingModal.vendor?.upi}
-            onConfirm={({ amtNow }) => onClearPending({ month: pendingModal.month, amtNow })}
+            onConfirm={(payInfo) => onClearPending({ ...payInfo, month: pendingModal.month })}
             onClose={() => setPendingModal(null)}
           />
         )}
@@ -683,7 +699,7 @@ export default function VendorTransactions() {
                 <span className="material-symbols-outlined" style={{ fontSize: 22, color: 'white' }}>store</span>
               </div>
               <div>
-                <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 2px' }}>{selectedVendor.name}</p>
+                <p onClick={() => setPurchaseModalVendor(selectedVendor)} style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 2px', cursor: 'pointer', textDecoration: 'underline' }}>{selectedVendor.name}</p>
                 <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{selectedVendor.store}</p>
               </div>
             </div>
@@ -775,7 +791,7 @@ export default function VendorTransactions() {
             totalAmt={currentVendorData?.months[pendingModal.month]?.pendingAmount || 0}
             defaultToWhom={pendingModal.vendor?.name}
             defaultReceiverUPI={pendingModal.vendor?.upi}
-            onConfirm={({ amtNow }) => onClearPending({ month: pendingModal.month, amtNow })}
+            onConfirm={(payInfo) => onClearPending({ ...payInfo, month: pendingModal.month })}
             onClose={() => setPendingModal(null)}
           />
         )}
@@ -839,7 +855,7 @@ export default function VendorTransactions() {
               <div key={v.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                 <div onClick={() => setSelectedVendor(v)} style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }}>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px' }}>{v.name}</p>
+                    <p onClick={(e) => { e.stopPropagation(); setPurchaseModalVendor(v); }} style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px', cursor: 'pointer', textDecoration: 'underline' }}>{v.name}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                       <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>store</span>
                       <span style={{ fontSize: 13, color: '#64748b' }}>{v.store}</span>
