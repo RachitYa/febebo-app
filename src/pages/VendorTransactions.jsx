@@ -22,6 +22,9 @@ const CATEGORY_ITEMS = {
     'Curd (Dahi)', 'Ghee', 'Lassi', 'Milk (Full Cream)', 'Milk (Toned)',
     'Paneer', 'Skimmed Milk Powder', 'Whey Protein',
   ],
+  Water: [
+    'RO Water (20L Camper)',
+  ],
 };
 
 const VENDORS = [
@@ -31,6 +34,7 @@ const VENDORS = [
   { id: 4, name: 'Meena Devi',   store: 'Shree Dairy Farm',   phone: '+91 9876543210', upi: 'meena.dairy@gpay', amount: '3,000', status: 'Paid',  category: 'Dairy' },
   { id: 5, name: 'Raju Verma',   store: 'Fresh Picks',        phone: '+91 9345678901', upi: 'rajuverma@upi', amount: '5,000', status: 'Paid',    category: 'Groceries' },
   { id: 6, name: 'Pintu Sahu',   store: 'Green Valley Farm',  phone: '+91 9456789012', upi: 'pintusahu@phonepe', amount: '3,000', status: 'Pending', category: 'Vegetables' },
+  { id: 7, name: 'Anil Gupta',   store: 'RO Water Supplier',  phone: '+91 9111222333', upi: 'anil@upi', amount: '2,000', status: 'Pending', category: 'Water' },
 ];
 
 const MONTHS_LIST = [
@@ -326,7 +330,7 @@ export default function VendorTransactions() {
   const [search, setSearch]                     = useState('');
   const [fromDate, setFromDate]                 = useState('2025-02-02');
   const [toDate, setToDate]                     = useState('2025-02-02');
-  const [categories, setCategories]             = useState(['Groceries', 'Laundry', 'Vegetables', 'Dairy']);
+  const [categories, setCategories]             = useState(['Groceries', 'Laundry', 'Vegetables', 'Dairy', 'Water']);
   const [activeCategory, setActiveCategory]     = useState('Groceries');
   const [purchaseModalVendor, setPurchaseModalVendor] = useState(null);
   const [vendorData, setVendorData]             = useState(INITIAL_VENDOR_DATA);
@@ -335,6 +339,9 @@ export default function VendorTransactions() {
   const [filterOpen, setFilterOpen]             = useState(false);
   const [filterStatus, setFilterStatus]         = useState('All Payments');
   const [pendingModal, setPendingModal]         = useState(null); // { vendor, month }
+  
+  const [showAnalytics, setShowAnalytics]       = useState(false);
+  const [analyticsPeriod, setAnalyticsPeriod]   = useState('Monthly'); // 'Weekly', 'Monthly', 'Yearly'
 
   const handleAddCategory = () => {
     const newCat = window.prompt('Enter new category name:');
@@ -402,6 +409,83 @@ export default function VendorTransactions() {
       return newData;
     });
   };
+
+  // ── Detail View 4: Item Analytics ──
+  if (selectedVendor && showAnalytics) {
+    const allItemsMap = {};
+    if (currentVendorData) {
+      Object.values(currentVendorData.months).forEach(m => {
+        Object.values(m.days).forEach(d => {
+          d.items.forEach(it => {
+            if (!allItemsMap[it.item]) {
+              allItemsMap[it.item] = { qty: 0, unit: it.unit, total: 0 };
+            }
+            allItemsMap[it.item].qty += parseFloat(it.qty) || 0;
+            allItemsMap[it.item].total += it.price || 0;
+          });
+        });
+      });
+    }
+
+    const aggregatedItems = Object.keys(allItemsMap)
+      .sort((a, b) => a.localeCompare(b))
+      .map(name => ({
+        name,
+        qty: allItemsMap[name].qty,
+        unit: allItemsMap[name].unit,
+        total: allItemsMap[name].total,
+      }));
+
+    return (
+      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+        <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
+          <button onClick={() => setShowAnalytics(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0891b2', display: 'flex' }}>
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Item Analytics</p>
+          <div style={{ width: 32 }} />
+        </div>
+
+        <div style={{ padding: 16 }}>
+          {/* Period Toggle */}
+          <div style={{ display: 'flex', background: '#e2e8f0', borderRadius: 12, padding: 4, marginBottom: 20 }}>
+            {['Weekly', 'Monthly', 'Yearly'].map(p => (
+              <button key={p} onClick={() => setAnalyticsPeriod(p)}
+                style={{ flex: 1, padding: '8px 0', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', background: analyticsPeriod === p ? 'white' : 'transparent', color: analyticsPeriod === p ? '#0f172a' : '#64748b', boxShadow: analyticsPeriod === p ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s' }}>
+                {p}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {aggregatedItems.length === 0 ? (
+               <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>No items purchased yet.</p>
+            ) : (
+              aggregatedItems.map((it, i) => (
+                <div key={i} style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <div>
+                      <p style={{ fontWeight: 800, fontSize: 16, color: '#0f172a', margin: '0 0 4px' }}>{it.name}</p>
+                      <p style={{ fontSize: 13, color: '#64748b', margin: 0, fontWeight: 600 }}>Total Qty: {it.qty.toLocaleString('en-IN')} {it.unit}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 16, color: '#0891b2', margin: '0 0 4px' }}>₹ {it.total.toLocaleString('en-IN')}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Dummy comparison logic */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f0fdf4', padding: '6px 10px', borderRadius: 8, width: 'fit-content' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#16a34a' }}>trending_up</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>12% vs last {analyticsPeriod.toLowerCase().replace('ly', '')}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── Detail View 3: Payment Details (Itemised Bill) ──
   if (selectedDate && selectedMonth && currentVendorData) {
@@ -603,11 +687,17 @@ export default function VendorTransactions() {
                 <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{selectedVendor.store}</p>
               </div>
             </div>
-            <button onClick={() => setPurchaseModalVendor(selectedVendor)}
-              style={{ padding: '9px 14px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13, fontFamily: 'inherit' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
-              Add Items
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => setShowAnalytics(true)}
+                style={{ padding: '9px 12px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 10, color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13, fontFamily: 'inherit' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>analytics</span>
+              </button>
+              <button onClick={() => setPurchaseModalVendor(selectedVendor)}
+                style={{ padding: '9px 14px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13, fontFamily: 'inherit' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
+                Add Items
+              </button>
+            </div>
           </div>
 
           {/* Overall totals */}

@@ -12,7 +12,6 @@ const MOCK_STAFF = [
   { id: 8, name: 'Ashok', empId: '#1008', role: 'Plumber', email: 'ashok@hotel.com', phone: '+91 9876543217', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=150&fit=crop' },
   { id: 9, name: 'Mohit', empId: '#1009', role: 'Electrician', email: 'mohit@hotel.com', phone: '+91 9876543218', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&h=150&fit=crop' },
   { id: 10, name: 'Raju', empId: '#1010', role: 'Carpenter', email: 'raju@hotel.com', phone: '+91 9876543219', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=150&fit=crop' },
-  { id: 11, name: 'Chotu', empId: '#1011', role: 'RO waterboy', email: 'chotu@hotel.com', phone: '+91 9876543220', img: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=120&h=150&fit=crop' },
 ];
 
 export default function ManageStaff() {
@@ -194,7 +193,7 @@ export default function ManageStaff() {
 // ─── NEW COMPONENT: WORK STAFF VIEW ───────────────────────
 function WorkStaffView({ search, setSearch }) {
   const navigate = useNavigate();
-  const CATEGORIES = ['HR', 'Purchase Manager', 'Sales Manager', 'Manager', 'Cook', 'Helper', 'Cleaner', 'Plumber', 'Electrician', 'Carpenter', 'RO waterboy'];
+  const CATEGORIES = ['HR', 'Purchase Manager', 'Sales Manager', 'Manager', 'Cook', 'Helper', 'Cleaner', 'Plumber', 'Electrician', 'Carpenter'];
 
   return (
     <div style={{ paddingBottom: 20 }}>
