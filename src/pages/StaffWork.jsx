@@ -166,6 +166,38 @@ const STAFF_INFO = {
   }
 };
 
+const PETTY_CASH_DATA = {
+  default: { balance: 5000, transactions: [{ id: 1, type: 'credit', amount: 10000, date: '2026-07-01', desc: 'Monthly Allocation' }, { id: 2, type: 'debit', amount: 5000, date: '2026-07-05', desc: 'Grocery Shopping' }] }
+};
+
+const COOK_STATS = {
+  default: {
+    day: {
+      breakfast: { req: 40, eaten: 35, notEaten: [{name: 'Rahul (104)', phone: '9090'}, {name: 'Anita (201)', phone: '8080'}], tiffinReq: 5, tiffinTaken: [{id: 1, name: 'Sanjay', items: '4 Puri, Sabzi'}], tiffinMissed: [{id: 2, name: 'Amit'}], extra: [{name: 'Ravi', qty: 2}] },
+      lunch: { req: 45, eaten: 45, notEaten: [], tiffinReq: 10, tiffinTaken: [], tiffinMissed: [], extra: [] },
+      dinner: { req: 42, eaten: 40, notEaten: [{name: 'Sneha', phone:'123'}], tiffinReq: 2, tiffinTaken: [], tiffinMissed: [], extra: [] }
+    },
+    week: {
+      breakfast: { req: 280, eaten: 260, notEaten: [], tiffinReq: 35, tiffinTaken: [], tiffinMissed: [], extra: [] },
+      lunch: { req: 300, eaten: 290, notEaten: [], tiffinReq: 70, tiffinTaken: [], tiffinMissed: [], extra: [] },
+      dinner: { req: 290, eaten: 275, notEaten: [], tiffinReq: 14, tiffinTaken: [], tiffinMissed: [], extra: [] }
+    },
+    month: {
+      breakfast: { req: 1200, eaten: 1100, notEaten: [], tiffinReq: 150, tiffinTaken: [], tiffinMissed: [], extra: [] },
+      lunch: { req: 1300, eaten: 1250, notEaten: [], tiffinReq: 300, tiffinTaken: [], tiffinMissed: [], extra: [] },
+      dinner: { req: 1250, eaten: 1180, notEaten: [], tiffinReq: 60, tiffinTaken: [], tiffinMissed: [], extra: [] }
+    }
+  }
+};
+
+const NEW_CLEANER_STATS = {
+  default: {
+    day: { assigned: 15, cleaned: 10, uncleaned: 2, notReq: 3, fan: [{room: '101', time: '10AM'}], bath: [{room: '102', time: '11AM'}, {room: '105', time: '11:30AM'}], room: [{room: '101', time: '10AM'}, {room: '102', time: '11AM'}], others: [] },
+    week: { assigned: 105, cleaned: 90, uncleaned: 5, notReq: 10, fan: [], bath: [], room: [], others: [] },
+    month: { assigned: 450, cleaned: 400, uncleaned: 10, notReq: 40, fan: [], bath: [], room: [], others: [] }
+  }
+};
+
 // ─── SHARED UI ─────────────────────────────────────────────────────────────────
 
 const TopBar = ({ title, subtitle, onBack }) => (
@@ -195,8 +227,60 @@ const TopTabs = ({ tabs, activeTab, setActiveTab }) => (
 
 function GenericStaffInfo({ staffId }) {
   const info = STAFF_INFO[staffId] || STAFF_INFO.default;
+  const pettyCash = PETTY_CASH_DATA[staffId] || PETTY_CASH_DATA.default;
+  const [pcModal, setPcModal] = useState(null);
+  const [pcAmount, setPcAmount] = useState('');
+  const [pcDesc, setPcDesc] = useState('');
+  const [localPc, setLocalPc] = useState(pettyCash);
+
+  const handlePcSubmit = () => {
+    if(!pcAmount || !pcDesc) return;
+    const amt = parseFloat(pcAmount);
+    const newTx = { id: Date.now(), type: pcModal === 'add' ? 'credit' : 'debit', amount: amt, date: new Date().toISOString().split('T')[0], desc: pcDesc };
+    setLocalPc(prev => ({
+      balance: prev.balance + (pcModal === 'add' ? amt : -amt),
+      transactions: [newTx, ...prev.transactions]
+    }));
+    setPcModal(null); setPcAmount(''); setPcDesc('');
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Petty Cash Account */}
+      <div>
+        <SectionTitle text="Petty Cash Wallet" />
+        <Card style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})`, color: 'white', padding: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', margin: '0 0 4px', fontWeight: 600 }}>Wallet Balance</p>
+              <p style={{ fontSize: 32, fontWeight: 800, margin: 0, fontFamily: "'Bricolage Grotesque',sans-serif", letterSpacing: -0.5 }}>₹{localPc.balance.toLocaleString('en-IN')}</p>
+            </div>
+            <span className="material-symbols-outlined" style={{ fontSize: 44, color: 'rgba(255,255,255,0.2)' }}>account_balance_wallet</span>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={() => setPcModal('add')} style={{ flex: 1, padding: '10px 0', background: 'white', color: C.primary, border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>+ Add Funds</button>
+            <button onClick={() => setPcModal('expense')} style={{ flex: 1, padding: '10px 0', background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>- Log Expense</button>
+          </div>
+        </Card>
+        
+        {localPc.transactions.length > 0 && (
+          <div style={{ marginTop: 12, background: C.white, borderRadius: 12, border: `1px solid ${C.border}`, overflow: 'hidden' }}>
+            <p style={{ fontSize: 13, fontWeight: 800, color: C.text, padding: '12px 14px', margin: 0, borderBottom: `1px solid ${C.border}`, background: C.bg }}>Recent Transactions</p>
+            {localPc.transactions.slice(0, 3).map((tx, i) => (
+              <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 14px', borderBottom: i < Math.min(localPc.transactions.length-1, 2) ? `1px solid ${C.border}` : 'none' }}>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: C.text, margin: '0 0 2px' }}>{tx.desc}</p>
+                  <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>{tx.date}</p>
+                </div>
+                <p style={{ fontSize: 15, fontWeight: 800, color: tx.type === 'credit' ? C.success : C.danger, margin: 0 }}>
+                  {tx.type === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div>
         <SectionTitle text="Attendance & Timing" />
         <Card>
@@ -255,6 +339,22 @@ function GenericStaffInfo({ staffId }) {
           </div>
         </Card>
       </div>
+      
+      {pcModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ width: '100%', maxWidth: 360, background: C.white, borderRadius: 20, padding: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>{pcModal === 'add' ? 'Add Funds to Wallet' : 'Log Wallet Expense'}</p>
+              <button onClick={() => setPcModal(null)} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0, lineHeight: 1 }}>&times;</button>
+            </div>
+            <input type="number" placeholder="Amount (₹)" value={pcAmount} onChange={e => setPcAmount(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 16, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
+            <input type="text" placeholder="Description" value={pcDesc} onChange={e => setPcDesc(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 16, marginBottom: 20, outline: 'none', boxSizing: 'border-box' }} />
+            <button onClick={handlePcSubmit} style={{ width: '100%', padding: '14px', background: C.primary, color: 'white', border: 'none', borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Confirm Transaction
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -356,156 +456,159 @@ export function TimelineView({ staffId, staffName, role, onBack }) {
 // ─── COOK VIEW ────────────────────────────────────────────────────────────────
 export function CookView({ staffId, staffName, onBack }) {
   const [activeTab, setActiveTab] = useState('Work Details');
-  const [extraFood, setExtraFood] = useState(EXTRA_GUEST_FOOD);
-  const [paymentModal, setPaymentModal] = useState(null);
+  const [timeFilter, setTimeFilter] = useState('day'); // 'day' | 'week' | 'month'
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const stats = COOK_STATS[staffId] || COOK_STATS.default;
+  const currentStats = stats[timeFilter];
 
-  const handlePayment = (mode) => {
-    setExtraFood(prev => prev.map(f => f.id === paymentModal.id ? { ...f, status: 'Paid', mode } : f));
-    setPaymentModal(null);
-  };
+  const renderMealSection = (mealName, data) => (
+    <Card style={{ marginBottom: 16 }}>
+      <p style={{ fontSize: 16, fontWeight: 800, color: C.text, textTransform: 'uppercase', marginBottom: 12, borderBottom: `1px solid ${C.border}`, paddingBottom: 8 }}>{mealName}</p>
+      
+      <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px' }}>DINE-IN</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
+        <div style={{ background: C.bg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+          <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>{data.req}</p>
+          <p style={{ fontSize: 11, color: C.muted, margin: 0, fontWeight: 700 }}>Requested</p>
+        </div>
+        <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+          <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.eaten}</p>
+          <p style={{ fontSize: 11, color: C.success, margin: 0, fontWeight: 700 }}>Eaten</p>
+        </div>
+        <div style={{ background: C.dangerBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+          <p style={{ fontSize: 18, fontWeight: 800, color: C.danger, margin: 0 }}>{data.notEaten.length > 0 ? data.notEaten.length : (data.req - data.eaten)}</p>
+          <p style={{ fontSize: 11, color: C.danger, margin: 0, fontWeight: 700 }}>Not Eaten</p>
+        </div>
+      </div>
+      {data.notEaten.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 16 }}>
+          {data.notEaten.map((u, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: C.bg, padding: '6px 12px', borderRadius: 6 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{u.name}</span>
+              <a href={`tel:${u.phone}`} style={{ fontSize: 12, color: C.primary, fontWeight: 700, textDecoration: 'none' }}>Call</a>
+            </div>
+          ))}
+        </div>
+      )}
 
-  const data = COOK_DATA[staffId] || Object.values(COOK_DATA)[0];
-  if (!data) return null;
-  const { todayMenu, rating, totalReviews, reviews } = data;
-  const dayStats = COOK_DAY_STATS[staffId] || [];
+      <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px' }}>TIFFIN / PACKED</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
+        <div style={{ background: C.bg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+          <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>{data.tiffinReq}</p>
+          <p style={{ fontSize: 11, color: C.muted, margin: 0, fontWeight: 700 }}>Requested</p>
+        </div>
+        <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+          <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.tiffinTaken.length}</p>
+          <p style={{ fontSize: 11, color: C.success, margin: 0, fontWeight: 700 }}>Picked Up</p>
+        </div>
+        <div style={{ background: C.warnBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+          <p style={{ fontSize: 18, fontWeight: 800, color: C.warn, margin: 0 }}>{data.tiffinMissed.length}</p>
+          <p style={{ fontSize: 11, color: C.warn, margin: 0, fontWeight: 700 }}>Missed</p>
+        </div>
+      </div>
+      {data.tiffinTaken.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          {data.tiffinTaken.map((t, i) => (
+            <p key={i} style={{ fontSize: 13, color: C.textSub, margin: '0 0 4px' }}><b>{t.name}</b> took: {t.items}</p>
+          ))}
+        </div>
+      )}
+
+      {data.extra.length > 0 && (
+        <>
+          <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px', marginTop: 12 }}>EXTRA PLATES</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {data.extra.map((e, i) => (
+              <span key={i} style={{ background: C.indigoBg, color: C.indigo, fontSize: 12, fontWeight: 700, padding: '4px 8px', borderRadius: 6 }}>{e.name} (+{e.qty})</span>
+            ))}
+          </div>
+        </>
+      )}
+    </Card>
+  );
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
       <TopBar title={staffName} subtitle="Cook" onBack={onBack} />
       <TopTabs tabs={['Work Details', 'Extra Guest Food', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
-
       <div style={{ padding: '0 16px' }}>
-        {activeTab === 'Staff Info' && <GenericStaffInfo staffId={staffId} />}
-
-        {activeTab === 'Extra Guest Food' && (
-          <div>
-            <SectionTitle text="Extra Guest Food Requests" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {extraFood.map(req => (
-                <Card key={req.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{req.student} <span style={{ color: C.muted, fontWeight: 500, fontSize: 13 }}>· Rm {req.room}</span></p>
-                      <p style={{ fontSize: 13, color: C.textSub, margin: 0 }}>{req.date} · {req.count} plate{req.count > 1 ? 's' : ''}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 6px' }}>₹{req.amount}</p>
-                      {req.status === 'Pending' ? (
-                        <button onClick={() => setPaymentModal(req)}
-                          style={{ background: C.warnBg, border: `1px solid ${C.warn}`, color: C.warn, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                          Pay Now
-                        </button>
-                      ) : (
-                        <span style={{ background: C.successBg, color: C.success, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700 }}>
-                          Paid ({req.mode})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'Work Details' && (
+        {activeTab === 'Staff Info' ? <GenericStaffInfo staffId={staffId} /> : 
+         activeTab === 'Extra Guest Food' ? (
           <>
-            <SectionTitle text="Overall rating" />
-            <Card style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-              <div style={{ textAlign: 'center', minWidth: 80 }}>
-                <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 44, fontWeight: 900, color: C.text, margin: 0, lineHeight: 1 }}>{rating}</p>
-                <p style={{ fontSize: 13, color: C.muted, margin: '4px 0 0', fontWeight: 600 }}>out of 5</p>
-              </div>
-              <div>
-                <div style={{ display: 'flex', gap: 3, marginBottom: 8 }}>
-                  {[1,2,3,4,5].map(i => (
-                    <span key={i} className="material-symbols-outlined" style={{ fontSize: 22, color: i <= Math.round(rating) ? '#f59e0b' : C.border }}>star</span>
-                  ))}
-                </div>
-                <p style={{ fontSize: 14, color: C.muted, margin: 0, fontWeight: 600 }}>{totalReviews} student reviews</p>
-              </div>
-            </Card>
-
-            <SectionTitle text="Day-wise Stats" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {dayStats.map((stat, i) => (
-                <Card key={i}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: 0 }}>{stat.date}</p>
-                    <span style={{ fontSize: 13, color: C.primary, fontWeight: 700, background: C.primaryBg, padding: '2px 8px', borderRadius: 12, border: `1px solid ${C.primaryBdr}` }}>{stat.eaten} people ate</span>
-                  </div>
-                  <div style={{ background: C.bg, padding: 12, borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <p style={{ fontSize: 14, color: C.textSub, margin: 0, lineHeight: 1.4 }}><b>Ingredients Used:</b> {stat.ingredients}</p>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <p style={{ fontSize: 14, color: C.textSub, margin: 0 }}><b>Packed Food:</b> {stat.packed}</p>
-                      <p style={{ fontSize: 14, color: C.textSub, margin: 0 }}><b>Stored Late:</b> {stat.lateFood}</p>
-                    </div>
-                    {stat.extraPlates.length > 0 && (
-                      <p style={{ fontSize: 14, color: C.textSub, margin: 0, marginTop: 4 }}><b>Extra Plates:</b> {stat.extraPlates.map(e => `${e.by} (${e.count})`).join(', ')}</p>
-                    )}
-                  </div>
-                </Card>
+            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '20px 0 16px' }}>
+              {['day', 'week', 'month'].map(t => (
+                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s' }}>{t}</button>
               ))}
             </div>
-
-            <SectionTitle text="Today's menu" />
-            <Card style={{ padding: 0, overflow: 'hidden' }}>
-              {[
-                { meal: 'Breakfast', icon: 'free_breakfast', item: todayMenu.breakfast },
-                { meal: 'Lunch',     icon: 'lunch_dining',   item: todayMenu.lunch },
-                { meal: 'Dinner',    icon: 'dinner_dining',  item: todayMenu.dinner },
-              ].map((m, i, arr) => (
-                <div key={m.meal} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: C.primary }}>{m.icon}</span>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 12, fontWeight: 800, color: C.primary, margin: '0 0 2px', textTransform: 'uppercase', letterSpacing: 0.5 }}>{m.meal}</p>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: C.text, margin: 0 }}>{m.item}</p>
-                  </div>
-                </div>
-              ))}
-            </Card>
-
-            <SectionTitle text="Student feedback" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {reviews.map(r => (
-                <Card key={r.id} style={{ padding: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                    <div>
-                      <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{r.tenant} <span style={{ color: C.muted, fontWeight: 500, fontSize: 13 }}>· Rm {r.room}</span></p>
-                      <div style={{ display: 'flex', gap: 2 }}>
-                        {[1,2,3,4,5].map(i => (
-                          <span key={i} className="material-symbols-outlined" style={{ fontSize: 15, color: i <= r.rating ? '#f59e0b' : C.border }}>star</span>
-                        ))}
-                      </div>
+            {timeFilter === 'day' && (
+              <div style={{ marginBottom: 16 }}>
+                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+                  style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box', background: C.white }} />
+              </div>
+            )}
+            
+            {(() => {
+              let filteredFood = EXTRA_GUEST_FOOD;
+              if (timeFilter === 'day') {
+                filteredFood = EXTRA_GUEST_FOOD.filter(f => f.date === selectedDate);
+              }
+              const totalPaid = filteredFood.filter(f => f.status === 'Paid').reduce((s,f) => s + f.amount, 0);
+              const totalUnpaid = filteredFood.filter(f => f.status === 'Pending').reduce((s,f) => s + f.amount, 0);
+              
+              return (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+                    <div style={{ background: C.successBg, border: '1px solid #a7f3d0', borderRadius: 12, padding: 14 }}>
+                      <p style={{ fontSize: 12, fontWeight: 800, color: C.success, margin: '0 0 4px', textTransform: 'uppercase' }}>Total Paid</p>
+                      <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>₹{totalPaid}</p>
                     </div>
-                    <span style={{ fontSize: 13, color: C.muted }}>{r.date}</span>
+                    <div style={{ background: C.dangerBg, border: '1px solid #fecaca', borderRadius: 12, padding: 14 }}>
+                      <p style={{ fontSize: 12, fontWeight: 800, color: C.danger, margin: '0 0 4px', textTransform: 'uppercase' }}>Total Unpaid</p>
+                      <p style={{ fontSize: 18, fontWeight: 800, color: C.danger, margin: 0 }}>₹{totalUnpaid}</p>
+                    </div>
                   </div>
-                  <p style={{ fontSize: 14, color: C.textSub, margin: 0, lineHeight: 1.6, fontStyle: 'italic' }}>"{r.text}"</p>
-                </Card>
+                  
+                  {filteredFood.length === 0 ? (
+                    <p style={{ textAlign: 'center', color: C.muted, fontSize: 14, marginTop: 20 }}>No extra food requests for this period.</p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {filteredFood.map((f, i) => (
+                        <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{f.student} (Rm {f.room})</p>
+                            <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>{f.count} plates · {f.date}</p>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>₹{f.amount}</p>
+                            <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10, background: f.status === 'Paid' ? C.successBg : C.warnBg, color: f.status === 'Paid' ? C.success : C.warn }}>{f.status}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )
+            })()}
+          </>
+         ) : (
+          <>
+            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '20px 0 16px' }}>
+              {['day', 'week', 'month'].map(t => (
+                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s' }}>{t}</button>
               ))}
             </div>
+            {timeFilter === 'day' && (
+              <div style={{ marginBottom: 16 }}>
+                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+                  style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box', background: C.white }} />
+              </div>
+            )}
+            {renderMealSection('Breakfast', currentStats.breakfast)}
+            {renderMealSection('Lunch', currentStats.lunch)}
+            {renderMealSection('Dinner', currentStats.dinner)}
           </>
         )}
       </div>
-
-      {/* Payment Modal */}
-      {paymentModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ width: '100%', maxWidth: 400, background: C.white, borderRadius: 20, padding: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Settle Payment</p>
-              <button onClick={() => setPaymentModal(null)} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0, lineHeight: 1 }}>&times;</button>
-            </div>
-            <p style={{ fontSize: 16, color: C.text, marginBottom: 24 }}>Receive <b>₹{paymentModal.amount}</b> from <b>{paymentModal.student}</b>?</p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button onClick={() => handlePayment('Cash')} style={{ flex: 1, padding: 14, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontWeight: 800, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>Cash</button>
-              <button onClick={() => handlePayment('UPI')} style={{ flex: 1, padding: 14, background: C.primary, border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, color: C.white, cursor: 'pointer', fontFamily: 'inherit' }}>UPI</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -513,120 +616,88 @@ export function CookView({ staffId, staffName, onBack }) {
 // ─── CLEANER VIEW ─────────────────────────────────────────────────────────────
 export function CleanerView({ staffId, staffName, onBack }) {
   const [activeTab, setActiveTab] = useState('Work Details');
-  const [showStats, setShowStats] = useState(false);
-  const data = CLEANER_DATA[staffId] || Object.values(CLEANER_DATA)[0];
-  const [rooms, setRooms] = useState(data ? data.assignedRooms : []);
+  const [timeFilter, setTimeFilter] = useState('day');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [expandedCat, setExpandedCat] = useState(null);
+  
+  const stats = NEW_CLEANER_STATS[staffId] || NEW_CLEANER_STATS.default;
+  const cur = stats[timeFilter];
 
-  const override = (roomNum) => setRooms(prev => prev.map(r => r.room === roomNum ? { ...r, studentStatus: 'Approved' } : r));
-
-  const cnt = {
-    Approved: rooms.filter(r => r.studentStatus === 'Approved').length,
-    Pending:  rooms.filter(r => r.studentStatus === 'Pending').length,
-    Rejected: rooms.filter(r => r.studentStatus === 'Rejected').length,
-  };
+  const renderCat = (key, label, dataArr) => (
+    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 10 }}>
+      <div onClick={() => setExpandedCat(expandedCat === key ? null : key)} style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: expandedCat === key ? C.primaryBg : 'transparent' }}>
+        <p style={{ fontSize: 15, fontWeight: 700, color: expandedCat === key ? C.primary : C.text, margin: 0 }}>{label}</p>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{dataArr.length}</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 20, color: C.muted, transform: expandedCat === key ? 'rotate(180deg)' : 'none', transition: 'all 0.2s' }}>expand_more</span>
+        </div>
+      </div>
+      {expandedCat === key && (
+        <div style={{ padding: '12px 16px', borderTop: `1px solid ${C.border}`, background: C.bg }}>
+          {dataArr.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {dataArr.map((d, i) => (
+                <div key={i} style={{ background: C.white, padding: '8px 12px', borderRadius: 8, display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Rm {d.room}</span>
+                  <span style={{ fontSize: 12, color: C.muted }}>{d.time}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>No records found for this period.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
       <TopBar title={staffName} subtitle="Cleaner" onBack={onBack} />
       <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
-
       <div style={{ padding: '0 16px' }}>
-        {activeTab === 'Staff Info' ? (
-          <GenericStaffInfo staffId={staffId} />
-        ) : (
+        {activeTab === 'Staff Info' ? <GenericStaffInfo staffId={staffId} /> : (
           <>
-            <SectionTitle text="Today's summary" />
-            <div onClick={() => setShowStats(true)} style={{ cursor: 'pointer' }}>
-              <StatRow items={[
-                { label: 'Approved', value: cnt.Approved, color: C.success },
-                { label: 'Pending',  value: cnt.Pending,  color: C.warn    },
-                { label: 'Rejected', value: cnt.Rejected, color: C.danger  },
-              ]} />
-            </div>
-            <p style={{ fontSize: 13, color: C.primary, textAlign: 'center', marginTop: 12, cursor: 'pointer', fontWeight: 700 }} onClick={() => setShowStats(true)}>View detailed cleaning stats</p>
-
-            <SectionTitle text="Room status" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {rooms.map(r => (
-                <Card key={r.room} style={{ padding: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: 22, color: C.primary }}>door_front</span>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 17, fontWeight: 800, color: C.text, margin: 0 }}>Room {r.room}</p>
-                        <p style={{ fontSize: 13, color: C.muted, margin: '3px 0 0' }}>{r.studentName}</p>
-                      </div>
-                    </div>
-                    <Chip label={r.studentStatus} />
-                  </div>
-
-                  <div style={{ display: 'flex', gap: 10, marginBottom: r.studentStatus === 'Rejected' ? 12 : 0 }}>
-                    <div style={{ flex: 1, background: C.bg, borderRadius: 10, padding: '10px 14px', border: `1px solid ${C.border}` }}>
-                      <p style={{ fontSize: 11, fontWeight: 800, color: C.muted, margin: '0 0 5px', letterSpacing: 0.5, textTransform: 'uppercase' }}>Cleaned At</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: 15, color: C.success }}>check_circle</span>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{r.cleanedAt}</span>
-                      </div>
-                    </div>
-                    <div style={{ flex: 1, background: C.bg, borderRadius: 10, padding: '10px 14px', border: `1px solid ${C.border}` }}>
-                      <p style={{ fontSize: 11, fontWeight: 800, color: C.muted, margin: '0 0 5px', letterSpacing: 0.5, textTransform: 'uppercase' }}>Student</p>
-                      <Chip label={r.studentStatus} />
-                    </div>
-                  </div>
-
-                  {r.studentStatus === 'Rejected' && (
-                    <div style={{ background: C.dangerBg, borderRadius: 10, padding: '10px 14px', marginBottom: 12, border: `1px solid #fecaca` }}>
-                      <p style={{ fontSize: 14, color: C.danger, margin: 0, fontWeight: 600 }}>Issue: {r.rejectionNote}</p>
-                    </div>
-                  )}
-                  {r.studentStatus !== 'Approved' && (
-                    <button onClick={() => override(r.room)}
-                      style={{ width: '100%', padding: '12px', background: C.successBg, border: `1.5px solid ${C.success}`, borderRadius: 10, color: C.success, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', marginTop: 4 }}>
-                      ✅ Override — Mark Approved
-                    </button>
-                  )}
-                </Card>
+            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '20px 0 16px' }}>
+              {['day', 'week', 'month'].map(t => (
+                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s' }}>{t}</button>
               ))}
             </div>
+            {timeFilter === 'day' && (
+              <div style={{ marginBottom: 16 }}>
+                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+                  style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box', background: C.white }} />
+              </div>
+            )}
+            
+            <SectionTitle text="Overview" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+              <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+                <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, margin: '0 0 4px', textTransform: 'uppercase' }}>Total Assigned</p>
+                <p style={{ fontSize: 24, fontWeight: 900, color: C.text, margin: 0 }}>{cur.assigned}</p>
+              </div>
+              <div style={{ background: C.successBg, border: `1px solid #a7f3d0`, borderRadius: 12, padding: 16 }}>
+                <p style={{ fontSize: 12, fontWeight: 800, color: C.success, margin: '0 0 4px', textTransform: 'uppercase' }}>Cleaned</p>
+                <p style={{ fontSize: 24, fontWeight: 900, color: C.success, margin: 0 }}>{cur.cleaned}</p>
+              </div>
+              <div style={{ background: C.dangerBg, border: `1px solid #fecaca`, borderRadius: 12, padding: 16 }}>
+                <p style={{ fontSize: 12, fontWeight: 800, color: C.danger, margin: '0 0 4px', textTransform: 'uppercase' }}>Uncleaned</p>
+                <p style={{ fontSize: 24, fontWeight: 900, color: C.danger, margin: 0 }}>{cur.uncleaned}</p>
+              </div>
+              <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+                <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, margin: '0 0 4px', textTransform: 'uppercase' }}>Not Requested</p>
+                <p style={{ fontSize: 24, fontWeight: 900, color: C.textSub, margin: 0 }}>{cur.notReq}</p>
+              </div>
+            </div>
+
+            <SectionTitle text="Cleaning Types Breakdown" />
+            {renderCat('room', '🧹 Room Cleaning (Sweep/Mop)', cur.room)}
+            {renderCat('bath', '🚽 Bathroom Cleaning', cur.bath)}
+            {renderCat('fan', '💨 Fan & Dusting', cur.fan)}
+            {renderCat('others', '🪣 Others / Deep Clean', cur.others)}
           </>
         )}
       </div>
-
-      {/* Stats Breakdown Modal */}
-      {showStats && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ width: '100%', maxWidth: 400, background: C.white, borderRadius: 20, padding: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Cleaning Breakdown</p>
-              <button onClick={() => setShowStats(false)} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0, lineHeight: 1 }}>&times;</button>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {['daily', 'weekly', 'monthly'].map(period => (
-                <div key={period} style={{ background: C.bg, borderRadius: 12, padding: 16, border: `1px solid ${C.border}` }}>
-                  <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 14px', textTransform: 'capitalize' }}>{period} (Total: {CLEANER_STATS[period].total})</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, textAlign: 'center' }}>
-                    <div>
-                      <p style={{ fontSize: 20, fontWeight: 800, color: C.primary, margin: 0, fontFamily: "'Bricolage Grotesque',sans-serif" }}>{CLEANER_STATS[period].breakdown.full}</p>
-                      <p style={{ fontSize: 12, color: C.muted, fontWeight: 700, margin: '4px 0 0', textTransform: 'uppercase' }}>Full Room</p>
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 20, fontWeight: 800, color: C.indigo, margin: 0, fontFamily: "'Bricolage Grotesque',sans-serif" }}>{CLEANER_STATS[period].breakdown.dusting}</p>
-                      <p style={{ fontSize: 12, color: C.muted, fontWeight: 700, margin: '4px 0 0', textTransform: 'uppercase' }}>Dusting</p>
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 20, fontWeight: 800, color: C.success, margin: 0, fontFamily: "'Bricolage Grotesque',sans-serif" }}>{CLEANER_STATS[period].breakdown.bathroom}</p>
-                      <p style={{ fontSize: 12, color: C.muted, fontWeight: 700, margin: '4px 0 0', textTransform: 'uppercase' }}>Bathroom</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

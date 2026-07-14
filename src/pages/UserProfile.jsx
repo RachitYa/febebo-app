@@ -362,7 +362,11 @@ function VisitorHistoryView({ user, onBack }) {
           <div style={{ marginBottom: 16, background: 'white', padding: 16, borderRadius: 12, border: '1px solid #e2e8f0' }}>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Relation: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.relation}</span></p>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Phone: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.number}</span></p>
-            <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>ID Proof: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.idProof || 'N/A'}</span></p>
+            <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 12px' }}>ID Proof: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.idProof || 'N/A'}</span></p>
+            <div style={{ background: '#f8fafc', borderRadius: 8, padding: 8, border: '1px dashed #cbd5e1', textAlign: 'center' }}>
+              <img src="https://placehold.co/400x250/e2e8f0/64748b?text=Aadhaar+Front" alt="ID Proof Front" style={{ width: '100%', borderRadius: 6, objectFit: 'cover', marginBottom: 8 }} />
+              <img src="https://placehold.co/400x250/e2e8f0/64748b?text=Aadhaar+Back" alt="ID Proof Back" style={{ width: '100%', borderRadius: 6, objectFit: 'cover' }} />
+            </div>
           </div>
           <p style={{ fontSize: 14, fontWeight: 700, color: '#334155', marginBottom: 12 }}>Past Visits</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -644,6 +648,18 @@ function StudentStaffWorkView({ profile, roomNo, onBack }) {
 // ─── MAIN DETAILS VIEW ────────────────────────────────────
 function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubView }) {
   const profile = USER_PROFILES[user?.id] || DEFAULT_PROFILE;
+  const [damages, setDamages] = useState([{ id: 1, desc: 'Broken Chair Hinge', cost: 350 }]);
+  const [damageInput, setDamageInput] = useState('');
+  const [damageCost, setDamageCost] = useState('');
+
+  const handleAddDamage = () => {
+    if(!damageInput || !damageCost) return;
+    setDamages([...damages, { id: Date.now(), desc: damageInput, cost: parseFloat(damageCost) }]);
+    setDamageInput(''); setDamageCost('');
+  };
+  const totalDamages = damages.reduce((s,d) => s + d.cost, 0);
+  const finalSecurity = profile.securityAmt - totalDamages;
+
   const rent = profile.rent;
   const token = profile.token;
   const pending = profile.pending;
@@ -819,6 +835,28 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
             </div>
           )}
         </Accordion>
+
+        {profile.type === 'notice_period' && (
+          <Accordion title="Damages & Deductions" icon="gavel" defaultOpen={true}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {damages.map(d => (
+                <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', border: '1px solid #fecaca', background: '#fef2f2', borderRadius: 8 }}>
+                  <span style={{ fontSize: 13, color: '#7f1d1d', fontWeight: 600 }}>{d.desc}</span>
+                  <span style={{ fontSize: 14, color: '#b91c1c', fontWeight: 800 }}>-₹{d.cost}</span>
+                </div>
+              ))}
+              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                <input type="text" placeholder="Item damaged..." value={damageInput} onChange={e => setDamageInput(e.target.value)} style={{ flex: 2, padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, outline: 'none' }} />
+                <input type="number" placeholder="Cost" value={damageCost} onChange={e => setDamageCost(e.target.value)} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, outline: 'none' }} />
+                <button onClick={handleAddDamage} style={{ padding: '8px 12px', background: cyan, color: 'white', borderRadius: 8, border: 'none', fontWeight: 700, cursor: 'pointer' }}>Add</button>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, padding: '12px', background: '#ecfdf5', borderRadius: 8, border: '1px solid #a7f3d0' }}>
+                <span style={{ fontSize: 12, color: '#166534', fontWeight: 700, textTransform: 'uppercase' }}>Final Refundable Deposit:</span>
+                <span style={{ fontSize: 16, color: '#15803d', fontWeight: 900 }}>₹{finalSecurity > 0 ? finalSecurity.toLocaleString() : 0}</span>
+              </div>
+            </div>
+          </Accordion>
+        )}
 
         {profile.type !== 'upcoming' && (
           <Accordion title="Visitor Details" icon="badge" onHeaderClick={() => setSubView('visitor_history')} />

@@ -452,6 +452,8 @@ export default function VendorTransactions() {
         total: allItemsMap[name].total,
       }));
 
+    const totalSpend = aggregatedItems.reduce((acc, it) => acc + it.total, 0);
+
     return (
       <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
         <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
@@ -473,6 +475,19 @@ export default function VendorTransactions() {
             ))}
           </div>
 
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 8 }}>Overview ({analyticsPeriod})</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 24 }}>
+            <div style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#64748b', margin: '0 0 6px', textTransform: 'uppercase' }}>Total Spend</p>
+              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 20, color: '#0f172a', margin: 0 }}>₹ {totalSpend.toLocaleString('en-IN')}</p>
+            </div>
+            <div style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#64748b', margin: '0 0 6px', textTransform: 'uppercase' }}>Total Items</p>
+              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 20, color: '#0f172a', margin: 0 }}>{aggregatedItems.length}</p>
+            </div>
+          </div>
+
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 12 }}>Detailed Spend by Item</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {aggregatedItems.length === 0 ? (
                <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>No items purchased yet.</p>
@@ -688,7 +703,9 @@ export default function VendorTransactions() {
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Monthly Payment List</p>
-          <div style={{ width: 32 }} />
+          <button onClick={() => setShowAnalytics(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0891b2', display: 'flex' }}>
+            <span className="material-symbols-outlined">analytics</span>
+          </button>
         </div>
 
         <div style={{ padding: 16 }}>
@@ -704,12 +721,8 @@ export default function VendorTransactions() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setShowAnalytics(true)}
-                style={{ padding: '9px 12px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 10, color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13, fontFamily: 'inherit' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>analytics</span>
-              </button>
               <button onClick={() => setPurchaseModalVendor(selectedVendor)}
-                style={{ padding: '9px 14px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13, fontFamily: 'inherit' }}>
+                style={{ padding: '9px 14px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13, fontFamily: 'inherit', flex: 1, justifyContent: 'center' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
                 Add Items
               </button>
