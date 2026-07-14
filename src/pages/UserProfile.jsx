@@ -660,12 +660,6 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
   return (
     <>
       <div style={{ position: 'sticky', top: 0, zIndex: 60 }}>
-        {profile.type === 'notice_period' && profile.pending > 0 && (
-          <div style={{ background: '#ef4444', color: 'white', padding: '10px 16px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>warning</span>
-            <span style={{ fontSize: 13, fontWeight: 700 }}>Notice Period: ₹{profile.pending.toLocaleString()} Pending</span>
-          </div>
-        )}
         <Header title="User Details" onBack={onBack} center={true} dark={true} containerStyle={{ position: 'relative', zIndex: 50 }} action={
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'white', padding: '4px 8px', borderRadius: 12 }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: cyan }}>4.3</span>
@@ -701,14 +695,21 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
           <InfoRow label="Date of Birth" value={profile.dob} />
           <InfoRow label="Email" value={profile.email} />
           <InfoRow label="Aadhar No." value={profile.aadhar} />
-          <InfoRow label="Career" value={profile.careerStatus} />
-          {profile.careerStatus === 'Student' ? <InfoRow label="College" value={profile.college} /> : <InfoRow label="Company" value={profile.companyName} />}
           <InfoRow label="Permanent Address" value={profile.permanentAddress} />
-          <InfoRow label="Corresponding Address" value={profile.correspondingAddress} last={profile.type !== 'current'} />
+          <InfoRow label="Corresponding Address" value={profile.correspondingAddress} last={profile.type !== 'current' && profile.careerStatus !== 'Student' && profile.careerStatus !== 'Working'} />
           {profile.type === 'current' && (
             <>
               <InfoRow label="Blood Group" value={profile.bloodGroup} />
-              <InfoRow label="School Address" value={profile.schoolAddress} last />
+              <InfoRow label="School Address" value={profile.schoolAddress} />
+            </>
+          )}
+          <InfoRow label="Career" value={profile.careerStatus} />
+          {profile.careerStatus === 'Student' ? (
+            <InfoRow label="College & Address" value={profile.college} last />
+          ) : (
+            <>
+              <InfoRow label="Company Name" value={profile.companyName} />
+              <InfoRow label="Company Address" value={profile.companyAddress} last />
             </>
           )}
         </Accordion>
@@ -745,7 +746,9 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
           </div>
         </Accordion>
 
-        <Accordion title="Inventory Allotted" icon="inventory_2" onHeaderClick={() => setSubView('inventory')} />
+        {profile.type !== 'upcoming' && (
+          <Accordion title="Inventory Allotted" icon="inventory_2" onHeaderClick={() => setSubView('inventory')} />
+        )}
 
         {profile.type !== 'upcoming' && (
           <Accordion title="Meter Unit Details" icon="electric_meter" defaultOpen={true}>
@@ -785,7 +788,18 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
 
         {profile.type !== 'upcoming' && (
           <Accordion title="Pending Amount" icon="history" defaultOpen={false}>
-            <div style={{ textAlign: 'right', padding: '8px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {pending > 0 ? (
+                  <>
+                    <span style={{ fontSize: 13, color: '#475569' }}>• Rent Due: ₹1,500</span>
+                    <span style={{ fontSize: 13, color: '#475569' }}>• Late Fee: ₹500</span>
+                    <span style={{ fontSize: 13, color: '#475569' }}>• Others: ₹500</span>
+                  </>
+                ) : (
+                  <span style={{ fontSize: 13, color: '#475569' }}>No pending dues.</span>
+                )}
+              </div>
               <span style={{ fontSize: 18, color: pending > 0 ? '#ef4444' : '#16a34a', fontWeight: 800 }}>
                 {pending > 0 ? `₹ ${pending.toLocaleString()}` : '✓ All Clear'}
               </span>
@@ -793,15 +807,17 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
           </Accordion>
         )}
 
-        <Accordion title="Rent / Security Amount" icon="bed" defaultOpen={true}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: 'rgba(14,165,233,0.05)', borderRadius: 8, marginBottom: 8 }}>
+        <Accordion title={profile.type === 'upcoming' ? "Room Rent" : "Rent / Security Amount"} icon="bed" defaultOpen={true}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: 'rgba(14,165,233,0.05)', borderRadius: 8, marginBottom: profile.type === 'upcoming' ? 0 : 8 }}>
             <span style={{ fontSize: 12, color: '#475569' }}>Rent Of Bed:</span>
             <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 700 }}>₹{rent.toLocaleString()}/month</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: 'rgba(14,165,233,0.05)', borderRadius: 8 }}>
-            <span style={{ fontSize: 12, color: '#475569' }}>Security Amount:</span>
-            <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 700 }}>₹{profile.securityAmt.toLocaleString()}</span>
-          </div>
+          {profile.type !== 'upcoming' && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: 'rgba(14,165,233,0.05)', borderRadius: 8 }}>
+              <span style={{ fontSize: 12, color: '#475569' }}>Security Amount:</span>
+              <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 700 }}>₹{profile.securityAmt.toLocaleString()}</span>
+            </div>
+          )}
         </Accordion>
 
         {profile.type !== 'upcoming' && (
@@ -813,11 +829,13 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
           <Accordion title="Staff Work" icon="engineering" onHeaderClick={() => setSubView('staff_work')} />
         )}
 
-        <Accordion title="Police Verification" icon="local_police" defaultOpen={false}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 12 }}>Verified</span>
-          </div>
-        </Accordion>
+        {profile.type !== 'upcoming' && (
+          <Accordion title="Police Verification" icon="local_police" defaultOpen={false}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 12 }}>Verified</span>
+            </div>
+          </Accordion>
+        )}
 
         <Accordion title="Document" icon="description" defaultOpen={false}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
@@ -836,10 +854,13 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
 
         <p style={{ fontSize: 14, fontWeight: 700, color: '#334155', margin: '24px 0 12px' }}>Payment History</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {[
-            { label: 'June 2025', amount: 10000, date: '05/06/2025' },
-            { label: 'May 2025',  amount: 9500,  date: '04/05/2025' },
-          ].map((p, i) => (
+          {(profile.type === 'upcoming' 
+            ? [{ label: 'Token Amount', amount: profile.token, date: profile.dateOfTokenAmount }]
+            : [
+                { label: 'June 2025', amount: 10000, date: '05/06/2025' },
+                { label: 'May 2025',  amount: 9500,  date: '04/05/2025' },
+              ]
+          ).map((p, i) => (
             <div key={i} onClick={onReceipt} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', padding: '12px 16px', borderRadius: 12, border: '1px solid #e2e8f0', cursor: 'pointer' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
