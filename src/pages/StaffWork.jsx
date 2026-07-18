@@ -934,59 +934,21 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
   );
 }
 
-// ─── STAFF MEMBER LIST ────────────────────────────────────────────────────────
-function StaffMemberList({ role, onBack, onSelect }) {
-  const members = STAFF_MEMBERS[role.id] || [];
-  return (
-    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={role.label} subtitle={`${members.length} member${members.length !== 1 ? 's' : ''}`} onBack={onBack} />
-      <div style={{ padding: '0 16px' }}>
-        <SectionTitle text="Team members" />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {members.map(m => (
-            <Card key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: 16 }} onClick={() => onSelect(m)}>
-              <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                <div style={{ width: 48, height: 48, borderRadius: 14, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 24, color: C.primary }}>{role.icon}</span>
-                </div>
-                <div>
-                  <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>{m.name}</p>
-                  <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Since {m.joined} · {m.phone}</p>
-                </div>
-              </div>
-              <span className="material-symbols-outlined" style={{ color: C.border, fontSize: 22 }}>chevron_right</span>
-            </Card>
-          ))}
-          {members.length === 0 && (
-            <Card style={{ padding: '40px 20px', textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 44, color: C.border, display: 'block', marginBottom: 10 }}>person_off</span>
-              <p style={{ fontSize: 15, color: C.muted, margin: 0 }}>No staff assigned yet.</p>
-            </Card>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── ROLE GRID  (main entry) ──────────────────────────────────────────────────
+// ─── ROLE MENU ACCORDION (main entry) ─────────────────────────────────────────
 export default function StaffWork() {
   const navigate = useNavigate();
+  const [expandedRoleId, setExpandedRoleId] = useState(null);
   const [selRole,  setSelRole]  = useState(null);
   const [selStaff, setSelStaff] = useState(null);
 
   if (selRole && selStaff) {
-    const p   = { staffId: selStaff.id, staffName: selStaff.name, role: selRole.label, onBack: () => setSelStaff(null) };
+    const p   = { staffId: selStaff.id, staffName: selStaff.name, role: selRole.label, onBack: () => { setSelStaff(null); setSelRole(null); } };
     const cat = selRole.category;
     if (cat === 'A')       return <TimelineView {...p} />;
     if (cat === 'B_cook')  return <CookView {...p} />;
     if (cat === 'B_clean') return <CleanerView {...p} />;
     if (cat === 'C')       return <TicketView {...p} />;
     if (cat === 'D')       return <PurchaseManagerView {...p} />;
-  }
-
-  if (selRole) {
-    return <StaffMemberList role={selRole} onBack={() => setSelRole(null)} onSelect={m => setSelStaff(m)} />;
   }
 
   const ROLE_GRADIENTS = {
@@ -1027,25 +989,60 @@ export default function StaffWork() {
         {ROLE_CATS.map(cat => (
           <div key={cat.key} style={{ marginBottom: 24 }}>
             <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px' }}>{cat.label}</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {ROLES.filter(r => cat.ids.includes(r.id)).map(role => {
-                const count = (STAFF_MEMBERS[role.id] || []).length;
+                const members = STAFF_MEMBERS[role.id] || [];
+                const count = members.length;
                 const grad = ROLE_GRADIENTS[role.id] || C.primary;
+                const isExpanded = expandedRoleId === role.id;
+
                 return (
-                  <div key={role.id} onClick={() => setSelRole(role)}
-                    style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 18, padding: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'all 0.2s', position: 'relative', overflow: 'hidden' }}
-                    onTouchStart={e => e.currentTarget.style.transform = 'scale(0.97)'}
-                    onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
-                    {/* Gradient strip */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: grad, borderRadius: '18px 18px 0 0' }} />
-                    <div style={{ width: 48, height: 48, borderRadius: 14, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 24, color: 'white' }}>{role.icon}</span>
+                  <div key={role.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                    {/* Header / Menu Item */}
+                    <div onClick={() => setExpandedRoleId(isExpanded ? null : role.id)}
+                      style={{ padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: isExpanded ? '#f8fafc' : 'white', transition: 'background 0.2s' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 24, color: 'white' }}>{role.icon}</span>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>{role.label}</p>
+                          <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined" style={{ color: C.muted, transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                        expand_more
+                      </span>
                     </div>
-                    <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{role.label}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 12, color: C.muted }}>{count} member{count !== 1 ? 's' : ''}</span>
-                      {count > 0 && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }} />}
-                    </div>
+
+                    {/* Expanded Staff List */}
+                    {isExpanded && (
+                      <div style={{ borderTop: `1px solid ${C.border}`, background: 'white' }}>
+                        {members.map((m, idx) => (
+                          <div key={m.id} onClick={() => { setSelRole(role); setSelStaff(m); }}
+                            style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', borderBottom: idx < members.length - 1 ? `1px solid #f1f5f9` : 'none', transition: 'background 0.2s' }}
+                            onMouseOver={e => e.currentTarget.style.background = '#f8fafc'}
+                            onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                              <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.primary, fontWeight: 800, fontSize: 14 }}>
+                                {m.name.charAt(0)}
+                              </div>
+                              <div>
+                                <p style={{ fontSize: 15, fontWeight: 700, color: C.text, margin: '0 0 2px' }}>{m.name}</p>
+                                <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>{m.phone}</p>
+                              </div>
+                            </div>
+                            <span className="material-symbols-outlined" style={{ color: C.border, fontSize: 20 }}>chevron_right</span>
+                          </div>
+                        ))}
+                        {members.length === 0 && (
+                          <div style={{ padding: '24px 16px', textAlign: 'center' }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 32, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>person_off</span>
+                            <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>No staff assigned yet.</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
