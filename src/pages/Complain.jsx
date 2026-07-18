@@ -1,84 +1,135 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+
+const cyan = '#0891b2';
 
 const MOCK_COMPLAINTS = [
-  { id: 1, tenant: 'Rahul Rastogi', room: '103', title: 'Washing Machine Not Working', desc: 'The washing machine on 2nd floor has been broken for 3 days.', date: '28 Jun 2025', status: 'Active' },
-  { id: 2, tenant: 'Amit Sachdeva', room: '103', title: 'Water Leakage in Bathroom', desc: 'There is a water leakage near the sink in the attached bathroom.', date: '26 Jun 2025', status: 'Pending' },
-  { id: 3, tenant: 'Ravi Kumar', room: '102', title: 'WiFi Not Working', desc: 'Internet has been down since yesterday evening.', date: '24 Jun 2025', status: 'Closed' },
+  { id: 1, tenant: 'Rahul Rastogi', room: '103', phone: '+91 9876543210', title: 'Washing Machine Not Working', desc: 'The washing machine on 2nd floor has been broken for 3 days. Very inconvenient.', date: '28 Jun 2025', status: 'Active', priority: 'High' },
+  { id: 2, tenant: 'Amit Sachdeva', room: '103', phone: '+91 9988776655', title: 'Water Leakage in Bathroom', desc: 'There is a water leakage near the sink in the attached bathroom. The floor is always wet.', date: '26 Jun 2025', status: 'Pending', priority: 'Medium' },
+  { id: 3, tenant: 'Ravi Kumar', room: '102', phone: '+91 9111223344', title: 'WiFi Not Working', desc: 'Internet has been down since yesterday evening. Need it for work.', date: '24 Jun 2025', status: 'Closed', priority: 'Low' },
+  { id: 4, tenant: 'Sneha Kapoor', room: '108', phone: '+91 9444556677', title: 'Room Heater Not Functional', desc: 'Room heater stopped working. Nights are very cold.', date: '27 Jun 2025', status: 'Active', priority: 'High' },
+  { id: 5, tenant: 'Priya Sharma', room: '202', phone: '+91 9666778899', title: 'Cockroach Problem', desc: 'Cockroaches seen in the kitchen area near sink. Need pest control.', date: '25 Jun 2025', status: 'Pending', priority: 'High' },
 ];
 
-const STATUS_ICON = {
-  Active: <AlertCircle size={16} style={{ color: 'var(--danger)' }} />,
-  Pending: <Clock size={16} style={{ color: 'var(--warning)' }} />,
-  Closed: <CheckCircle size={16} style={{ color: 'var(--success)' }} />,
+const STATUS_CONFIG = {
+  Active:  { bg: '#fff1f2', text: '#e11d48', border: '#fecaca', icon: 'error' },
+  Pending: { bg: '#fffbeb', text: '#d97706', border: '#fde68a', icon: 'schedule' },
+  Closed:  { bg: '#ecfdf5', text: '#059669', border: '#a7f3d0', icon: 'task_alt' },
 };
-const STATUS_COLOR = {
-  Active: { bg: 'rgba(239,68,68,0.1)', text: 'var(--danger)', border: 'var(--danger)' },
-  Pending: { bg: 'rgba(245,158,11,0.1)', text: 'var(--warning)', border: 'var(--warning)' },
-  Closed: { bg: 'rgba(16,185,129,0.1)', text: 'var(--success)', border: 'var(--success)' },
+
+const PRIORITY_CONFIG = {
+  High:   { color: '#e11d48', bg: '#fff1f2' },
+  Medium: { color: '#d97706', bg: '#fffbeb' },
+  Low:    { color: '#059669', bg: '#ecfdf5' },
 };
 
 export default function Complain() {
   const navigate = useNavigate();
   const [complaints, setComplaints] = useState(MOCK_COMPLAINTS);
   const [activeTab, setActiveTab] = useState('All');
-  const TABS = ['All', 'Active', 'Pending', 'Closed'];
+  const [expanded, setExpanded] = useState(null);
 
+  const TABS = ['All', 'Active', 'Pending', 'Closed'];
   const filtered = activeTab === 'All' ? complaints : complaints.filter(c => c.status === activeTab);
 
+  const counts = {
+    All: complaints.length,
+    Active: complaints.filter(c => c.status === 'Active').length,
+    Pending: complaints.filter(c => c.status === 'Pending').length,
+    Closed: complaints.filter(c => c.status === 'Closed').length,
+  };
+
   return (
-    <div className="app-container">
-      <div className="top-nav">
-        <div className="flex items-center gap-4">
-          <button className="icon-btn" onClick={() => navigate('/admin-dashboard')}><ArrowLeft size={24} /></button>
-          <div className="nav-title">Complaints</div>
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk', sans-serif", paddingBottom: 40 }}>
+      {/* Header */}
+      <div style={{ background: 'linear-gradient(135deg, #0c1a2e, #0f2847)', padding: '0 16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, height: 64 }}>
+          <button onClick={() => navigate('/admin-dashboard')} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back_ios_new</span>
+          </button>
+          <div style={{ flex: 1 }}>
+            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'white' }}>Complaints</h1>
+            <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>{counts.Active} active · {counts.Pending} pending</p>
+          </div>
+          <div style={{ background: '#fff1f2', borderRadius: 10, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#e11d48' }}>error</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#e11d48' }}>{counts.Active}</span>
+          </div>
         </div>
-      </div>
-      <div style={{ padding: '0 16px' }}>
+
         {/* Tabs */}
-        <div className="flex" style={{ borderBottom: '1px solid var(--border-color)', marginBottom: '16px', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 6 }}>
           {TABS.map(tab => (
-            <div key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: activeTab === tab ? '2px solid var(--primary)' : '2px solid transparent', color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)', fontWeight: activeTab === tab ? '600' : '400', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              style={{ flex: 1, padding: '8px 4px', border: 'none', borderRadius: 10, background: activeTab === tab ? 'rgba(255,255,255,0.18)' : 'transparent', color: activeTab === tab ? 'white' : '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
               {tab}
-            </div>
+              <span style={{ display: 'block', fontSize: 16, fontWeight: 900, color: activeTab === tab ? '#38bdf8' : '#475569' }}>{counts[tab]}</span>
+            </button>
           ))}
         </div>
       </div>
 
-      <div style={{ padding: '0 16px 16px' }}>
-        {filtered.map(comp => (
-          <div key={comp.id} className="card" style={{ borderLeft: `4px solid ${STATUS_COLOR[comp.status].border}`, marginBottom: '12px' }}>
-            <div className="flex justify-between items-start mb-2">
-              <div style={{ fontWeight: '600', flex: 1 }}>{comp.title}</div>
-              <span className="flex items-center gap-1" style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 'var(--radius-full)', backgroundColor: STATUS_COLOR[comp.status].bg, color: STATUS_COLOR[comp.status].text, fontWeight: '600', whiteSpace: 'nowrap', marginLeft: '8px' }}>
-                {STATUS_ICON[comp.status]} {comp.status}
-              </span>
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-              {comp.tenant} · Room {comp.room} · {comp.date}
-            </div>
-            <p style={{ fontSize: '0.875rem', marginBottom: '12px' }}>{comp.desc}</p>
-            {comp.status !== 'Closed' && (
-              <div className="flex gap-2">
-                {comp.status === 'Active' && (
-                  <button className="btn-outline" style={{ padding: '6px 12px', width: 'auto', fontSize: '0.75rem' }}
-                    onClick={() => setComplaints(prev => prev.map(c => c.id === comp.id ? { ...c, status: 'Pending' } : c))}>
-                    Assign Staff
-                  </button>
-                )}
-                <button className="btn-primary" style={{ padding: '6px 12px', width: 'auto', fontSize: '0.75rem' }}
-                  onClick={() => setComplaints(prev => prev.map(c => c.id === comp.id ? { ...c, status: 'Closed' } : c))}>
-                  Mark Resolved
-                </button>
+      <div style={{ padding: 16 }}>
+        {filtered.map(comp => {
+          const sc = STATUS_CONFIG[comp.status];
+          const pc = PRIORITY_CONFIG[comp.priority];
+          const isExpanded = expanded === comp.id;
+          return (
+            <div key={comp.id} onClick={() => setExpanded(isExpanded ? null : comp.id)}
+              style={{ background: 'white', borderRadius: 16, border: `1px solid ${sc.border}`, marginBottom: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', cursor: 'pointer', borderLeft: `4px solid ${sc.text}` }}>
+              <div style={{ padding: '14px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: '#0f172a', flex: 1, paddingRight: 8 }}>{comp.title}</p>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: pc.bg, color: pc.color }}>{comp.priority}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: sc.bg, color: sc.text, display: 'flex', alignItems: 'center', gap: 3 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>{sc.icon}</span>
+                      {comp.status}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 12, color: '#64748b' }}>{comp.tenant}</span>
+                  <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#cbd5e1' }} />
+                  <span style={{ fontSize: 12, color: '#64748b' }}>Room {comp.room}</span>
+                  <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#cbd5e1' }} />
+                  <span style={{ fontSize: 12, color: '#64748b' }}>{comp.date}</span>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+
+              {isExpanded && (
+                <div style={{ padding: '0 16px 14px', borderTop: '1px solid #f1f5f9' }}>
+                  <p style={{ fontSize: 13, color: '#475569', margin: '12px 0' }}>{comp.desc}</p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <a href={`tel:${comp.phone}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#ecfeff', color: cyan, border: '1px solid #a5f3fc', borderRadius: 10, padding: '9px', textDecoration: 'none', fontSize: 13, fontWeight: 700 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>call</span>
+                      Call Tenant
+                    </a>
+                    {comp.status !== 'Closed' && (
+                      <>
+                        {comp.status === 'Active' && (
+                          <button onClick={e => { e.stopPropagation(); setComplaints(prev => prev.map(c => c.id === comp.id ? { ...c, status: 'Pending' } : c)); }}
+                            style={{ flex: 1, background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a', borderRadius: 10, padding: '9px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            Assign Staff
+                          </button>
+                        )}
+                        <button onClick={e => { e.stopPropagation(); setComplaints(prev => prev.map(c => c.id === comp.id ? { ...c, status: 'Closed' } : c)); }}
+                          style={{ flex: 1, background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', borderRadius: 10, padding: '9px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                          Mark Resolved
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
         {filtered.length === 0 && (
-          <div className="text-center" style={{ paddingTop: '48px', color: 'var(--text-muted)' }}>
-            <CheckCircle size={48} style={{ margin: '0 auto 12px', color: 'var(--success)' }} />
-            <p>No complaints in this category!</p>
+          <div style={{ textAlign: 'center', paddingTop: 60, color: '#94a3b8' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 56, color: '#e2e8f0' }}>task_alt</span>
+            <p style={{ fontSize: 15, fontWeight: 600 }}>No complaints here!</p>
           </div>
         )}
       </div>
