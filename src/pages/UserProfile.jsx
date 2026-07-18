@@ -366,6 +366,7 @@ function VisitorHistoryView({ user, onBack }) {
         <div style={{ padding: 16 }}>
           <div style={{ marginBottom: 16, background: 'white', padding: 16, borderRadius: 12, border: '1px solid #e2e8f0' }}>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Relation: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.relation}</span></p>
+            <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Address: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.address || 'N/A'}</span></p>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Phone: <a href={`tel:${selectedVisitor.number}`} style={{ color: '#0f172a', fontWeight: 600, textDecoration: 'none' }}>{selectedVisitor.number}</a></p>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 12px' }}>ID Proof: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.idProof || 'N/A'}</span></p>
             <div style={{ background: '#f8fafc', borderRadius: 8, padding: 8, border: '1px dashed #cbd5e1', textAlign: 'center' }}>
@@ -706,6 +707,15 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
               <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>calendar_month</span>
               <span style={{ fontSize: 12, color: '#64748b' }}>{profile.joiningDate}</span>
             </div>
+            {profile.type === 'notice_period' && profile.dateOfLeaving && (() => {
+              const diff = new Date(profile.dateOfLeaving) - new Date();
+              const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+              return (
+                <div style={{ marginTop: 6, display: 'inline-block', background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: 12, fontSize: 11, fontWeight: 700 }}>
+                  {days > 0 ? `${days} Days Left` : 'Leaving Today/Past'}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -808,22 +818,20 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
         )}
 
         {profile.type !== 'upcoming' && (
-          <Accordion title="Pending Amount" icon="history" defaultOpen={false}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {pending > 0 ? (
-                  <>
-                    <span style={{ fontSize: 13, color: '#475569' }}>• Rent Due: ₹1,500</span>
-                    <span style={{ fontSize: 13, color: '#475569' }}>• Late Fee: ₹500</span>
-                    <span style={{ fontSize: 13, color: '#475569' }}>• Others: ₹500</span>
-                  </>
-                ) : (
-                  <span style={{ fontSize: 13, color: '#475569' }}>No pending dues.</span>
-                )}
-              </div>
-              <span style={{ fontSize: 18, color: pending > 0 ? '#ef4444' : '#16a34a', fontWeight: 800 }}>
-                {pending > 0 ? `₹ ${pending.toLocaleString()}` : '✓ All Clear'}
-              </span>
+          <Accordion title="Pending Amount" badge={pending > 0 ? `₹${pending.toLocaleString()}` : '✓ Clear'} icon="history" defaultOpen={false}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 0' }}>
+              {pending > 0 ? (
+                <>
+                  <span style={{ fontSize: 13, color: '#475569' }}>• Rent Due: ₹1,500</span>
+                  <span style={{ fontSize: 13, color: '#475569' }}>• Late Fee: ₹500</span>
+                  <span style={{ fontSize: 13, color: '#475569' }}>• Others: ₹500</span>
+                  <div style={{ borderTop: '1px dashed #cbd5e1', margin: '4px 0' }} />
+                  <span style={{ fontSize: 12, color: '#ca8a04', fontWeight: 600 }}>Note: May be adjusted against security deposit.</span>
+                  <span style={{ fontSize: 12, color: '#b91c1c', fontWeight: 600 }}>Due Date: 5th of this month</span>
+                </>
+              ) : (
+                <span style={{ fontSize: 13, color: '#475569' }}>No pending dues.</span>
+              )}
             </div>
           </Accordion>
         )}
