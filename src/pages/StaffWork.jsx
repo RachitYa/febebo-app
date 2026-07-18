@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // ─── App-consistent design tokens ─────────────────────────────────────────────
 const C = {
@@ -24,7 +24,8 @@ const C = {
 };
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
-const ROLES = [
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+export const ROLES = [
   { id: 'hr',          label: 'HR',              icon: 'manage_accounts',    category: 'A'       },
   { id: 'manager',     label: 'Manager',          icon: 'supervisor_account', category: 'A'       },
   { id: 'sales',       label: 'Sales Manager',    icon: 'query_stats',        category: 'A'       },
@@ -37,7 +38,7 @@ const ROLES = [
   { id: 'carpenter',   label: 'Carpenter',        icon: 'carpenter',          category: 'C'       },
 ];
 
-const STAFF_MEMBERS = {
+export const STAFF_MEMBERS = {
   hr:          [{ id: 'h1',  name: 'Priya Mishra',     joined: 'Jan 2024', phone: '9876543210' }],
   manager:     [{ id: 'm1',  name: 'Vikram Sharma',    joined: 'Mar 2023', phone: '9123456789' }],
   sales:       [{ id: 's1',  name: 'Anita Rao',        joined: 'Jul 2023', phone: '9988776655' }],
@@ -969,10 +970,30 @@ function StaffMemberList({ role, onBack, onSelect }) {
   );
 }
 
+export const ROLE_GRADIENTS = {
+  hr:          'linear-gradient(135deg,#6366f1,#4f46e5)',
+  manager:     'linear-gradient(135deg,#0891b2,#0e7490)',
+  sales:       'linear-gradient(135deg,#f59e0b,#d97706)',
+  purchase:    'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+  cook:        'linear-gradient(135deg,#ef4444,#dc2626)',
+  cleaner:     'linear-gradient(135deg,#10b981,#059669)',
+  helper:      'linear-gradient(135deg,#64748b,#475569)',
+  plumber:     'linear-gradient(135deg,#06b6d4,#0891b2)',
+  electrician: 'linear-gradient(135deg,#f59e0b,#92400e)',
+  carpenter:   'linear-gradient(135deg,#a16207,#78350f)',
+};
+
+export const ROLE_CATS = [
+  { key: 'management', label: 'Management', ids: ['hr', 'manager', 'sales', 'purchase'] },
+  { key: 'services',   label: 'Daily Services', ids: ['cook', 'cleaner', 'helper'] },
+  { key: 'technical',  label: 'Technical', ids: ['plumber', 'electrician', 'carpenter'] },
+];
+
 // ─── ROLE MENU ACCORDION (main entry) ─────────────────────────────────────────
 export default function StaffWork() {
   const navigate = useNavigate();
-  const [selRole,  setSelRole]  = useState(null);
+  const location = useLocation();
+  const [selRole,  setSelRole]  = useState(location.state?.role || null);
   const [selStaff, setSelStaff] = useState(null);
 
   if (selRole && selStaff) {
@@ -988,25 +1009,6 @@ export default function StaffWork() {
   if (selRole) {
     return <StaffMemberList role={selRole} onBack={() => setSelRole(null)} onSelect={m => setSelStaff(m)} />;
   }
-
-  const ROLE_GRADIENTS = {
-    hr:          'linear-gradient(135deg,#6366f1,#4f46e5)',
-    manager:     'linear-gradient(135deg,#0891b2,#0e7490)',
-    sales:       'linear-gradient(135deg,#f59e0b,#d97706)',
-    purchase:    'linear-gradient(135deg,#8b5cf6,#7c3aed)',
-    cook:        'linear-gradient(135deg,#ef4444,#dc2626)',
-    cleaner:     'linear-gradient(135deg,#10b981,#059669)',
-    helper:      'linear-gradient(135deg,#64748b,#475569)',
-    plumber:     'linear-gradient(135deg,#06b6d4,#0891b2)',
-    electrician: 'linear-gradient(135deg,#f59e0b,#92400e)',
-    carpenter:   'linear-gradient(135deg,#a16207,#78350f)',
-  };
-
-  const ROLE_CATS = [
-    { key: 'management', label: 'Management', ids: ['hr', 'manager', 'sales', 'purchase'] },
-    { key: 'services',   label: 'Daily Services', ids: ['cook', 'cleaner', 'helper'] },
-    { key: 'technical',  label: 'Technical', ids: ['plumber', 'electrician', 'carpenter'] },
-  ];
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
