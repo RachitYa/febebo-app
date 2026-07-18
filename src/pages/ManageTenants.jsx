@@ -12,7 +12,14 @@ const MOCK_USERS = [
   { id: 4, name: 'Ravi Kumar', studentId: '#1234567', phone: '+91 9234567681', date: '25 Feb 2025', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop', type: 'Upcoming User', room: 14, bed: 1 },
 ];
 
-const AMENITIES = ['AC', 'Fridge', 'Washing Machine', 'Study Table', 'Cooler', 'Geyser'];
+const AMENITIES_DATA = [
+  { id: 'ac', label: 'AC', icon: '❄️' },
+  { id: 'fridge', label: 'Fridge', icon: '🧊' },
+  { id: 'washing-machine', label: 'Washing Machine', icon: '🧺' },
+  { id: 'study-table', label: 'Study Table', icon: '🪚' },
+  { id: 'cooler', label: 'Cooler', icon: '🌬️' },
+  { id: 'geyser', label: 'Geyser', icon: '♨️' },
+];
 
 // ─── REUSABLE HEADER ──────────────────────────────────────
 function Header({ title, onBack, action, center = true, dark = false }) {
@@ -98,7 +105,7 @@ function UserListView({ onBack, onAdd, onSelect }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>call</span>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>{u.phone}</span>
+                  <a href={`tel:${u.phone}`} style={{ fontSize: 12, color: '#64748b', textDecoration: 'none' }}>{u.phone}</a>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>calendar_month</span>
@@ -120,19 +127,81 @@ function UserListView({ onBack, onAdd, onSelect }) {
 
 // ─── VIEW 2: ADD USER ─────────────────────────────────────
 function AddUserView({ onBack }) {
+  const [userType, setUserType] = useState('upcoming'); // upcoming | current
   const [career, setCareer] = useState('student'); // student | working
   const [payment, setPayment] = useState('cash'); // cash | online
+  const [paymentType, setPaymentType] = useState('token'); // token | full
+  const [joiningDate, setJoiningDate] = useState(new Date().toISOString().split('T')[0]);
+  const [parentsAlive, setParentsAlive] = useState(true);
+  const [paymentReceiver, setPaymentReceiver] = useState('admin'); // admin | manager | other
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [customAmenities, setCustomAmenities] = useState([]);
+  const [lockInPeriod, setLockInPeriod] = useState('6 Months');
   const fileInputRef = useRef(null);
 
   const Label = ({ children, req }) => <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>{children} {req && <span style={{ color: '#ef4444' }}>*</span>}</label>;
-  const Input = ({ placeholder, type = 'text' }) => <input type={type} placeholder={placeholder} style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: `1px solid ${cyan}`, fontSize: 14, marginBottom: 16, outline: 'none' }} />;
+  const Input = ({ placeholder, type = 'text', value, onChange }) => <input type={type} placeholder={placeholder} value={value} onChange={onChange} style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: `1px solid ${cyan}`, fontSize: 14, marginBottom: 16, outline: 'none' }} />;
 
   const handleUploadClick = () => fileInputRef.current?.click();
+
+  const handleAddCustomAmenity = () => {
+    const name = window.prompt('Enter custom amenity name:');
+    if (name && name.trim()) {
+      const id = 'custom-' + name.trim().toLowerCase().replace(/\s+/g, '-');
+      setCustomAmenities(prev => [...prev, { id, label: name.trim(), icon: '✨' }]);
+      setSelectedAmenities(prev => [...prev, id]);
+    }
+  };
+
+  const toggleAmenity = (id) => {
+    setSelectedAmenities(prev => 
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    );
+  };
+
+  const allAmenities = [...AMENITIES_DATA, ...customAmenities];
+  
+  const todayObj = new Date();
+  const today = todayObj.toISOString().split('T')[0];
+  const dayAfterTomorrowObj = new Date(todayObj);
+  dayAfterTomorrowObj.setDate(dayAfterTomorrowObj.getDate() + 2);
+  const dayAfterTomorrow = dayAfterTomorrowObj.toISOString().split('T')[0];
+  
+  const showFullAmount = userType === 'current' || joiningDate <= dayAfterTomorrow;
 
   return (
     <>
       <Header title="Add User" onBack={onBack} />
       <div style={{ padding: '20px 16px' }}>
+        
+        <Label req>User Type</Label>
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+          <button onClick={() => setUserType('upcoming')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: `1px solid ${cyan}`, background: userType === 'upcoming' ? 'rgba(14,165,233,0.1)' : 'white', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+            <div style={{ width: 16, height: 16, borderRadius: '50%', border: `4px solid ${userType === 'upcoming' ? cyan : '#e2e8f0'}`, background: 'white' }} />
+            <span style={{ fontSize: 14, color: '#334155' }}>Upcoming User</span>
+          </button>
+          <button onClick={() => setUserType('current')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: `1px solid ${cyan}`, background: userType === 'current' ? 'rgba(14,165,233,0.1)' : 'white', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+            <div style={{ width: 16, height: 16, borderRadius: '50%', border: `4px solid ${userType === 'current' ? cyan : '#e2e8f0'}`, background: 'white' }} />
+            <span style={{ fontSize: 14, color: '#334155' }}>Current User</span>
+          </button>
+        </div>
+
+        {userType === 'upcoming' && (
+          <>
+            <Label req>Lock-in Period</Label>
+            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16 }}>
+              {['1 Month', '3 Months', '6 Months', '12 Months'].map(period => (
+                <button key={period} onClick={() => setLockInPeriod(period)} style={{ padding: '8px 16px', borderRadius: 20, border: `1px solid ${cyan}`, background: lockInPeriod === period ? cyan : 'white', color: lockInPeriod === period ? 'white' : cyan, fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {period}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        <Label req>Joining Date</Label>
+        <Input type="date" value={joiningDate} onChange={(e) => setJoiningDate(e.target.value)} />
+
         <Label req>Name</Label><Input placeholder="Enter User Name" />
         <Label req>Mobile Number</Label><Input placeholder="Enter Mobile Number" type="tel" />
         <Label req>Email Id</Label><Input placeholder="Enter Email Id" type="email" />
@@ -144,19 +213,53 @@ function AddUserView({ onBack }) {
           <span className="material-symbols-outlined" style={{ display: 'block', marginTop: 8, color: '#94a3b8' }}>cloud_upload</span>
         </div>
 
-        <Label req>Father Name</Label><Input placeholder="Enter Father Name" />
-        <Label req>Father Mobile Number</Label><Input placeholder="Enter Mobile Number" type="tel" />
+        <Label req>Parents Alive?</Label>
+        <select value={parentsAlive ? 'yes' : 'no'} onChange={e => setParentsAlive(e.target.value === 'yes')} style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: `1px solid ${cyan}`, fontSize: 14, marginBottom: 16, outline: 'none', background: 'white' }}>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+
+        {parentsAlive ? (
+          <>
+            <Label req>Father Name</Label><Input placeholder="Enter Father Name" />
+            <Label req>Father Mobile Number</Label><Input placeholder="Enter Mobile Number" type="tel" />
+          </>
+        ) : (
+          <>
+            <Label req>Guardian/Relative Name</Label><Input placeholder="Enter Guardian Name" />
+            <Label req>Guardian Mobile Number</Label><Input placeholder="Enter Mobile Number" type="tel" />
+            <Label req>Relation</Label><Input placeholder="e.g. Uncle, Brother" />
+          </>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div><Label req>Bed Number</Label><Input placeholder="Enter Bed Number" /></div>
           <div><Label req>Room Number</Label><Input placeholder="Enter Room Number" /></div>
         </div>
 
-        <Label req>Amenities</Label>
-        <select style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: `1px solid ${cyan}`, fontSize: 14, marginBottom: 16, outline: 'none', background: 'white', color: '#94a3b8' }}>
-          <option>Select Amenities</option>
-          {AMENITIES.map(a => <option key={a}>{a}</option>)}
-        </select>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <Label req>Amenities</Label>
+          <span onClick={handleAddCustomAmenity} style={{ fontSize: '0.875rem', color: cyan, cursor: 'pointer', fontWeight: 600 }}>+ Add Custom</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: 16 }}>
+          {allAmenities.map(amenity => {
+            const isSelected = selectedAmenities.includes(amenity.id);
+            return (
+              <div 
+                key={amenity.id} onClick={() => toggleAmenity(amenity.id)}
+                style={{ border: `1px solid ${isSelected ? cyan : '#e2e8f0'}`, borderRadius: 8, padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', backgroundColor: isSelected ? 'rgba(14, 165, 233, 0.05)' : 'white', position: 'relative' }}
+              >
+                {isSelected && (
+                  <div style={{ position: 'absolute', top: '-6px', right: '-6px', backgroundColor: cyan, color: 'white', borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 12 }}>check</span>
+                  </div>
+                )}
+                <span style={{ fontSize: '1.4rem', marginBottom: '4px' }}>{amenity.icon}</span>
+                <span style={{ fontSize: '0.65rem', textAlign: 'center', fontWeight: '600', color: isSelected ? cyan : '#64748b' }}>{amenity.label}</span>
+              </div>
+            );
+          })}
+        </div>
 
         <Label req>Career Status</Label>
         <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
@@ -188,8 +291,36 @@ function AddUserView({ onBack }) {
           <span className="material-symbols-outlined" style={{ display: 'block', marginTop: 8, color: '#94a3b8' }}>cloud_upload</span>
         </div>
 
-        <Label req>Token Amount</Label><Input placeholder="Enter Token Amount" type="number" />
-        <Label req>Pending Amount</Label><Input placeholder="Enter Pending Amount" type="number" />
+        {showFullAmount ? (
+          <>
+            <Label req>Full Amount Paid</Label><Input placeholder="Enter Full Amount" type="number" />
+          </>
+        ) : (
+          <>
+            <Label req>Payment Type</Label>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+              <button onClick={() => setPaymentType('token')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: `1px solid ${cyan}`, background: paymentType === 'token' ? 'rgba(14,165,233,0.1)' : 'white', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <div style={{ width: 16, height: 16, borderRadius: '50%', border: `4px solid ${paymentType === 'token' ? cyan : '#e2e8f0'}`, background: 'white' }} />
+                <span style={{ fontSize: 14, color: '#334155' }}>Token Amount</span>
+              </button>
+              <button onClick={() => setPaymentType('full')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: `1px solid ${cyan}`, background: paymentType === 'full' ? 'rgba(14,165,233,0.1)' : 'white', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <div style={{ width: 16, height: 16, borderRadius: '50%', border: `4px solid ${paymentType === 'full' ? cyan : '#e2e8f0'}`, background: 'white' }} />
+                <span style={{ fontSize: 14, color: '#334155' }}>Full Amount</span>
+              </button>
+            </div>
+            
+            {paymentType === 'token' ? (
+              <>
+                <Label req>Token Amount</Label><Input placeholder="Enter Token Amount" type="number" />
+                <Label req>Pending Amount</Label><Input placeholder="Enter Pending Amount" type="number" />
+              </>
+            ) : (
+              <>
+                <Label req>Full Amount Paid</Label><Input placeholder="Enter Full Amount" type="number" />
+              </>
+            )}
+          </>
+        )}
 
         <Label req>Payment Mode</Label>
         <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
@@ -202,6 +333,26 @@ function AddUserView({ onBack }) {
             <span style={{ fontSize: 14, color: '#334155' }}>ONLINE</span>
           </button>
         </div>
+
+        <Label req>Payment Handled By</Label>
+        <select value={paymentReceiver} onChange={e => setPaymentReceiver(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: `1px solid ${cyan}`, fontSize: 14, marginBottom: 16, outline: 'none', background: 'white' }}>
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="other">Other</option>
+        </select>
+        
+        {paymentReceiver === 'other' && (
+          <>
+            <Label req>Receiver Name</Label><Input placeholder="Enter Name of Receiver" />
+          </>
+        )}
+
+        {payment === 'online' && (
+          <>
+            <Label req>Sender Phone / UPI ID</Label><Input placeholder="e.g. 9876543210 or user@upi" />
+            <Label req>Receiver Phone / UPI ID</Label><Input placeholder="e.g. 9876543210 or pg@upi" />
+          </>
+        )}
 
         <Label req>Meter Unit</Label><Input placeholder="1000 Unit" />
         

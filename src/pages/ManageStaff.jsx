@@ -126,8 +126,8 @@ export default function ManageStaff() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#000', fontSize: 13 }}>
                         <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#38bdf8', fontWeight: 300 }}>mail</span> {s.email}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#000', fontSize: 13 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#38bdf8', fontWeight: 300 }}>phone_in_talk</span> {s.phone}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#64748b' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#38bdf8', fontWeight: 300 }}>phone_in_talk</span> <a href={`tel:${s.phone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{s.phone}</a>
                       </div>
                     </div>
                   </div>
@@ -225,8 +225,8 @@ function WorkStaffView({ search, setSearch }) {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: 13 }}>
                         <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>badge</span> {s.empId}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: 13 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>phone_in_talk</span> {s.phone}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#94a3b8' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>phone_in_talk</span> <a href={`tel:${s.phone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{s.phone}</a>
                       </div>
                     </div>
                   </div>

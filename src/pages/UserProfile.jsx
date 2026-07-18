@@ -65,10 +65,15 @@ function Header({ title, onBack, action, center = true, dark = false, containerS
 
 // ─── INFO ROW ─────────────────────────────────────────────
 function InfoRow({ label, value, last }) {
+  const isPhone = label.toLowerCase().includes('mobile') || label.toLowerCase().includes('phone');
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', borderBottom: last ? 'none' : '1px solid #f1f5f9' }}>
       <span style={{ fontSize: 13, color: '#64748b', minWidth: 120 }}>{label}</span>
-      <span style={{ fontSize: 13, color: cyan, fontWeight: 600, textAlign: 'right', maxWidth: '55%' }}>{value}</span>
+      {isPhone && value ? (
+        <a href={`tel:${value}`} style={{ fontSize: 13, color: cyan, fontWeight: 600, textAlign: 'right', maxWidth: '55%', textDecoration: 'none' }}>{value}</a>
+      ) : (
+        <span style={{ fontSize: 13, color: cyan, fontWeight: 600, textAlign: 'right', maxWidth: '55%' }}>{value}</span>
+      )}
     </div>
   );
 }
@@ -361,7 +366,7 @@ function VisitorHistoryView({ user, onBack }) {
         <div style={{ padding: 16 }}>
           <div style={{ marginBottom: 16, background: 'white', padding: 16, borderRadius: 12, border: '1px solid #e2e8f0' }}>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Relation: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.relation}</span></p>
-            <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Phone: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.number}</span></p>
+            <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Phone: <a href={`tel:${selectedVisitor.number}`} style={{ color: '#0f172a', fontWeight: 600, textDecoration: 'none' }}>{selectedVisitor.number}</a></p>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 12px' }}>ID Proof: <span style={{ color: '#0f172a', fontWeight: 600 }}>{selectedVisitor.idProof || 'N/A'}</span></p>
             <div style={{ background: '#f8fafc', borderRadius: 8, padding: 8, border: '1px dashed #cbd5e1', textAlign: 'center' }}>
               <img src="https://placehold.co/400x250/e2e8f0/64748b?text=Aadhaar+Front" alt="ID Proof Front" style={{ width: '100%', borderRadius: 6, objectFit: 'cover', marginBottom: 8 }} />
@@ -695,7 +700,7 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
               <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>call</span>
-              <span style={{ fontSize: 12, color: '#64748b' }}>{user?.phone || '+91 9234567681'}</span>
+              <a href={`tel:${user?.phone || '+91 9234567681'}`} style={{ fontSize: 12, color: '#64748b', textDecoration: 'none' }}>{user?.phone || '+91 9234567681'}</a>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>calendar_month</span>
