@@ -248,7 +248,7 @@ function Fab({ onClick }) {
 }
 
 // Simple item row — qty is typeable input, always clickable
-function ItemRow({ item, idx, total, onQtyChange, onClick }) {
+function ItemRow({ item, idx, total, onQtyChange, onClick, onRemove }) {
   return (
     <div onClick={onClick} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 16px', borderBottom: idx < total - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer', background: 'white' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -263,7 +263,13 @@ function ItemRow({ item, idx, total, onQtyChange, onClick }) {
           onChange={e => { e.stopPropagation(); onQtyChange && onQtyChange(parseInt(e.target.value) || 0); }}
           style={{ width: 52, padding: '6px 8px', border: `1.5px solid ${cyan}`, borderRadius: 8, fontSize: 15, fontWeight: 700, color: '#0f172a', textAlign: 'center', outline: 'none', fontFamily: 'inherit', background: 'white' }}
         />
-        <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#94a3b8' }}>chevron_right</span>
+        {onRemove ? (
+          <button onClick={e => { e.stopPropagation(); onRemove(); }} style={{ background: 'none', border: 'none', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+          </button>
+        ) : (
+          <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#94a3b8' }}>chevron_right</span>
+        )}
       </div>
     </div>
   );
@@ -514,12 +520,18 @@ function UserAllottedView({ person, onBack }) {
 
         <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {items.map((item, idx) => (
-            <ItemRow key={item.name} item={item} idx={idx} total={items.length}
+            <ItemRow key={idx} item={item} idx={idx} total={items.length}
               onQtyChange={val => updateQty(idx, val)}
+              onRemove={() => setItems(p => p.filter((_, i) => i !== idx))}
               onClick={() => setSelectedIdx(idx)} />
           ))}
         </div>
-        <Fab />
+        <Fab onClick={() => {
+          const name = window.prompt("Enter new item name:");
+          if (name && name.trim()) {
+            setItems(p => [...p, { id: 'new_'+Date.now(), name: name.trim(), qty: 1, icon: 'inventory_2', cat: 'Others' }]);
+          }
+        }} />
       </div>
     </div>
   );
@@ -568,12 +580,18 @@ function StaffAllottedView({ person, onBack }) {
 
         <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {items.map((item, idx) => (
-            <ItemRow key={item.name} item={item} idx={idx} total={items.length}
+            <ItemRow key={idx} item={item} idx={idx} total={items.length}
               onQtyChange={val => updateQty(idx, val)}
+              onRemove={() => setItems(p => p.filter((_, i) => i !== idx))}
               onClick={() => setSelectedIdx(idx)} />
           ))}
         </div>
-        <Fab />
+        <Fab onClick={() => {
+          const name = window.prompt("Enter new item name:");
+          if (name && name.trim()) {
+            setItems(p => [...p, { id: 'new_'+Date.now(), name: name.trim(), qty: 1, icon: 'inventory_2', cat: 'Others' }]);
+          }
+        }} />
       </div>
     </div>
   );
