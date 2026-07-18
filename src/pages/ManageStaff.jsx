@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ROLES, ROLE_CATS, ROLE_GRADIENTS, STAFF_MEMBERS } from './StaffWork';
 
 const MOCK_STAFF = [
   { id: 1, name: 'Amit Sharma', empId: '#1001', role: 'HR', email: 'amit@hotel.com', phone: '+91 9876543210', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&h=150&fit=crop' },
@@ -191,53 +190,47 @@ export default function ManageStaff() {
   );
 }
 
-// ─── NEW COMPONENT: WORK STAFF VIEW (ROLE MENU) ───────────────────────
+// ─── NEW COMPONENT: WORK STAFF VIEW ───────────────────────
 function WorkStaffView({ search, setSearch }) {
   const navigate = useNavigate();
+  const CATEGORIES = ['HR', 'Purchase Manager', 'Sales Manager', 'Manager', 'Cook', 'Helper', 'Cleaner', 'Plumber', 'Electrician', 'Carpenter'];
 
   return (
     <div style={{ paddingBottom: 20 }}>
       {/* Search */}
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Roles" style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Staff Name or ID" style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {ROLE_CATS.map(cat => {
-          // Filter roles based on search text
-          const matchingRoles = ROLES.filter(r => cat.ids.includes(r.id) && r.label.toLowerCase().includes(search.toLowerCase()));
-          if (matchingRoles.length === 0) return null;
-
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        {CATEGORIES.map(category => {
+          const catStaff = MOCK_STAFF.filter(s => s.role.toLowerCase() === category.toLowerCase() && (s.name.toLowerCase().includes(search.toLowerCase()) || s.empId.includes(search)));
+          if (catStaff.length === 0) return null;
           return (
-            <div key={cat.key} style={{ marginBottom: 24 }}>
-              <p style={{ fontSize: 12, fontWeight: 800, color: '#64748b', letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px' }}>{cat.label}</p>
+            <div key={category}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '0 0 12px 0', paddingLeft: 4, borderLeft: '4px solid #0891b2' }}>
+                <span style={{ marginLeft: 8 }}>{category}</span>
+              </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {matchingRoles.map(role => {
-                  const members = STAFF_MEMBERS[role.id] || [];
-                  const count = members.length;
-                  const grad = ROLE_GRADIENTS[role.id] || '#0891b2';
-
-                  return (
-                    <div key={role.id} onClick={() => navigate('/staff-work', { state: { role } })}
-                      style={{ background: 'white', border: `1px solid #e2e8f0`, borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s' }}
-                      onTouchStart={e => e.currentTarget.style.transform = 'scale(0.98)'}
-                      onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: 24, color: 'white' }}>{role.icon}</span>
-                        </div>
-                        <div>
-                          <p style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: '0 0 3px' }}>{role.label}</p>
-                          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
-                        </div>
+                {catStaff.map(s => (
+                  <div 
+                    key={s.id} 
+                    onClick={() => navigate(`/staff-work/${s.id}`, { state: { staff: s } })}
+                    style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}
+                  >
+                    <img src={s.img} alt={s.name} style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
+                      <p style={{ fontWeight: 700, fontSize: 15, color: '#000', margin: 0 }}>{s.name}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: 13 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>badge</span> {s.empId}
                       </div>
-                      <span className="material-symbols-outlined" style={{ color: '#64748b' }}>
-                        chevron_right
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#94a3b8' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>phone_in_talk</span> <a href={`tel:${s.phone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{s.phone}</a>
+                      </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           );
