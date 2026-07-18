@@ -1,72 +1,133 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+
+const cyan = '#0891b2';
 
 const MOCK_ENQUIRIES = [
-  { id: 1, name: 'Rohit Sharma', mobile: '+91 9876543210', message: 'Looking for a single room with AC. Budget around ₹10,000.', date: '28 Jun 2025', status: 'New' },
-  { id: 2, name: 'Priya Mehta', mobile: '+91 9123456789', message: 'Do you have double sharing available near metro station?', date: '27 Jun 2025', status: 'Contacted' },
-  { id: 3, name: 'Arun Verma', mobile: '+91 9012345678', message: 'What is the security deposit for triple sharing?', date: '25 Jun 2025', status: 'Closed' },
+  { id: 1, name: 'Rohit Sharma',  mobile: '+91 9876543210', message: 'Looking for a single room with AC. Budget around ₹10,000.', date: '28 Jun 2025', status: 'New',       source: 'WhatsApp' },
+  { id: 2, name: 'Priya Mehta',   mobile: '+91 9123456789', message: 'Do you have double sharing available near metro station?', date: '27 Jun 2025', status: 'Contacted', source: 'NoBroker' },
+  { id: 3, name: 'Arun Verma',    mobile: '+91 9012345678', message: 'What is the security deposit for triple sharing?', date: '25 Jun 2025', status: 'Closed',    source: 'MagicBricks' },
+  { id: 4, name: 'Kavya Singh',   mobile: '+91 9444556677', message: 'Need a working girls PG with food. Any availability?', date: '29 Jun 2025', status: 'New',       source: 'Instagram' },
+  { id: 5, name: 'Deepak Rathi',  mobile: '+91 9777888001', message: 'Looking for long stay of 12 months. Any discount?', date: '28 Jun 2025', status: 'Contacted', source: 'Walk-in' },
 ];
 
-const STATUS_COLOR = {
-  New: { bg: 'rgba(14,165,233,0.1)', text: 'var(--primary)' },
-  Contacted: { bg: 'rgba(245,158,11,0.1)', text: 'var(--warning)' },
-  Closed: { bg: 'rgba(16,185,129,0.1)', text: 'var(--success)' },
+const STATUS_CONFIG = {
+  New:       { bg: '#ecfeff', text: '#0891b2', border: '#a5f3fc', icon: 'mark_chat_unread' },
+  Contacted: { bg: '#fffbeb', text: '#d97706', border: '#fde68a', icon: 'call_made' },
+  Closed:    { bg: '#ecfdf5', text: '#059669', border: '#a7f3d0', icon: 'check_circle' },
+};
+
+const SOURCE_CONFIG = {
+  WhatsApp:   { color: '#25d366', icon: 'chat' },
+  NoBroker:   { color: '#e11d48', icon: 'home' },
+  MagicBricks:{ color: '#f59e0b', icon: 'apartment' },
+  Instagram:  { color: '#c026d3', icon: 'photo_camera' },
+  'Walk-in':  { color: '#0891b2', icon: 'directions_walk' },
 };
 
 export default function Enquiry() {
   const navigate = useNavigate();
   const [enquiries, setEnquiries] = useState(MOCK_ENQUIRIES);
+  const [filter, setFilter] = useState('All');
+
+  const tabs = ['All', 'New', 'Contacted', 'Closed'];
+  const counts = { All: enquiries.length, New: enquiries.filter(e => e.status === 'New').length, Contacted: enquiries.filter(e => e.status === 'Contacted').length, Closed: enquiries.filter(e => e.status === 'Closed').length };
+  const filtered = filter === 'All' ? enquiries : enquiries.filter(e => e.status === filter);
 
   return (
-    <div className="app-container">
-      <div className="top-nav">
-        <div className="flex items-center gap-4">
-          <button className="icon-btn" onClick={() => navigate('/admin-dashboard')}><ArrowLeft size={24} /></button>
-          <div className="nav-title">Enquiries</div>
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk', sans-serif", paddingBottom: 40 }}>
+      {/* Header */}
+      <div style={{ background: 'linear-gradient(135deg, #0c1a2e, #0f2847)', padding: '0 16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, height: 64 }}>
+          <button onClick={() => navigate('/admin-dashboard')} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back_ios_new</span>
+          </button>
+          <div style={{ flex: 1 }}>
+            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'white' }}>Enquiries</h1>
+            <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>{counts.New} new leads today</p>
+          </div>
+          <div style={{ background: '#ecfeff', borderRadius: 10, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16, color: cyan }}>mark_chat_unread</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: cyan }}>{counts.New}</span>
+          </div>
         </div>
-      </div>
-      <div style={{ padding: '16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-          {[
-            { label: 'New', count: enquiries.filter(e => e.status === 'New').length, color: 'var(--primary)' },
-            { label: 'Contacted', count: enquiries.filter(e => e.status === 'Contacted').length, color: 'var(--warning)' },
-            { label: 'Closed', count: enquiries.filter(e => e.status === 'Closed').length, color: 'var(--success)' },
-          ].map((s, i) => (
-            <div key={i} className="card text-center" style={{ padding: '12px', marginBottom: 0 }}>
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: s.color }}>{s.count}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.label}</div>
+
+        {/* Stats strip */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
+          {[{ label: 'New', val: counts.New, c: '#38bdf8' }, { label: 'Contacted', val: counts.Contacted, c: '#fbbf24' }, { label: 'Closed', val: counts.Closed, c: '#4ade80' }].map(s => (
+            <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: '10px', textAlign: 'center' }}>
+              <p style={{ margin: 0, fontWeight: 900, fontSize: 22, color: s.c }}>{s.val}</p>
+              <p style={{ margin: 0, fontSize: 11, color: '#64748b' }}>{s.label}</p>
             </div>
           ))}
         </div>
 
-        {enquiries.map((enq, idx) => (
-          <div key={enq.id} className="card" style={{ marginBottom: '12px' }}>
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <div style={{ fontWeight: '600' }}>{enq.name}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--primary)', marginTop: '2px' }}>{enq.mobile}</div>
+        {/* Filter tabs */}
+        <div style={{ display: 'flex', gap: 6 }}>
+          {tabs.map(t => (
+            <button key={t} onClick={() => setFilter(t)}
+              style={{ flex: 1, padding: '7px 4px', border: 'none', borderRadius: 10, background: filter === t ? 'rgba(255,255,255,0.18)' : 'transparent', color: filter === t ? 'white' : '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: 16 }}>
+        {filtered.map(enq => {
+          const sc = STATUS_CONFIG[enq.status];
+          const src = SOURCE_CONFIG[enq.source] || { color: '#64748b', icon: 'link' };
+          return (
+            <div key={enq.id} style={{ background: 'white', borderRadius: 16, border: `1px solid ${sc.border}`, marginBottom: 12, overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', borderLeft: `4px solid ${sc.text}` }}>
+              <div style={{ padding: '14px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{enq.name}</p>
+                    <a href={`tel:${enq.mobile}`} style={{ fontSize: 12, color: cyan, textDecoration: 'none', fontWeight: 600 }}>{enq.mobile}</a>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 8, background: sc.bg, color: sc.text, display: 'flex', alignItems: 'center', gap: 3 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>{sc.icon}</span>
+                      {enq.status}
+                    </span>
+                    <span style={{ fontSize: 10, color: src.color, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 11 }}>{src.icon}</span>
+                      {enq.source}
+                    </span>
+                  </div>
+                </div>
+                <p style={{ margin: '0 0 12px', fontSize: 13, color: '#475569' }}>{enq.message}</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <a href={`tel:${enq.mobile}`} style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#ecfeff', color: cyan, border: '1px solid #a5f3fc', borderRadius: 9, padding: '7px 12px', textDecoration: 'none', fontSize: 12, fontWeight: 700 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 15 }}>call</span>
+                    Call
+                  </a>
+                  {enq.status === 'New' && (
+                    <button onClick={() => setEnquiries(p => p.map(e => e.id === enq.id ? { ...e, status: 'Contacted' } : e))}
+                      style={{ flex: 1, background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a', borderRadius: 9, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Mark Contacted
+                    </button>
+                  )}
+                  {enq.status !== 'Closed' && (
+                    <button onClick={() => setEnquiries(p => p.map(e => e.id === enq.id ? { ...e, status: 'Closed' } : e))}
+                      style={{ flex: 1, background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', borderRadius: 9, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Close Lead
+                    </button>
+                  )}
+                  {enq.status === 'Closed' && (
+                    <span style={{ flex: 1, textAlign: 'center', fontSize: 12, color: '#059669', fontWeight: 700 }}>✓ Closed</span>
+                  )}
+                </div>
               </div>
-              <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 'var(--radius-full)', backgroundColor: STATUS_COLOR[enq.status].bg, color: STATUS_COLOR[enq.status].text, fontWeight: '600' }}>
-                {enq.status}
-              </span>
             </div>
-            <p style={{ fontSize: '0.875rem', marginBottom: '12px' }}>{enq.message}</p>
-            <div className="flex justify-between items-center">
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{enq.date}</div>
-              <div className="flex gap-2">
-                <button className="btn-outline" style={{ padding: '6px 12px', width: 'auto', fontSize: '0.75rem' }}
-                  onClick={() => setEnquiries(prev => prev.map(e => e.id === enq.id ? { ...e, status: 'Contacted' } : e))}>
-                  Mark Contacted
-                </button>
-                <button className="btn-primary" style={{ padding: '6px 12px', width: 'auto', fontSize: '0.75rem' }}
-                  onClick={() => setEnquiries(prev => prev.map(e => e.id === enq.id ? { ...e, status: 'Closed' } : e))}>
-                  Close
-                </button>
-              </div>
-            </div>
+          );
+        })}
+        {filtered.length === 0 && (
+          <div style={{ textAlign: 'center', paddingTop: 60 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 56, color: '#e2e8f0' }}>contact_support</span>
+            <p style={{ color: '#94a3b8', fontSize: 15, fontWeight: 600 }}>No enquiries in this category.</p>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
