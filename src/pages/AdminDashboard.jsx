@@ -9,20 +9,22 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const MODULES = [
-    { id: 'account',   label: 'Account',   desc: 'Ledgers',       icon: 'account_balance_wallet', gradient: 'linear-gradient(135deg,#0ea5e9,#0891b2)' },
-    { id: 'inventory', label: 'Inventory', desc: 'Stock',          icon: 'inventory_2',            gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
-    { id: 'vendor',    label: 'Vendor',    desc: 'Suppliers',      icon: 'local_shipping',         gradient: 'linear-gradient(135deg,#8b5cf6,#7c3aed)' },
-    { id: 'room',      label: 'Seats',     desc: 'Spaces',         icon: 'meeting_room',           gradient: 'linear-gradient(135deg,#10b981,#059669)' },
-    { id: 'user',      label: 'Users',     desc: 'Tenants',        icon: 'groups',                 gradient: 'linear-gradient(135deg,#f59e0b,#d97706)' },
-    { id: 'staff',     label: 'Staff',     desc: 'HR & Pay',       icon: 'badge',                  gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)' },
-    { id: 'work',      label: 'Tasks',     desc: 'Maintenance',    icon: 'task_alt',               gradient: 'linear-gradient(135deg,#64748b,#475569)' },
-    { id: 'enquiry',   label: 'Enquiry',   desc: '12 New',         icon: 'contact_support',        gradient: 'linear-gradient(135deg,#06b6d4,#0891b2)' },
+    { id: 'account',        label: 'Account',        desc: 'Ledgers',       icon: 'account_balance_wallet', gradient: 'linear-gradient(135deg,#0ea5e9,#0891b2)' },
+    { id: 'inventory',      label: 'Inventory',      desc: 'Stock',          icon: 'inventory_2',            gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
+    { id: 'vendor',         label: 'Vendor',         desc: 'Suppliers',      icon: 'local_shipping',         gradient: 'linear-gradient(135deg,#8b5cf6,#7c3aed)' },
+    { id: 'room',           label: 'Seats',          desc: 'Spaces',         icon: 'meeting_room',           gradient: 'linear-gradient(135deg,#10b981,#059669)' },
+    { id: 'user',           label: 'Users',          desc: 'Tenants',        icon: 'groups',                 gradient: 'linear-gradient(135deg,#f59e0b,#d97706)' },
+    { id: 'staff',          label: 'Staff',          desc: 'HR & Pay',       icon: 'badge',                  gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)' },
+    { id: 'work',           label: 'Tasks',          desc: 'Maintenance',    icon: 'task_alt',               gradient: 'linear-gradient(135deg,#64748b,#475569)' },
+    { id: 'enquiry',        label: 'Enquiry',        desc: '12 New',         icon: 'contact_support',        gradient: 'linear-gradient(135deg,#06b6d4,#0891b2)' },
+    { id: 'transportation', label: 'Transport',      desc: 'Drivers',        icon: 'directions_car',         gradient: 'linear-gradient(135deg,#16a34a,#15803d)' },
+    { id: 'chat',           label: 'Chat',           desc: 'Messages',       icon: 'chat',                   gradient: 'linear-gradient(135deg,#ec4899,#db2777)' },
   ];
 
   const routes = {
     room: '/manage-rooms', user: '/manage-tenants', staff: '/manage-staff',
     work: '/staff-work', account: '/manage-account', vendor: '/vendor-transactions',
-    inventory: '/inventory', enquiry: '/enquiry',
+    inventory: '/inventory', enquiry: '/enquiry', transportation: '/transportation', chat: '/chat',
   };
 
   const DUES = [
@@ -57,15 +59,17 @@ export default function AdminDashboard() {
           <p style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>Admin Panel</p>
         </div>
         {[
-          { icon: 'dashboard',           label: 'Dashboard',    path: '/admin-dashboard' },
-          { icon: 'people',              label: 'Tenants',      path: '/manage-tenants' },
-          { icon: 'meeting_room',        label: 'Seats',        path: '/manage-rooms' },
-          { icon: 'badge',               label: 'Staff',        path: '/manage-staff' },
-          { icon: 'account_balance_wallet', label: 'Accounts',  path: '/manage-account' },
-          { icon: 'pending_actions',     label: 'Request Box',  path: '/request-box' },
-          { icon: 'event_busy',          label: 'Leave',        path: '/leave' },
-          { icon: 'bar_chart',           label: 'Reports',      path: '/reports' },
-          { icon: 'workspace_premium',   label: 'Subscription', path: '/subscription' },
+          { icon: 'dashboard',           label: 'Dashboard',      path: '/admin-dashboard' },
+          { icon: 'people',              label: 'Tenants',        path: '/manage-tenants' },
+          { icon: 'meeting_room',        label: 'Seats',          path: '/manage-rooms' },
+          { icon: 'badge',               label: 'Staff',          path: '/manage-staff' },
+          { icon: 'account_balance_wallet', label: 'Accounts',    path: '/manage-account' },
+          { icon: 'directions_car',      label: 'Transportation', path: '/transportation' },
+          { icon: 'chat',                label: 'Messages',       path: '/chat' },
+          { icon: 'pending_actions',     label: 'Request Box',    path: '/request-box' },
+          { icon: 'event_busy',          label: 'Leave',          path: '/leave' },
+          { icon: 'bar_chart',           label: 'Reports',        path: '/reports' },
+          { icon: 'workspace_premium',   label: 'Subscription',   path: '/subscription' },
         ].map((item, i) => (
           <div key={i} onClick={() => { navigate(item.path); setSidebarOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 20px', cursor: 'pointer', color: item.path === '/admin-dashboard' ? '#38bdf8' : '#94a3b8', background: item.path === '/admin-dashboard' ? 'rgba(56,189,248,0.08)' : 'transparent', borderLeft: item.path === '/admin-dashboard' ? '3px solid #38bdf8' : '3px solid transparent', transition: 'all 0.15s' }}>
@@ -205,10 +209,15 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* ── FAB ── */}
-      <button style={{ position: 'fixed', right: 20, bottom: 80, width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#0891b2,#0e7490)', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(8,145,178,0.4)', cursor: 'pointer', zIndex: 40 }}>
-        <span className="material-symbols-outlined" style={{ fontSize: 24 }}>add</span>
-      </button>
+      {/* ── FAB Row (Chat + Add) ── */}
+      <div style={{ position: 'fixed', right: 20, bottom: 80, display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
+        <button onClick={() => navigate('/chat')} style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#ec4899,#db2777)', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 20px rgba(236,72,153,0.4)', cursor: 'pointer' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 22 }}>chat</span>
+        </button>
+        <button style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#0891b2,#0e7490)', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(8,145,178,0.4)', cursor: 'pointer' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 24 }}>add</span>
+        </button>
+      </div>
 
       {/* ── BOTTOM NAV ── */}
       <nav style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 480, background: 'white', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '8px 0 20px', zIndex: 50 }}>

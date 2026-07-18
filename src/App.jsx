@@ -27,6 +27,8 @@ import Subscription from './pages/Subscription';
 import PriceMenu from './pages/PriceMenu';
 import UserProfile from './pages/UserProfile';
 import StaffProfile from './pages/StaffProfile';
+import Chat from './pages/Chat';
+import Transportation from './pages/Transportation';
 
 // Redirect helper
 const RootRedirect = () => {
@@ -68,6 +70,8 @@ function AppRoutes() {
       <Route path="/leave" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><Leave /></ProtectedRoute>} />
       <Route path="/subscription" element={<AdminRoute><Subscription /></AdminRoute>} />
       <Route path="/price-menu" element={<AdminRoute><PriceMenu /></AdminRoute>} />
+      <Route path="/chat" element={<AdminRoute><Chat /></AdminRoute>} />
+      <Route path="/transportation" element={<AdminRoute><Transportation /></AdminRoute>} />
 
       {/* Staff Routes */}
       <Route path="/staff-dashboard" element={<ProtectedRoute allowedRoles={['staff']}><StaffDashboard /></ProtectedRoute>} />

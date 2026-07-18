@@ -989,33 +989,69 @@ export default function StaffWork() {
     return <StaffMemberList role={selRole} onBack={() => setSelRole(null)} onSelect={m => setSelStaff(m)} />;
   }
 
+  const ROLE_GRADIENTS = {
+    hr:          'linear-gradient(135deg,#6366f1,#4f46e5)',
+    manager:     'linear-gradient(135deg,#0891b2,#0e7490)',
+    sales:       'linear-gradient(135deg,#f59e0b,#d97706)',
+    purchase:    'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+    cook:        'linear-gradient(135deg,#ef4444,#dc2626)',
+    cleaner:     'linear-gradient(135deg,#10b981,#059669)',
+    helper:      'linear-gradient(135deg,#64748b,#475569)',
+    plumber:     'linear-gradient(135deg,#06b6d4,#0891b2)',
+    electrician: 'linear-gradient(135deg,#f59e0b,#92400e)',
+    carpenter:   'linear-gradient(135deg,#a16207,#78350f)',
+  };
+
+  const ROLE_CATS = [
+    { key: 'management', label: 'Management', ids: ['hr', 'manager', 'sales', 'purchase'] },
+    { key: 'services',   label: 'Daily Services', ids: ['cook', 'cleaner', 'helper'] },
+    { key: 'technical',  label: 'Technical', ids: ['plumber', 'electrician', 'carpenter'] },
+  ];
+
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
       {/* Header */}
-      <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', gap: 14, position: 'sticky', top: 0, zIndex: 20 }}>
-        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex', alignItems: 'center', padding: 0 }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 22 }}>arrow_back_ios_new</span>
-        </button>
-        <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Staff Work</p>
+      <div style={{ background: 'linear-gradient(135deg, #0c1a2e, #0f2847)', padding: '0 20px 24px', position: 'sticky', top: 0, zIndex: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, height: 64 }}>
+          <button onClick={() => navigate(-1)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back_ios_new</span>
+          </button>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 20, fontWeight: 800, color: 'white', margin: 0 }}>Staff Work</p>
+            <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>Select a role to view staff</p>
+          </div>
+        </div>
       </div>
 
-      <div style={{ padding: '0 16px' }}>
-        <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '20px 0 12px' }}>Select a Role</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {ROLES.map(role => {
-            const count = (STAFF_MEMBERS[role.id] || []).length;
-            return (
-              <div key={role.id} onClick={() => setSelRole(role)}
-                style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: 18, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: C.primaryBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 22, color: C.primary }}>{role.icon}</span>
-                </div>
-                <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>{role.label}</p>
-                <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
-              </div>
-            );
-          })}
-        </div>
+      <div style={{ padding: '16px 16px' }}>
+        {ROLE_CATS.map(cat => (
+          <div key={cat.key} style={{ marginBottom: 24 }}>
+            <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px' }}>{cat.label}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {ROLES.filter(r => cat.ids.includes(r.id)).map(role => {
+                const count = (STAFF_MEMBERS[role.id] || []).length;
+                const grad = ROLE_GRADIENTS[role.id] || C.primary;
+                return (
+                  <div key={role.id} onClick={() => setSelRole(role)}
+                    style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 18, padding: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'all 0.2s', position: 'relative', overflow: 'hidden' }}
+                    onTouchStart={e => e.currentTarget.style.transform = 'scale(0.97)'}
+                    onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
+                    {/* Gradient strip */}
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: grad, borderRadius: '18px 18px 0 0' }} />
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 24, color: 'white' }}>{role.icon}</span>
+                    </div>
+                    <p style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: '0 0 4px' }}>{role.label}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 12, color: C.muted }}>{count} member{count !== 1 ? 's' : ''}</span>
+                      {count > 0 && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }} />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
