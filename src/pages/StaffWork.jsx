@@ -380,8 +380,8 @@ const Chip = ({ label }) => {
   );
 };
 
-const Card = ({ children, style = {} }) => (
-  <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: 18, ...style }}>
+const Card = ({ children, style = {}, ...props }) => (
+  <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: 18, ...style }} {...props}>
     {children}
   </div>
 );
@@ -1049,13 +1049,32 @@ export default function StaffWork() {
   const [selStaff, setSelStaff] = useState(null);
 
   if (selRole && selStaff) {
-    const p   = { staffId: selStaff.id, staffName: selStaff.name, role: selRole.label, onBack: () => setSelStaff(null) };
-    const cat = selRole.category;
-    if (cat === 'A')       return <TimelineView {...p} />;
-    if (cat === 'B_cook')  return <CookView {...p} />;
-    if (cat === 'B_clean') return <CleanerView {...p} />;
-    if (cat === 'C')       return <TicketView {...p} />;
-    if (cat === 'D')       return <PurchaseManagerView {...p} />;
+    try {
+      const p   = { staffId: selStaff.id, staffName: selStaff.name, role: selRole.label, onBack: () => setSelStaff(null) };
+      const cat = selRole.category;
+      if (cat === 'A')       return <TimelineView {...p} />;
+      if (cat === 'B_cook')  return <CookView {...p} />;
+      if (cat === 'B_clean') return <CleanerView {...p} />;
+      if (cat === 'C')       return <TicketView {...p} />;
+      if (cat === 'D')       return <PurchaseManagerView {...p} />;
+      
+      // Fallback if category is unknown or undefined
+      return (
+        <div style={{ padding: 20 }}>
+          <h2>Error</h2>
+          <p>Unknown category: {String(cat)}</p>
+          <button onClick={() => setSelStaff(null)}>Go Back</button>
+        </div>
+      );
+    } catch (err) {
+      return (
+        <div style={{ padding: 20 }}>
+          <h2>Component Crash</h2>
+          <p>{err.message}</p>
+          <button onClick={() => setSelStaff(null)}>Go Back</button>
+        </div>
+      );
+    }
   }
 
   if (selRole) {
