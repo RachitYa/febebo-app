@@ -647,28 +647,36 @@ export function CleanerView({ staffId, staffName, onBack }) {
   const notReqCount = timeFilter === 'day' ? notReqRooms.length : cur.notReq;
   const assignedCount = timeFilter === 'day' ? uncleanedCount + cleanedCount + notReqCount : cur.assigned;
 
-  const renderCat = (key, label, dataArr) => (
-    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 10 }}>
-      <div onClick={() => setExpandedCat(expandedCat === key ? null : key)} style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: expandedCat === key ? C.primaryBg : 'transparent' }}>
-        <p style={{ fontSize: 15, fontWeight: 700, color: expandedCat === key ? C.primary : C.text, margin: 0 }}>{label}</p>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{dataArr.length}</span>
-          <span className="material-symbols-outlined" style={{ fontSize: 20, color: C.muted, transform: expandedCat === key ? 'rotate(180deg)' : 'none', transition: 'all 0.2s' }}>expand_more</span>
+  const renderCat = (key, label, dataArr, iconStr) => (
+    <div style={{ background: C.white, borderRadius: 16, overflow: 'hidden', marginBottom: 12, boxShadow: '0 4px 15px rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.04)' }}>
+      <div onClick={() => setExpandedCat(expandedCat === key ? null : key)} 
+           style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: expandedCat === key ? 'linear-gradient(to right, #ecfeff, #ffffff)' : 'transparent', transition: 'all 0.3s ease' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #06b6d4, #0891b2)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(8, 145, 178, 0.3)' }}>
+            <span style={{ fontSize: 18 }}>{iconStr}</span>
+          </div>
+          <p style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>{label}</p>
+        </div>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ background: '#f1f5f9', padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 800, color: '#334155' }}>
+            {dataArr.length}
+          </div>
+          <span className="material-symbols-outlined" style={{ fontSize: 22, color: '#94a3b8', transform: expandedCat === key ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>expand_more</span>
         </div>
       </div>
       {expandedCat === key && (
-        <div style={{ padding: '12px 16px', borderTop: `1px solid ${C.border}`, background: C.bg }}>
+        <div style={{ padding: '16px', borderTop: `1px solid ${C.border}`, background: '#fafaf9' }}>
           {dataArr.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               {dataArr.map((d, i) => (
-                <div key={i} style={{ background: C.white, padding: '8px 12px', borderRadius: 8, display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Rm {d.room}</span>
-                  <span style={{ fontSize: 12, color: C.muted }}>{d.time}</span>
+                <div key={i} style={{ background: C.white, padding: '12px', borderRadius: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.02)', border: '1px solid #f1f5f9' }}>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: '#1e293b' }}>Rm {d.room}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0891b2', background: '#ecfeff', padding: '4px 8px', borderRadius: 8 }}>{d.time}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>No records found for this period.</p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#94a3b8', margin: 0, textAlign: 'center', padding: '10px 0' }}>No records found for this period.</p>
           )}
         </div>
       )}
@@ -676,96 +684,135 @@ export function CleanerView({ staffId, staffName, onBack }) {
   );
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle="Cleaner" onBack={onBack} />
-      <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f8fafc', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      <TopBar title={staffName} subtitle="Housekeeping • Cleaner" onBack={onBack} />
+      
+      {/* Sleek Tabs */}
+      <div style={{ display: 'flex', padding: '16px', gap: 10 }}>
+        {['Work Details', 'Staff Info'].map(t => (
+          <button key={t} onClick={() => setActiveTab(t)}
+            style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', background: activeTab === t ? '#0f172a' : C.white, color: activeTab === t ? C.white : '#64748b', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: activeTab === t ? '0 4px 12px rgba(15, 23, 42, 0.2)' : '0 2px 6px rgba(0,0,0,0.02)' }}>
+            {t}
+          </button>
+        ))}
+      </div>
+
       <div style={{ padding: '0 16px' }}>
         {activeTab === 'Staff Info' ? <GenericStaffInfo staffId={staffId} /> : (
-          <>
-            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '20px 0 16px' }}>
+          <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
+            {/* Time Filter Toggle */}
+            <div style={{ display: 'flex', background: '#e2e8f0', borderRadius: 12, padding: 4, marginBottom: 20 }}>
               {['day', 'week', 'month'].map(t => (
-                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s' }}>{t}</button>
+                <button key={t} onClick={() => setTimeFilter(t)} 
+                  style={{ flex: 1, padding: '10px 0', border: 'none', borderRadius: 10, background: timeFilter === t ? C.white : 'transparent', color: timeFilter === t ? '#0f172a' : '#64748b', fontSize: 14, fontWeight: 800, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s ease', boxShadow: timeFilter === t ? '0 2px 8px rgba(0,0,0,0.05)' : 'none' }}>
+                  {t}
+                </button>
               ))}
             </div>
+
             {timeFilter === 'day' && (
-              <div style={{ marginBottom: 16 }}>
-                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
-                  style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box', background: C.white }} />
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ position: 'relative' }}>
+                  <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+                    style={{ width: '100%', padding: '14px 16px', paddingLeft: 44, border: `1px solid ${C.border}`, borderRadius: 14, fontSize: 15, fontWeight: 700, fontFamily: 'inherit', color: '#0f172a', outline: 'none', boxSizing: 'border-box', background: C.white, boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }} />
+                  <span className="material-symbols-outlined" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#0891b2' }}>calendar_month</span>
+                </div>
               </div>
             )}
             
-            <SectionTitle text="Overview" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-              <div onClick={() => setActiveModal('assigned')} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, margin: '0 0 4px', textTransform: 'uppercase' }}>Total Assigned</p>
-                <p style={{ fontSize: 24, fontWeight: 900, color: C.text, margin: 0 }}>{assignedCount}</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: '0 0 16px' }}>Activity Overview</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+              {/* Stat Cards with Gradients & Glassmorphism */}
+              <div onClick={() => setActiveModal('assigned')} style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #334155, #0f172a)', borderRadius: 16, padding: 18, cursor: 'pointer', boxShadow: '0 4px 15px rgba(15, 23, 42, 0.2)' }}>
+                <span className="material-symbols-outlined" style={{ position: 'absolute', right: -10, bottom: -10, fontSize: 80, color: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }}>assignment</span>
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#94a3b8', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Assigned</p>
+                <p style={{ fontSize: 28, fontWeight: 900, color: C.white, margin: 0 }}>{assignedCount}</p>
               </div>
-              <div onClick={() => setActiveModal('cleaned')} style={{ background: C.successBg, border: `1px solid #a7f3d0`, borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <p style={{ fontSize: 12, fontWeight: 800, color: C.success, margin: '0 0 4px', textTransform: 'uppercase' }}>Cleaned</p>
-                <p style={{ fontSize: 24, fontWeight: 900, color: C.success, margin: 0 }}>{cleanedCount}</p>
+              <div onClick={() => setActiveModal('cleaned')} style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #10b981, #059669)', borderRadius: 16, padding: 18, cursor: 'pointer', boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)' }}>
+                <span className="material-symbols-outlined" style={{ position: 'absolute', right: -10, bottom: -10, fontSize: 80, color: 'rgba(255,255,255,0.1)', pointerEvents: 'none' }}>check_circle</span>
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#a7f3d0', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Cleaned</p>
+                <p style={{ fontSize: 28, fontWeight: 900, color: C.white, margin: 0 }}>{cleanedCount}</p>
               </div>
-              <div onClick={() => setActiveModal('uncleaned')} style={{ background: C.dangerBg, border: `1px solid #fecaca`, borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <p style={{ fontSize: 12, fontWeight: 800, color: C.danger, margin: '0 0 4px', textTransform: 'uppercase' }}>Uncleaned</p>
-                <p style={{ fontSize: 24, fontWeight: 900, color: C.danger, margin: 0 }}>{uncleanedCount}</p>
+              <div onClick={() => setActiveModal('uncleaned')} style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #f43f5e, #e11d48)', borderRadius: 16, padding: 18, cursor: 'pointer', boxShadow: '0 4px 15px rgba(225, 29, 72, 0.3)' }}>
+                <span className="material-symbols-outlined" style={{ position: 'absolute', right: -10, bottom: -10, fontSize: 80, color: 'rgba(255,255,255,0.1)', pointerEvents: 'none' }}>cancel</span>
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#fecdd3', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Uncleaned</p>
+                <p style={{ fontSize: 28, fontWeight: 900, color: C.white, margin: 0 }}>{uncleanedCount}</p>
               </div>
-              <div onClick={() => setActiveModal('notReq')} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, margin: '0 0 4px', textTransform: 'uppercase' }}>Not Requested</p>
-                <p style={{ fontSize: 24, fontWeight: 900, color: C.textSub, margin: 0 }}>{notReqCount}</p>
+              <div onClick={() => setActiveModal('notReq')} style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #94a3b8, #64748b)', borderRadius: 16, padding: 18, cursor: 'pointer', boxShadow: '0 4px 15px rgba(100, 116, 139, 0.2)' }}>
+                <span className="material-symbols-outlined" style={{ position: 'absolute', right: -10, bottom: -10, fontSize: 80, color: 'rgba(255,255,255,0.1)', pointerEvents: 'none' }}>block</span>
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#e2e8f0', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Not Req.</p>
+                <p style={{ fontSize: 28, fontWeight: 900, color: C.white, margin: 0 }}>{notReqCount}</p>
               </div>
             </div>
 
-            <SectionTitle text="Cleaning Types Breakdown" />
-            {renderCat('room', '🧹 Room Cleaning (Sweep/Mop)', cur.room)}
-            {renderCat('bath', '🚽 Bathroom Cleaning', cur.bath)}
-            {renderCat('fan', '💨 Fan & Dusting', cur.fan)}
-            {renderCat('others', '🪣 Others / Deep Clean', cur.others)}
+            <p style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: '0 0 16px' }}>Detailed Breakdown</p>
+            {renderCat('room', 'Room Cleaning', cur.room, '🧹')}
+            {renderCat('bath', 'Bathroom Cleaning', cur.bath, '🚽')}
+            {renderCat('fan', 'Fan & Dusting', cur.fan, '💨')}
+            {renderCat('others', 'Deep Clean', cur.others, '🪣')}
 
             {activeModal && (
-              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                <div style={{ background: C.white, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, maxHeight: '80vh', overflowY: 'auto' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                    <h3 style={{ margin: 0, fontSize: 18, color: C.text }}>
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', zIndex: 100, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', animation: 'fadeIn 0.2s ease-out' }}>
+                <div style={{ background: '#f8fafc', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: '24px 20px', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(0,0,0,0.1)', animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+                  <div style={{ width: 40, height: 4, background: '#cbd5e1', borderRadius: 2, margin: '0 auto 20px' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <h3 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#0f172a' }}>
                       {activeModal === 'assigned' && 'Assigned Rooms'}
                       {activeModal === 'cleaned' && 'Cleaned Rooms'}
                       {activeModal === 'uncleaned' && 'Uncleaned Rooms'}
-                      {activeModal === 'notReq' && 'Not Requested Rooms'}
+                      {activeModal === 'notReq' && 'Not Requested'}
                     </h3>
-                    <button onClick={() => setActiveModal(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <span className="material-symbols-outlined" style={{ color: C.muted }}>close</span>
+                    <button onClick={() => setActiveModal(null)} style={{ background: '#e2e8f0', border: 'none', borderRadius: 20, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                      <span className="material-symbols-outlined" style={{ color: '#475569', fontSize: 18 }}>close</span>
                     </button>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {activeModal === 'uncleaned' ? (
                       uncleanedRooms.length > 0 ? uncleanedRooms.map(r => (
-                        <div key={r.room} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: C.bg, padding: 12, borderRadius: 12 }}>
+                        <div key={r.room} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: C.white, padding: '16px', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.03)', border: '1px solid #f1f5f9' }}>
                           <div>
-                            <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: C.text }}>Room {r.room}</p>
-                            <p style={{ margin: 0, fontSize: 13, color: C.danger }}>{r.reason}</p>
+                            <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0f172a' }}>Room {r.room}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#e11d48' }}>error</span>
+                              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#e11d48' }}>{r.reason}</p>
+                            </div>
                           </div>
-                          <button onClick={() => handleOverride(r.room)} style={{ padding: '8px 12px', background: C.successBg, color: C.success, border: '1px solid #a7f3d0', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-                            Mark Cleaned
+                          <button onClick={() => handleOverride(r.room)} style={{ padding: '10px 16px', background: 'linear-gradient(135deg, #10b981, #059669)', color: C.white, border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 10px rgba(16, 185, 129, 0.3)', transition: 'transform 0.1s' }} onTouchStart={e => e.currentTarget.style.transform='scale(0.95)'} onTouchEnd={e => e.currentTarget.style.transform='scale(1)'}>
+                            Override
                           </button>
                         </div>
-                      )) : <p style={{ fontSize: 14, color: C.muted }}>No uncleaned rooms.</p>
+                      )) : (
+                        <div style={{ textAlign: 'center', padding: '30px 0' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 48, color: '#cbd5e1', marginBottom: 10 }}>celebration</span>
+                          <p style={{ fontSize: 15, fontWeight: 700, color: '#64748b', margin: 0 }}>All caught up! No uncleaned rooms.</p>
+                        </div>
+                      )
                     ) : activeModal === 'cleaned' ? (
                       cleanedRooms.map(r => (
-                        <div key={r.room} style={{ background: C.bg, padding: 12, borderRadius: 12, display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: 15, fontWeight: 700, color: C.text }}>Room {r.room}</span>
-                          <span style={{ fontSize: 13, color: C.success, fontWeight: 600 }}>Cleaned</span>
+                        <div key={r.room} style={{ background: C.white, padding: '16px', borderRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #f1f5f9' }}>
+                          <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>Room {r.room}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#ecfdf5', padding: '6px 12px', borderRadius: 20 }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#059669' }}>check_circle</span>
+                            <span style={{ fontSize: 13, color: '#059669', fontWeight: 800 }}>Cleaned</span>
+                          </div>
                         </div>
                       ))
                     ) : activeModal === 'notReq' ? (
                       notReqRooms.map(r => (
-                        <div key={r.room} style={{ background: C.bg, padding: 12, borderRadius: 12, display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: 15, fontWeight: 700, color: C.text }}>Room {r.room}</span>
-                          <span style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>Not Requested</span>
+                        <div key={r.room} style={{ background: C.white, padding: '16px', borderRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #f1f5f9' }}>
+                          <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>Room {r.room}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f1f5f9', padding: '6px 12px', borderRadius: 20 }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#64748b' }}>block</span>
+                            <span style={{ fontSize: 13, color: '#64748b', fontWeight: 800 }}>Not Req.</span>
+                          </div>
                         </div>
                       ))
                     ) : (
-                      [...cleanedRooms, ...uncleanedRooms, ...notReqRooms].map(r => (
-                        <div key={r.room} style={{ background: C.bg, padding: 12, borderRadius: 12, display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: 15, fontWeight: 700, color: C.text }}>Room {r.room}</span>
-                          <span style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>Assigned</span>
+                      [...cleanedRooms, ...uncleanedRooms, ...notReqRooms].map((r, idx) => (
+                        <div key={idx} style={{ background: C.white, padding: '16px', borderRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #f1f5f9' }}>
+                          <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>Room {r.room}</span>
+                          <span style={{ fontSize: 13, color: '#64748b', fontWeight: 700 }}>Assigned</span>
                         </div>
                       ))
                     )}
@@ -773,7 +820,12 @@ export function CleanerView({ staffId, staffName, onBack }) {
                 </div>
               </div>
             )}
-          </>
+            
+            <style>{`
+              @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+              @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            `}</style>
+          </div>
         )}
       </div>
     </div>
