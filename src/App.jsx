@@ -32,6 +32,11 @@ import Transportation from './pages/Transportation';
 import Approvals from './pages/Approvals';
 import HiredWorkers from './pages/HiredWorkers';
 import AdminProfile from './pages/AdminProfile';
+import AddTenant from './pages/AddTenant';
+import MoveOutFlow from './pages/MoveOutFlow';
+import MeterReading from './pages/MeterReading';
+import VisitorLog from './pages/VisitorLog';
+import MessHeadcount from './pages/MessHeadcount';
 
 // Redirect helper
 const RootRedirect = () => {
@@ -98,6 +103,11 @@ function AppRoutes() {
       <Route path="/price-menu" element={<AdminRoute><PriceMenu /></AdminRoute>} />
       <Route path="/chat" element={<AdminRoute><Chat /></AdminRoute>} />
       <Route path="/transportation" element={<AdminRoute><Transportation /></AdminRoute>} />
+      <Route path="/add-tenant" element={<AdminRoute><AddTenant /></AdminRoute>} />
+      <Route path="/move-out" element={<AdminRoute><MoveOutFlow /></AdminRoute>} />
+      <Route path="/meter-reading" element={<AdminRoute><MeterReading /></AdminRoute>} />
+      <Route path="/visitor-log" element={<AdminRoute><VisitorLog /></AdminRoute>} />
+      <Route path="/mess-headcount" element={<AdminRoute><MessHeadcount /></AdminRoute>} />
 
       {/* Staff Routes */}
       <Route path="/staff-dashboard" element={<ProtectedRoute allowedRoles={['staff']}><StaffDashboard /></ProtectedRoute>} />

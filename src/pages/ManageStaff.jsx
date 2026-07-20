@@ -212,7 +212,7 @@ function WorkStaffView({ search, setSearch }) {
           return (
             <div key={cat.key} style={{ marginBottom: 24 }}>
               <p style={{ fontSize: 12, fontWeight: 800, color: '#64748b', letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px' }}>{cat.label}</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {matchingRoles.map(role => {
                   const members = STAFF_MEMBERS[role.id] || [];
                   const count = members.length;
@@ -220,21 +220,18 @@ function WorkStaffView({ search, setSearch }) {
 
                   return (
                     <div key={role.id} onClick={() => navigate('/staff-work', { state: { role } })}
-                      style={{ background: 'white', border: `1px solid #e2e8f0`, borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s' }}
-                      onTouchStart={e => e.currentTarget.style.transform = 'scale(0.98)'}
+                      style={{ position: 'relative', width: '100%', paddingTop: '100%', cursor: 'pointer', transition: 'transform 0.2s' }}
+                      onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
                       onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: 24, color: 'white' }}>{role.icon}</span>
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'white', border: `1px solid #e2e8f0`, borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', textAlign: 'center', overflow: 'hidden', padding: 4 }}>
+                        <div style={{ width: 38, height: 38, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{role.icon}</span>
                         </div>
-                        <div>
-                          <p style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: '0 0 3px' }}>{role.label}</p>
-                          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                          <p style={{ fontSize: 11, fontWeight: 800, color: '#0f172a', margin: '0 0 2px', lineHeight: 1.1, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{role.label}</p>
+                          <p style={{ fontSize: 10, color: '#64748b', margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{count} member{count !== 1 ? 's' : ''}</p>
                         </div>
                       </div>
-                      <span className="material-symbols-outlined" style={{ color: '#64748b' }}>
-                        chevron_right
-                      </span>
                     </div>
                   );
                 })}

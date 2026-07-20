@@ -37,12 +37,9 @@ function Header({ title, onBack, action, center = true, dark = false }) {
 // ─── MAIN COMPONENT: MANAGE TENANTS ───────────────────────
 export default function ManageTenants() {
   const navigate = useNavigate();
-  // Navigation State: 'list' | 'add'
-  const [view, setView] = useState('list');
 
   const goBack = () => {
-    if (view === 'list') navigate('/admin-dashboard');
-    else if (view === 'add') setView('list');
+    navigate('/admin-dashboard');
   };
 
   const openDetails = (u) => {
@@ -51,8 +48,7 @@ export default function ManageTenants() {
 
   return (
     <div style={BASE}>
-      {view === 'list' && <UserListView onBack={goBack} onAdd={() => setView('add')} onSelect={openDetails} />}
-      {view === 'add' && <AddUserView onBack={goBack} />}
+      <UserListView onBack={goBack} onAdd={() => navigate('/add-tenant')} onSelect={openDetails} />
     </div>
   );
 }

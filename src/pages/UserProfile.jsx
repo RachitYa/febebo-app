@@ -652,7 +652,7 @@ function StudentStaffWorkView({ profile, roomNo, onBack }) {
 }
 
 // ─── MAIN DETAILS VIEW ────────────────────────────────────
-function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubView }) {
+function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subView, setSubView }) {
   const profile = USER_PROFILES[user?.id] || DEFAULT_PROFILE;
   const [damages, setDamages] = useState([{ id: 1, desc: 'Broken Chair Hinge', cost: 350 }]);
   const [damageInput, setDamageInput] = useState('');
@@ -930,6 +930,11 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, subView, setSubVi
           ))}
         </div>
         <button onClick={onHistory} style={{ width: '100%', padding: 14, background: 'white', border: `1px solid ${cyan}`, color: cyan, fontWeight: 700, borderRadius: 12, marginTop: 12, cursor: 'pointer' }}>View All History</button>
+        
+        {/* Move Out Button */}
+        <button onClick={onMoveOut} style={{ width: '100%', padding: 14, background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', fontWeight: 700, borderRadius: 12, marginTop: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>logout</span> Move Out / Settlement
+        </button>
       </div>
     </>
   );
@@ -1094,7 +1099,7 @@ export default function UserProfile() {
 
   return (
     <div style={BASE}>
-      {view === 'details' && <UserDetailsView user={user} onBack={goBack} onReceipt={() => setView('receipt')} onHistory={() => setView('history')} subView={subView} setSubView={setSubView} />}
+      {view === 'details' && <UserDetailsView user={user} onBack={goBack} onReceipt={() => setView('receipt')} onHistory={() => setView('history')} onMoveOut={() => navigate('/move-out', { state: { user } })} subView={subView} setSubView={setSubView} />}
       {view === 'history' && <PaymentHistoryView onBack={goBack} />}
       {view === 'receipt' && <ReceiptView user={user} onBack={goBack} />}
     </div>

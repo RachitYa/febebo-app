@@ -8,6 +8,8 @@ const MODULES = [
   { id: 'user-account',  label: 'User\nAccount',         icon: 'groups',                 gradient: 'linear-gradient(135deg,#f59e0b,#d97706)' },
   { id: 'staff-account', label: 'Staff\nAccount',        icon: 'badge',                  gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)' },
   { id: 'lease-account', label: 'Lease\nAccount',        icon: 'receipt_long',           gradient: 'linear-gradient(135deg,#64748b,#475569)' },
+  { id: 'petty-cash',    label: 'Petty\nCash',           icon: 'payments',               gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
+  { id: 'meter-reading', label: 'Meter\nReading',        icon: 'electric_bolt',          gradient: 'linear-gradient(135deg,#7c3aed,#6d28d9)' },
 ];
 
 const RENT_DATA = {
@@ -181,6 +183,113 @@ function AttendanceCalendar({ year, monthIndex, days }) {
   );
 }
 
+// ─── PETTY CASH VIEW ─────────────────────────────────────────────────────────
+const EXPENSE_CATS = ['Maintenance', 'Groceries', 'Utilities', 'Cleaning', 'Stationery', 'Other'];
+const INIT_EXPENSES = [
+  { id: 1, desc: 'Lock repair - Room 103', amount: 200, cat: 'Maintenance', date: '20 Jul 2025' },
+  { id: 2, desc: 'Cleaning supplies', amount: 450, cat: 'Cleaning', date: '19 Jul 2025' },
+  { id: 3, desc: 'Electricity top-up', amount: 1000, cat: 'Utilities', date: '18 Jul 2025' },
+];
+
+function PettyCashView({ onBack }) {
+  const [expenses, setExpenses] = useState(INIT_EXPENSES);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ desc: '', amount: '', cat: 'Maintenance', date: new Date().toISOString().split('T')[0] });
+
+  const total = expenses.reduce((s, e) => s + Number(e.amount), 0);
+
+  const addExpense = () => {
+    if (!form.desc || !form.amount) return;
+    setExpenses(prev => [{ id: Date.now(), ...form }, ...prev]);
+    setForm({ desc: '', amount: '', cat: 'Maintenance', date: new Date().toISOString().split('T')[0] });
+    setShowForm(false);
+  };
+
+  return (
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
+      {showForm && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          <div onClick={() => setShowForm(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)' }} />
+          <div style={{ position: 'relative', background: 'white', borderRadius: '24px 24px 0 0', padding: '20px 20px 40px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>Add Expense</p>
+              <button onClick={() => setShowForm(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: 10, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#475569' }}>close</span>
+              </button>
+            </div>
+            {[{ label: 'Description', key: 'desc', type: 'text', placeholder: 'e.g. Lock repair Room 103' },
+              { label: 'Amount (₹)', key: 'amount', type: 'number', placeholder: 'e.g. 200' }
+            ].map(f => (
+              <div key={f.key} style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>{f.label}</label>
+                <input value={form[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder} type={f.type}
+                  style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#f8fafc' }} />
+              </div>
+            ))}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Category</label>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {EXPENSE_CATS.map(c => (
+                  <button key={c} onClick={() => setForm(p => ({ ...p, cat: c }))}
+                    style={{ padding: '6px 12px', borderRadius: 20, border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', background: form.cat === c ? '#0891b2' : '#f1f5f9', color: form.cat === c ? 'white' : '#475569' }}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Date</label>
+              <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
+                style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#f8fafc' }} />
+            </div>
+            <button onClick={addExpense} style={{ width: '100%', padding: '14px 0', background: 'linear-gradient(135deg,#d97706,#b45309)', color: 'white', border: 'none', borderRadius: 14, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Add Expense
+            </button>
+          </div>
+        </div>
+      )}
+
+      <SubHeader title="Petty Cash" onBack={onBack} />
+      <div style={{ background: 'linear-gradient(135deg,#d97706,#b45309)', margin: '16px 16px 0', borderRadius: 16, padding: '18px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 600, margin: '0 0 4px', textTransform: 'uppercase' }}>Total This Month</p>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 30, fontWeight: 800, color: 'white', margin: 0 }}>₹{total.toLocaleString('en-IN')}</p>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: '4px 0 0' }}>{expenses.length} expenses logged</p>
+        </div>
+        <button onClick={() => setShowForm(true)} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 12, padding: '10px 16px', color: 'white', fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> Add
+        </button>
+      </div>
+
+      <div style={{ padding: '16px 16px' }}>
+        <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 16, color: '#0f172a', margin: '0 0 12px' }}>Recent Expenses</p>
+        <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          {expenses.length === 0 && (
+            <div style={{ padding: 32, textAlign: 'center' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 40, color: '#e2e8f0' }}>receipt</span>
+              <p style={{ color: '#94a3b8', fontSize: 14, margin: '8px 0 0' }}>No expenses yet. Tap Add to log one.</p>
+            </div>
+          )}
+          {expenses.map((exp, i) => (
+            <div key={exp.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: i < expenses.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#d97706' }}>receipt</span>
+                </div>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: '0 0 2px' }}>{exp.desc}</p>
+                  <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>{exp.cat} · {exp.date}</p>
+                </div>
+              </div>
+              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 16, fontWeight: 800, color: '#e11d48', margin: 0 }}>-₹{Number(exp.amount).toLocaleString('en-IN')}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ManageAccount() {
   const navigate = useNavigate();
   const [activeModule, setActiveModule] = useState(null);
@@ -203,7 +312,8 @@ export default function ManageAccount() {
 
   const handleModule = (id) => {
     if (id === 'vendor') { navigate('/vendor-transactions'); return; }
-    if (['total-rents', 'profit-loss', 'user-account', 'staff-account', 'lease-account'].includes(id)) {
+    if (id === 'meter-reading') { navigate('/meter-reading'); return; }
+    if (['total-rents', 'profit-loss', 'user-account', 'staff-account', 'lease-account', 'petty-cash'].includes(id)) {
       setActiveModule(id);
       setSearch('');
       setSelectedMonth(null);
@@ -654,6 +764,11 @@ export default function ManageAccount() {
         </div>
       </div>
     );
+  }
+
+  // ── PETTY CASH MODULE ─────────────────────────────────────────────────────
+  if (activeModule === 'petty-cash') {
+    return <PettyCashView onBack={() => setActiveModule(null)} />;
   }
 
   // ── LEASE ACCOUNT MODULE ───────────────────────────────────────────────────

@@ -341,8 +341,11 @@ function RoomDetailView({ room, onBack }) {
 // ─── LEVEL 2: Room Grid List ──────────────────────────────────────
 function RoomListView({ onBack, onAddRoom }) {
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('all'); // 'all' | 'occupied' | 'vacated'
+  const [filter, setFilter] = useState('all');
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [transferSheet, setTransferSheet] = useState(null); // room being transferred from
+  const [transferTarget, setTransferTarget] = useState(null); // { roomId, bed }
+  const [transferDone, setTransferDone] = useState(false);
 
   if (selectedRoom) return <RoomDetailView room={selectedRoom} onBack={() => setSelectedRoom(null)} />;
 
@@ -408,8 +411,9 @@ function RoomListView({ onBack, onAddRoom }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map(room => {
               const residents = USERS_DATA.filter(u => room.residentIds.includes(u.id));
+              const vacantRooms = ROOMS_DATA.filter(r => r.id !== room.id && r.status === 'vacated');
               return (
-                <div key={room.id} onClick={() => setSelectedRoom(room)} style={{ background: 'white', borderRadius: 16, overflow: 'hidden', border: '1px solid #e2e8f0', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div key={room.id} style={{ background: 'white', borderRadius: 16, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   {/* Room image */}
                   <div style={{ position: 'relative' }}>
                     <img src={room.img} alt={room.name} style={{ width: '100%', height: 140, objectFit: 'cover', display: 'block' }}
@@ -452,6 +456,18 @@ function RoomListView({ onBack, onAddRoom }) {
                         <span style={{ fontSize: 12, color: '#94a3b8' }}>No residents assigned</span>
                       </div>
                     )}
+                    {/* Transfer + View buttons */}
+                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }} onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setSelectedRoom(room)} style={{ flex: 1, padding: '8px 0', background: '#ecfeff', color: cyan, border: `1px solid ${cyan}`, borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        View Details
+                      </button>
+                      {room.status === 'occupied' && (
+                        <button onClick={() => { setTransferSheet(room); setTransferTarget(null); setTransferDone(false); }}
+                          style={{ flex: 1, padding: '8px 0', background: '#fef9c3', color: '#ca8a04', border: '1px solid #fde68a', borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>swap_horiz</span> Transfer
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -459,6 +475,58 @@ function RoomListView({ onBack, onAddRoom }) {
           </div>
         )}
       </div>
+
+      {/* ── Room Transfer Bottom Sheet ── */}
+      {transferSheet && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          <div onClick={() => setTransferSheet(null)} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)' }} />
+          <div style={{ position: 'relative', background: 'white', borderRadius: '24px 24px 0 0', padding: '20px 20px 48px', maxHeight: '85vh', overflowY: 'auto' }}>
+            {transferDone ? (
+              <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 40, color: '#059669' }}>check_circle</span>
+                </div>
+                <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 20, fontWeight: 800, color: '#0f172a', margin: '0 0 8px' }}>Transfer Complete!</p>
+                <p style={{ fontSize: 14, color: '#64748b', margin: '0 0 24px' }}>Tenant has been moved successfully. The old bed is now vacant.</p>
+                <button onClick={() => setTransferSheet(null)} style={{ padding: '12px 32px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: 'inherit' }}>Done</button>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>Transfer Tenant</p>
+                  <button onClick={() => setTransferSheet(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: 10, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#475569' }}>close</span>
+                  </button>
+                </div>
+                <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 20px' }}>Moving from Room {transferSheet.roomNo} ({transferSheet.type})</p>
+
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 12px' }}>Select Destination</p>
+                {ROOMS_DATA.filter(r => r.id !== transferSheet.id).map(r => {
+                  const avail = r.beds - r.residentIds.length;
+                  const isSel = transferTarget?.roomId === r.id;
+                  return (
+                    <div key={r.id} onClick={() => avail > 0 && setTransferTarget({ roomId: r.id, bed: avail })}
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', marginBottom: 8, borderRadius: 14, border: `1.5px solid ${isSel ? '#0891b2' : '#e2e8f0'}`, background: isSel ? '#ecfeff' : avail === 0 ? '#f8fafc' : 'white', cursor: avail > 0 ? 'pointer' : 'not-allowed', opacity: avail === 0 ? 0.6 : 1 }}>
+                      <div>
+                        <p style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', margin: '0 0 2px' }}>Room {r.roomNo} — {r.type}</p>
+                        <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{avail} bed{avail !== 1 ? 's' : ''} available</p>
+                      </div>
+                      {isSel && <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 22 }}>check_circle</span>}
+                      {avail === 0 && <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>Full</span>}
+                    </div>
+                  );
+                })}
+
+                <button onClick={() => transferTarget && setTransferDone(true)}
+                  disabled={!transferTarget}
+                  style={{ width: '100%', marginTop: 16, padding: '14px 0', background: transferTarget ? 'linear-gradient(135deg,#0891b2,#0e7490)' : '#e2e8f0', color: transferTarget ? 'white' : '#94a3b8', border: 'none', borderRadius: 14, fontWeight: 800, fontSize: 15, cursor: transferTarget ? 'pointer' : 'not-allowed', fontFamily: 'inherit' }}>
+                  Confirm Transfer
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
