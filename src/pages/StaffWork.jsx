@@ -1108,15 +1108,15 @@ export default function StaffWork() {
 
                 return (
                   <div key={role.id} onClick={() => setSelRole(role)}
-                    style={{ aspectRatio: '1 / 1', background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: '12px 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s', textAlign: 'center' }}
+                    style={{ aspectRatio: '1 / 1', background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s', textAlign: 'center', overflow: 'hidden' }}
                     onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
                     onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
-                    <div style={{ width: 48, height: 48, borderRadius: 14, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 26, color: 'white' }}>{role.icon}</span>
+                    <div style={{ width: 38, height: 38, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{role.icon}</span>
                     </div>
                     <div>
-                      <p style={{ fontSize: 13, fontWeight: 800, color: C.text, margin: '0 0 2px', lineHeight: 1.2 }}>{role.label}</p>
-                      <p style={{ fontSize: 11, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
+                      <p style={{ fontSize: 11, fontWeight: 800, color: C.text, margin: '0 0 2px', lineHeight: 1.1 }}>{role.label}</p>
+                      <p style={{ fontSize: 10, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
                     </div>
                   </div>
                 );
