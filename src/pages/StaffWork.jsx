@@ -1108,7 +1108,7 @@ export default function StaffWork() {
 
                 return (
                   <div key={role.id} onClick={() => setSelRole(role)}
-                    style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s', textAlign: 'center' }}
+                    style={{ aspectRatio: '1 / 1', background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: '12px 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s', textAlign: 'center' }}
                     onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
                     onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
                     <div style={{ width: 48, height: 48, borderRadius: 14, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
