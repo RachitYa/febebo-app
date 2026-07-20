@@ -99,7 +99,12 @@ export default function MeterReading() {
                   {isValid && (
                     <div style={{ flex: 1.5, background: '#f8fafc', padding: '10px 12px', borderRadius: 8, border: '1px solid #e2e8f0' }}>
                       <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>Units used: <strong>{units}</strong></p>
-                      <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#0891b2', fontWeight: 600 }}>Bill: ₹{bill.toFixed(2)}</p>
+                      <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#0891b2', fontWeight: 600 }}>Total Bill: ₹{bill.toFixed(2)}</p>
+                      {room.tenants.length > 1 && (
+                        <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#10b981', fontWeight: 600 }}>
+                          Per Person: ₹{(bill / room.tenants.length).toFixed(2)}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
