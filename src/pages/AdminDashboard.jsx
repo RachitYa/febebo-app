@@ -23,6 +23,9 @@ export default function AdminDashboard() {
     { id: 'staff',          label: 'Staff',          desc: 'HR & Pay',       icon: 'badge',                  gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)' },
     { id: 'work',           label: 'Tasks',          desc: 'Maintenance',    icon: 'task_alt',               gradient: 'linear-gradient(135deg,#64748b,#475569)' },
     { id: 'enquiry',        label: 'Enquiry',        desc: '12 New',         icon: 'contact_support',        gradient: 'linear-gradient(135deg,#06b6d4,#0891b2)' },
+    { id: 'visitor',        label: 'Visitors',       desc: 'Gate Log',       icon: 'recent_actors',          gradient: 'linear-gradient(135deg,#10b981,#047857)' },
+    { id: 'meter',          label: 'Meters',         desc: 'Readings',       icon: 'electric_meter',         gradient: 'linear-gradient(135deg,#f59e0b,#b45309)' },
+    { id: 'mess',           label: 'Mess',           desc: 'Headcount',      icon: 'restaurant',             gradient: 'linear-gradient(135deg,#ec4899,#be185d)' },
     { id: 'transportation', label: 'Transport',      desc: 'Drivers',        icon: 'directions_car',         gradient: 'linear-gradient(135deg,#16a34a,#15803d)' },
     { id: 'chat',           label: 'Chat',           desc: 'Messages',       icon: 'chat',                   gradient: 'linear-gradient(135deg,#ec4899,#db2777)' },
     { id: 'approvals',      label: 'Approvals',      desc: 'Room changes',   icon: 'verified',               gradient: 'linear-gradient(135deg,#eab308,#ca8a04)' },
@@ -31,7 +34,7 @@ export default function AdminDashboard() {
     { id: 'leave',          label: 'Leave',          desc: 'Requests',       icon: 'event_busy',             gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
     { id: 'complain',       label: 'Complaints',     desc: '4 Critical',     icon: 'report',                 gradient: 'linear-gradient(135deg,#dc2626,#b91c1c)' },
     { id: 'price',          label: 'Pricing',        desc: 'Rates',          icon: 'receipt_long',           gradient: 'linear-gradient(135deg,#059669,#047857)' },
-    { id: 'subscription',   label: 'Subscription',  desc: 'Plan',           icon: 'workspace_premium',      gradient: 'linear-gradient(135deg,#f59e0b,#b45309)' },
+    { id: 'subscription',   label: 'Subscription',   desc: 'Plan',           icon: 'workspace_premium',      gradient: 'linear-gradient(135deg,#f59e0b,#b45309)' },
   ];
 
   const routes = {
@@ -40,6 +43,7 @@ export default function AdminDashboard() {
     inventory: '/inventory', enquiry: '/enquiry', transportation: '/transportation', chat: '/chat',
     approvals: '/approvals', hired_workers: '/hired-workers', reports: '/reports',
     leave: '/leave', complain: '/complain', price: '/price-menu', subscription: '/subscription',
+    visitor: '/visitor-log', meter: '/meter-reading', mess: '/mess-headcount',
   };
 
   const STAT_ROUTES = {
