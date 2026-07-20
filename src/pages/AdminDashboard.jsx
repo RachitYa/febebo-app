@@ -8,6 +8,10 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAllModules, setShowAllModules] = useState(false);
+  const [isEditingModules, setIsEditingModules] = useState(false);
+  const [visibleModuleIds, setVisibleModuleIds] = useState([
+    'account', 'inventory', 'vendor', 'room', 'user', 'staff', 'work', 'enquiry'
+  ]);
   const [duesSheet, setDuesSheet] = useState(null); // selected dues person
 
   const MODULES = [
@@ -87,7 +91,7 @@ export default function AdminDashboard() {
   ];
 
   // First 8 modules shown in grid; rest in "See All" drawer
-  const VISIBLE_MODULES = MODULES.slice(0, 8);
+  const VISIBLE_MODULES = visibleModuleIds.map(id => MODULES.find(m => m.id === id)).filter(Boolean).slice(0, 8);
 
   const payStatusColor = (s) => s === 'Paid' ? '#059669' : s === 'Late' ? '#d97706' : '#e11d48';
 
@@ -141,24 +145,50 @@ export default function AdminDashboard() {
       {/* ── "See All" Modules Drawer ── */}
       {showAllModules && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-          <div onClick={() => setShowAllModules(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)' }} />
+          <div onClick={() => { setShowAllModules(false); setIsEditingModules(false); }} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)' }} />
           <div style={{ position: 'relative', background: 'white', borderRadius: '24px 24px 0 0', maxHeight: '80vh', overflowY: 'auto', padding: '0 0 40px' }}>
-            <div style={{ position: 'sticky', top: 0, background: 'white', padding: '16px 20px 12px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 1 }}>
-              <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>All Modules</p>
-              <button onClick={() => setShowAllModules(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: 10, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#475569' }}>close</span>
-              </button>
+            <div style={{ position: 'sticky', top: 0, background: 'white', padding: '16px 20px 12px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 2 }}>
+              <div>
+                <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>All Modules</p>
+                {isEditingModules && <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>Select up to 8 modules ({visibleModuleIds.length}/8)</p>}
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => setIsEditingModules(!isEditingModules)} style={{ background: isEditingModules ? '#0891b2' : '#f8fafc', color: isEditingModules ? 'white' : '#0891b2', border: isEditingModules ? 'none' : '1px solid #0891b2', borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  {isEditingModules ? 'Done' : 'Edit'}
+                </button>
+                <button onClick={() => { setShowAllModules(false); setIsEditingModules(false); }} style={{ background: '#f1f5f9', border: 'none', borderRadius: 10, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#475569' }}>close</span>
+                </button>
+              </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, padding: '16px 16px' }}>
-              {MODULES.map(mod => (
-                <button key={mod.id} onClick={() => { routes[mod.id] && navigate(routes[mod.id]); setShowAllModules(false); }}
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: '14px 6px', cursor: 'pointer', transition: 'all 0.2s' }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: mod.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{mod.icon}</span>
-                  </div>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#1e293b', textAlign: 'center', lineHeight: 1.3 }}>{mod.label}</span>
-                </button>
-              ))}
+              {MODULES.map(mod => {
+                const isSelected = visibleModuleIds.includes(mod.id);
+                return (
+                  <button key={mod.id} onClick={() => {
+                    if (isEditingModules) {
+                      if (isSelected) {
+                        setVisibleModuleIds(prev => prev.filter(id => id !== mod.id));
+                      } else if (visibleModuleIds.length < 8) {
+                        setVisibleModuleIds(prev => [...prev, mod.id]);
+                      }
+                    } else {
+                      if (routes[mod.id]) { navigate(routes[mod.id]); setShowAllModules(false); }
+                    }
+                  }}
+                    style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: '#f8fafc', border: `1px solid ${isEditingModules && isSelected ? '#0891b2' : '#e2e8f0'}`, borderRadius: 16, padding: '14px 6px', cursor: 'pointer', transition: 'all 0.2s', opacity: isEditingModules && !isSelected && visibleModuleIds.length >= 8 ? 0.5 : 1 }}>
+                    {isEditingModules && isSelected && (
+                      <div style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', background: '#0891b2', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>check</span>
+                      </div>
+                    )}
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: mod.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{mod.icon}</span>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#1e293b', textAlign: 'center', lineHeight: 1.3 }}>{mod.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
