@@ -20,13 +20,14 @@ export default function AdminDashboard() {
     { id: 'transportation', label: 'Transport',      desc: 'Drivers',        icon: 'directions_car',         gradient: 'linear-gradient(135deg,#16a34a,#15803d)' },
     { id: 'chat',           label: 'Chat',           desc: 'Messages',       icon: 'chat',                   gradient: 'linear-gradient(135deg,#ec4899,#db2777)' },
     { id: 'approvals',      label: 'Approvals',      desc: 'Room changes',   icon: 'verified',               gradient: 'linear-gradient(135deg,#eab308,#ca8a04)' },
+    { id: 'hired_workers',  label: 'Workers',        desc: 'Shared Pool',    icon: 'engineering',            gradient: 'linear-gradient(135deg,#0ea5e9,#2563eb)' },
   ];
 
   const routes = {
     room: '/manage-rooms', user: '/manage-tenants', staff: '/manage-staff',
     work: '/staff-work', account: '/manage-account', vendor: '/vendor-transactions',
     inventory: '/inventory', enquiry: '/enquiry', transportation: '/transportation', chat: '/chat',
-    approvals: '/approvals',
+    approvals: '/approvals', hired_workers: '/hired-workers',
   };
 
   const DUES = [
@@ -70,6 +71,7 @@ export default function AdminDashboard() {
           { icon: 'chat',                label: 'Messages',       path: '/chat' },
           { icon: 'pending_actions',     label: 'Request Box',    path: '/request-box' },
           { icon: 'verified',            label: 'Approvals',      path: '/approvals' },
+          { icon: 'engineering',         label: 'Hired Workers',  path: '/hired-workers' },
           { icon: 'event_busy',          label: 'Leave',          path: '/leave' },
           { icon: 'bar_chart',           label: 'Reports',        path: '/reports' },
           { icon: 'workspace_premium',   label: 'Subscription',   path: '/subscription' },

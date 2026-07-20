@@ -1100,7 +1100,7 @@ export default function StaffWork() {
         {ROLE_CATS.map(cat => (
           <div key={cat.key} style={{ marginBottom: 24 }}>
             <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px' }}>{cat.label}</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
               {ROLES.filter(r => cat.ids.includes(r.id)).map(role => {
                 const members = STAFF_MEMBERS[role.id] || [];
                 const count = members.length;
@@ -1108,21 +1108,16 @@ export default function StaffWork() {
 
                 return (
                   <div key={role.id} onClick={() => setSelRole(role)}
-                    style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s' }}
-                    onTouchStart={e => e.currentTarget.style.transform = 'scale(0.98)'}
+                    style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s', textAlign: 'center' }}
+                    onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
                     onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: 24, color: 'white' }}>{role.icon}</span>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 3px' }}>{role.label}</p>
-                        <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
-                      </div>
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 26, color: 'white' }}>{role.icon}</span>
                     </div>
-                    <span className="material-symbols-outlined" style={{ color: C.muted }}>
-                      chevron_right
-                    </span>
+                    <div>
+                      <p style={{ fontSize: 13, fontWeight: 800, color: C.text, margin: '0 0 2px', lineHeight: 1.2 }}>{role.label}</p>
+                      <p style={{ fontSize: 11, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
+                    </div>
                   </div>
                 );
               })}
