@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -31,6 +31,7 @@ import Chat from './pages/Chat';
 import Transportation from './pages/Transportation';
 import Approvals from './pages/Approvals';
 import HiredWorkers from './pages/HiredWorkers';
+import AdminProfile from './pages/AdminProfile';
 
 // Redirect helper
 const RootRedirect = () => {
@@ -45,9 +46,29 @@ const AdminRoute = ({ children }) => (
   <ProtectedRoute allowedRoles={['admin']}>{children}</ProtectedRoute>
 );
 
+// Android hardware back button fix
+function AndroidBackFix() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    // Push a state so the back button has something to pop
+    window.history.pushState({ page: 'app' }, '');
+    const handler = (e) => {
+      e.preventDefault();
+      navigate(-1);
+      // Re-push so next back press also works
+      setTimeout(() => window.history.pushState({ page: 'app' }, ''), 0);
+    };
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, [navigate]);
+  return null;
+}
+
 function AppRoutes() {
   return (
-    <Routes>
+    <>
+      <AndroidBackFix />
+      <Routes>
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<Login />} />
 
@@ -64,6 +85,7 @@ function AppRoutes() {
       <Route path="/staff-work/:id" element={<AdminRoute><StaffWorkDetails /></AdminRoute>} />
       <Route path="/approvals" element={<AdminRoute><Approvals /></AdminRoute>} />
       <Route path="/hired-workers" element={<AdminRoute><HiredWorkers /></AdminRoute>} />
+      <Route path="/admin-profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
       <Route path="/manage-account" element={<AdminRoute><ManageAccount /></AdminRoute>} />
       <Route path="/vendor-transactions" element={<AdminRoute><VendorTransactions /></AdminRoute>} />
       <Route path="/reports" element={<AdminRoute><Reports /></AdminRoute>} />
@@ -86,6 +108,7 @@ function AppRoutes() {
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 
