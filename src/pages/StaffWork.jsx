@@ -1108,15 +1108,17 @@ export default function StaffWork() {
 
                 return (
                   <div key={role.id} onClick={() => setSelRole(role)}
-                    style={{ aspectRatio: '1 / 1', background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s', textAlign: 'center', overflow: 'hidden' }}
+                    style={{ position: 'relative', width: '100%', paddingTop: '100%', cursor: 'pointer', transition: 'transform 0.2s' }}
                     onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
                     onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
-                    <div style={{ width: 38, height: 38, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{role.icon}</span>
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 11, fontWeight: 800, color: C.text, margin: '0 0 2px', lineHeight: 1.1 }}>{role.label}</p>
-                      <p style={{ fontSize: 10, color: C.muted, margin: 0 }}>{count} member{count !== 1 ? 's' : ''}</p>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', textAlign: 'center', overflow: 'hidden', padding: 4 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 12, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{role.icon}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                        <p style={{ fontSize: 11, fontWeight: 800, color: C.text, margin: '0 0 2px', lineHeight: 1.1, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{role.label}</p>
+                        <p style={{ fontSize: 10, color: C.muted, margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{count} member{count !== 1 ? 's' : ''}</p>
+                      </div>
                     </div>
                   </div>
                 );
