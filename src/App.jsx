@@ -37,6 +37,7 @@ import MoveOutFlow from './pages/MoveOutFlow';
 import MeterReading from './pages/MeterReading';
 import VisitorLog from './pages/VisitorLog';
 import MessHeadcount from './pages/MessHeadcount';
+import StaffApp from './pages/StaffApp';
 
 // Redirect helper
 const RootRedirect = () => {
@@ -111,6 +112,7 @@ function AppRoutes() {
 
       {/* Staff Routes */}
       <Route path="/staff-dashboard" element={<ProtectedRoute allowedRoles={['staff']}><StaffDashboard /></ProtectedRoute>} />
+      <Route path="/staff-app" element={<StaffApp />} />
 
       {/* Customer Routes */}
       <Route path="/customer-dashboard" element={<ProtectedRoute allowedRoles={['customer']}><CustomerDashboard /></ProtectedRoute>} />

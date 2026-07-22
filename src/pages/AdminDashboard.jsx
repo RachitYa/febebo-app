@@ -33,6 +33,7 @@ export default function AdminDashboard() {
     { id: 'reports',        label: 'Reports',        desc: 'Analytics',      icon: 'bar_chart',              gradient: 'linear-gradient(135deg,#7c3aed,#6d28d9)' },
     { id: 'leave',          label: 'Leave',          desc: 'Requests',       icon: 'event_busy',             gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
     { id: 'complain',       label: 'Complaints',     desc: '4 Critical',     icon: 'report',                 gradient: 'linear-gradient(135deg,#dc2626,#b91c1c)' },
+    { id: 'staff_app',      label: 'Staff App',      desc: 'Live Portal',    icon: 'smartphone',             gradient: 'linear-gradient(135deg,#059669,#10b981)' },
     { id: 'price',          label: 'Pricing',        desc: 'Rates',          icon: 'receipt_long',           gradient: 'linear-gradient(135deg,#059669,#047857)' },
     { id: 'subscription',   label: 'Subscription',   desc: 'Plan',           icon: 'workspace_premium',      gradient: 'linear-gradient(135deg,#f59e0b,#b45309)' },
   ];
@@ -43,7 +44,7 @@ export default function AdminDashboard() {
     inventory: '/inventory', enquiry: '/enquiry', transportation: '/transportation', chat: '/chat',
     approvals: '/approvals', hired_workers: '/hired-workers', reports: '/reports',
     leave: '/leave', complain: '/complain', price: '/price-menu', subscription: '/subscription',
-    visitor: '/visitor-log', meter: '/meter-reading', mess: '/mess-headcount',
+    visitor: '/visitor-log', meter: '/meter-reading', mess: '/mess-headcount', staff_app: '/staff-app',
   };
 
   const STAT_ROUTES = {
