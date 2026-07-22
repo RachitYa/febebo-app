@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 const cyan = '#0891b2';
 
 const MOCK_ENQUIRIES = [
-  { id: 1, name: 'Rohit Sharma',  mobile: '+91 9876543210', message: 'Looking for a single room with AC. Budget around ₹10,000.', date: '28 Jun 2025', status: 'New',       source: 'WhatsApp' },
-  { id: 2, name: 'Priya Mehta',   mobile: '+91 9123456789', message: 'Do you have double sharing available near metro station?', date: '27 Jun 2025', status: 'Contacted', source: 'NoBroker' },
-  { id: 3, name: 'Arun Verma',    mobile: '+91 9012345678', message: 'What is the security deposit for triple sharing?', date: '25 Jun 2025', status: 'Closed',    source: 'MagicBricks' },
-  { id: 4, name: 'Kavya Singh',   mobile: '+91 9444556677', message: 'Need a working girls PG with food. Any availability?', date: '29 Jun 2025', status: 'New',       source: 'Instagram' },
-  { id: 5, name: 'Deepak Rathi',  mobile: '+91 9777888001', message: 'Looking for long stay of 12 months. Any discount?', date: '28 Jun 2025', status: 'Contacted', source: 'Walk-in' },
+  { id: 1, contactId: 'e1', name: 'Rohit Sharma',  mobile: '+91 9876543210', message: 'Looking for a single room with AC. Budget around ₹10,000.', date: '28 Jun 2025', status: 'New',       source: 'WhatsApp' },
+  { id: 2, contactId: 'e2', name: 'Priya Mehta',   mobile: '+91 9123456789', message: 'Do you have double sharing available near metro station?', date: '27 Jun 2025', status: 'Contacted', source: 'NoBroker' },
+  { id: 3, contactId: 'e3', name: 'Arun Verma',    mobile: '+91 9012345678', message: 'What is the security deposit for triple sharing?', date: '25 Jun 2025', status: 'Closed',    source: 'MagicBricks' },
+  { id: 4, contactId: 'e4', name: 'Kavya Singh',   mobile: '+91 9444556677', message: 'Need a working girls PG with food. Any availability?', date: '29 Jun 2025', status: 'New',       source: 'Instagram' },
+  { id: 5, contactId: 'e5', name: 'Deepak Rathi',  mobile: '+91 9777888001', message: 'Looking for long stay of 12 months. Any discount?', date: '28 Jun 2025', status: 'Contacted', source: 'Walk-in' },
 ];
 
 const STATUS_CONFIG = {
@@ -33,6 +33,10 @@ export default function Enquiry() {
   const tabs = ['All', 'New', 'Contacted', 'Closed'];
   const counts = { All: enquiries.length, New: enquiries.filter(e => e.status === 'New').length, Contacted: enquiries.filter(e => e.status === 'Contacted').length, Closed: enquiries.filter(e => e.status === 'Closed').length };
   const filtered = filter === 'All' ? enquiries : enquiries.filter(e => e.status === filter);
+
+  const openChatForEnquiry = (enq) => {
+    navigate('/chat', { state: { contactId: enq.contactId, name: enq.name } });
+  };
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk', sans-serif", paddingBottom: 40 }}>
@@ -78,12 +82,15 @@ export default function Enquiry() {
           const sc = STATUS_CONFIG[enq.status];
           const src = SOURCE_CONFIG[enq.source] || { color: '#64748b', icon: 'link' };
           return (
-            <div key={enq.id} style={{ background: 'white', borderRadius: 16, border: `1px solid ${sc.border}`, marginBottom: 12, overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', borderLeft: `4px solid ${sc.text}` }}>
+            <div 
+              key={enq.id} 
+              onClick={() => openChatForEnquiry(enq)}
+              style={{ background: 'white', borderRadius: 16, border: `1px solid ${sc.border}`, marginBottom: 12, overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', borderLeft: `4px solid ${sc.text}`, cursor: 'pointer', transition: 'transform 0.15s' }}>
               <div style={{ padding: '14px 16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                   <div>
                     <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{enq.name}</p>
-                    <a href={`tel:${enq.mobile}`} style={{ fontSize: 12, color: cyan, textDecoration: 'none', fontWeight: 600 }}>{enq.mobile}</a>
+                    <span style={{ fontSize: 12, color: cyan, fontWeight: 600 }}>{enq.mobile}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                     <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 8, background: sc.bg, color: sc.text, display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -97,25 +104,29 @@ export default function Enquiry() {
                   </div>
                 </div>
                 <p style={{ margin: '0 0 12px', fontSize: 13, color: '#475569' }}>{enq.message}</p>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <a href={`tel:${enq.mobile}`} style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#ecfeff', color: cyan, border: '1px solid #a5f3fc', borderRadius: 9, padding: '7px 12px', textDecoration: 'none', fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: 'flex', gap: 8 }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => openChatForEnquiry(enq)} style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#ecfeff', color: cyan, border: '1px solid #a5f3fc', borderRadius: 9, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 15 }}>chat</span>
+                    Open Chat
+                  </button>
+                  <a href={`tel:${enq.mobile}`} style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f8fafc', color: '#334155', border: '1px solid #e2e8f0', borderRadius: 9, padding: '7px 10px', textDecoration: 'none', fontSize: 12, fontWeight: 700 }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 15 }}>call</span>
                     Call
                   </a>
                   {enq.status === 'New' && (
                     <button onClick={() => setEnquiries(p => p.map(e => e.id === enq.id ? { ...e, status: 'Contacted' } : e))}
-                      style={{ flex: 1, background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a', borderRadius: 9, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      style={{ flex: 1, background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a', borderRadius: 9, padding: '7px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                       Mark Contacted
                     </button>
                   )}
                   {enq.status !== 'Closed' && (
                     <button onClick={() => setEnquiries(p => p.map(e => e.id === enq.id ? { ...e, status: 'Closed' } : e))}
-                      style={{ flex: 1, background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', borderRadius: 9, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      style={{ flex: 1, background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', borderRadius: 9, padding: '7px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                       Close Lead
                     </button>
                   )}
                   {enq.status === 'Closed' && (
-                    <span style={{ flex: 1, textAlign: 'center', fontSize: 12, color: '#059669', fontWeight: 700 }}>✓ Closed</span>
+                    <span style={{ flex: 1, textAlign: 'center', fontSize: 12, color: '#059669', fontWeight: 700, paddingTop: 6 }}>✓ Closed</span>
                   )}
                 </div>
               </div>

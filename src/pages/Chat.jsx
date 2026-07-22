@@ -1,12 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const cyan = '#0891b2';
 
 const CONTACTS = [
   { id: 'admin', name: 'Admin (You)', role: 'admin', avatar: '👑', color: '#0891b2', initials: 'AD' },
-  { id: 'e1', name: 'Rohan Verma',   role: 'enquiry', source: 'Single AC Room Lead', phone: '9876501122', initials: 'RV', color: '#ec4899', isPinned: true, reminder: 'Reconnect Today 5:00 PM' },
-  { id: 'e2', name: 'Megha Roy',     role: 'enquiry', source: 'Double Sharing Inquiry', phone: '9811223344', initials: 'MR', color: '#8b5cf6' },
+  { id: 'e1', name: 'Rohit Sharma',  role: 'enquiry', source: 'WhatsApp', phone: '9876543210', initials: 'RS', color: '#ec4899', isPinned: true, reminder: 'Reconnect Today 5:00 PM' },
+  { id: 'e2', name: 'Priya Mehta',   role: 'enquiry', source: 'NoBroker', phone: '9123456789', initials: 'PM', color: '#8b5cf6' },
+  { id: 'e3', name: 'Arun Verma',    role: 'enquiry', source: 'MagicBricks', phone: '9012345678', initials: 'AV', color: '#10b981' },
+  { id: 'e4', name: 'Kavya Singh',   role: 'enquiry', source: 'Instagram', phone: '9444556677', initials: 'KS', color: '#f59e0b' },
+  { id: 'e5', name: 'Deepak Rathi',  role: 'enquiry', source: 'Walk-in', phone: '9777888001', initials: 'DR', color: '#06b6d4' },
   { id: 'u1', name: 'Arjun Mehta',   role: 'student', room: '101', initials: 'AM', color: '#6366f1' },
   { id: 'u2', name: 'Priya Sharma',  role: 'student', room: '202', initials: 'PS', color: '#f43f5e' },
   { id: 'u3', name: 'Ravi Kumar',    role: 'student', room: '305', initials: 'RK', color: '#10b981' },
@@ -19,13 +22,25 @@ const CONTACTS = [
 
 const INITIAL_MESSAGES = {
   e1: [
-    { id: 1, from: 'e1',   type: 'text', text: 'Hi, is AC single occupancy room available from 1st Aug?', time: '11:20 AM', date: '2026-07-22' },
-    { id: 2, from: 'admin',type: 'text', text: 'Yes, Room 201 single AC is available at ₹12,000/month.', time: '11:25 AM', date: '2026-07-22' },
+    { id: 1, from: 'e1',   type: 'text', text: 'Hi, looking for a single room with AC. Budget around ₹10,000.', time: '11:20 AM', date: '2026-07-22' },
+    { id: 2, from: 'admin',type: 'text', text: 'Yes, Room 201 single AC is available at ₹10,000/month.', time: '11:25 AM', date: '2026-07-22' },
     { id: 3, from: 'e1',   type: 'text', text: 'Great! Please call me at 5 PM to discuss deposit.', time: '11:30 AM', date: '2026-07-22' },
   ],
   e2: [
-    { id: 1, from: 'e2',   type: 'text', text: 'Hello, what are the mess charges per month?', time: '02:00 PM', date: '2026-07-21' },
-    { id: 2, from: 'admin',type: 'text', text: 'Mess is included in room rent (3 meals daily).', time: '02:05 PM', date: '2026-07-21' },
+    { id: 1, from: 'e2',   type: 'text', text: 'Do you have double sharing available near metro station?', time: '02:00 PM', date: '2026-07-21' },
+    { id: 2, from: 'admin',type: 'text', text: 'Yes double sharing is available on 2nd floor, 2 mins from Metro.', time: '02:05 PM', date: '2026-07-21' },
+  ],
+  e3: [
+    { id: 1, from: 'e3',   type: 'text', text: 'What is the security deposit for triple sharing?', time: '04:15 PM', date: '2026-07-20' },
+    { id: 2, from: 'admin',type: 'text', text: 'Security deposit is 1 month rent (refundable).', time: '04:20 PM', date: '2026-07-20' },
+  ],
+  e4: [
+    { id: 1, from: 'e4',   type: 'text', text: 'Need a working girls PG with food. Any availability?', time: '10:00 AM', date: '2026-07-22' },
+    { id: 2, from: 'admin',type: 'text', text: 'Hi Kavya! Yes 2 beds available in Girls Wing with 3 meals daily.', time: '10:10 AM', date: '2026-07-22' },
+  ],
+  e5: [
+    { id: 1, from: 'e5',   type: 'text', text: 'Looking for long stay of 12 months. Any discount?', time: '01:30 PM', date: '2026-07-21' },
+    { id: 2, from: 'admin',type: 'text', text: 'We offer 5% flat discount for 1 year upfront stay.', time: '01:45 PM', date: '2026-07-21' },
   ],
   u1: [
     { id: 1, from: 'u1',   type: 'text', text: 'Hello admin, my room heater is not working.', time: '10:05 AM', date: '2026-07-18' },
@@ -283,6 +298,7 @@ function ChatInputBar({ inputText, setInputText, onSend, onSendImage, onSendVide
 // ─── Main Component ─────────────────────────────────────────────────
 export default function Chat() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [view, setView] = useState('list'); // 'list' | 'chat' | 'group_chat' | 'monitor_list' | 'monitor_chat'
   const [contacts, setContacts] = useState(CONTACTS);
   const [activeContact, setActiveContact] = useState(null);
@@ -294,6 +310,20 @@ export default function Chat() {
   const [inputText, setInputText] = useState('');
   const [filter, setFilter] = useState('enquiry'); // 'enquiry' | 'student' | 'staff'
   const [search, setSearch] = useState('');
+
+  // Auto-open contact passed via location state (e.g. from /enquiry)
+  useEffect(() => {
+    if (location.state && (location.state.contactId || location.state.name)) {
+      const match = contacts.find(c => 
+        (location.state.contactId && c.id === location.state.contactId) ||
+        (location.state.name && c.name.toLowerCase() === location.state.name.toLowerCase())
+      );
+      if (match) {
+        setActiveContact(match);
+        setView('chat');
+      }
+    }
+  }, [location.state, contacts]);
 
   // Reminder modal state
   const [showReminderModal, setShowReminderModal] = useState(false);
