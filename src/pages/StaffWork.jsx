@@ -261,60 +261,88 @@ const TopBar = ({ title, subtitle, onBack, onReqClick, onAssignWorkClick, onProf
   );
 };
 
-export function RequisitionModal({ staffName, staffRole, onClose, onSubmit }) {
-  const [item, setItem] = useState('');
-  const [qty, setQty] = useState('');
-  const [vendor, setVendor] = useState('');
+export function StaffDemandedItemsModal({ staffName, staffRole, onClose }) {
+  const [itemsList, setItemsList] = useState([
+    { id: 1, date: new Date().toISOString().split('T')[0], isToday: true, item: 'Basmati Rice 25kg', qty: '2 Bags', vendor: 'The Local Market', status: 'Pending Rate', rate: '' },
+    { id: 2, date: new Date().toISOString().split('T')[0], isToday: true, item: 'Cooking Oil (Mustard)', qty: '5 Litres', vendor: 'Shree Traders', status: 'Pending Rate', rate: '' },
+    { id: 3, date: '2026-07-20', isToday: false, item: 'Wheat Flour (Aata) 10kg', qty: '3 Bags', vendor: 'Sharma Mandi', status: 'Purchased', rate: '350', totalPrice: 1050 },
+    { id: 4, date: '2026-07-18', isToday: false, item: 'Ghee & Dairy Products', qty: '4 kg', vendor: 'Shree Dairy Farm', status: 'Purchased', rate: '600', totalPrice: 2400 },
+    { id: 5, date: '2026-07-15', isToday: false, item: 'Floor Cleaner & Sanitizer', qty: '5 Litres', vendor: 'Sunil Traders', status: 'Purchased', rate: '120', totalPrice: 600 },
+  ]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!item.trim()) return;
-    const newReq = {
-      id: Date.now(),
-      date: new Date().toISOString().split('T')[0],
-      staffName: staffName || 'Staff Member',
-      staffRole: staffRole || 'Staff',
-      item: item.trim(),
-      qty: qty.trim() || '1 unit',
-      vendor: vendor.trim() || 'Desire Vendor / Local Mandi',
-      status: 'Pending',
-    };
-    onSubmit(newReq);
+  const handleApproveRate = (id) => {
+    setItemsList(prev => prev.map(item => item.id === id ? { ...item, status: 'Approved / Purchased' } : item));
+    alert(`Item demand approved and rate updated!`);
   };
+
+  const todayDemands = itemsList.filter(i => i.isToday);
+  const previousDemands = itemsList.filter(i => !i.isToday);
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div style={{ width: '100%', maxWidth: 420, background: C.white, borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div style={{ width: '100%', maxWidth: 440, background: C.white, borderRadius: 20, padding: 22, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Item Purchasing List</h3>
-            <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Request admin to buy items from desired vendor</p>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Item Demands List</h3>
+            <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Demanded by <b>{staffName || 'Staff Member'}</b> ({staffRole || 'Staff'})</p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16, paddingRight: 4 }}>
+          {/* Today's Demands */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Item Name *</label>
-            <input required type="text" placeholder="e.g. Basmati Rice 25kg / Floor Cleaner" value={item} onChange={e => setItem(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
+            <p style={{ fontSize: 12, fontWeight: 800, color: C.primary, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 8px' }}>
+              📅 Today's Demands ({todayDemands.length})
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {todayDemands.map(d => (
+                <div key={d.id} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                    <div>
+                      <h4 style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: 0 }}>{d.item}</h4>
+                      <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Qty: <b>{d.qty}</b> · Vendor: {d.vendor}</p>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: d.status === 'Pending Rate' ? '#fffbeb' : C.successBg, color: d.status === 'Pending Rate' ? '#d97706' : C.success }}>
+                      {d.status}
+                    </span>
+                  </div>
+
+                  {d.status === 'Pending Rate' && (
+                    <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
+                      <input type="number" placeholder="Enter Rate (₹)" onChange={e => d.rate = e.target.value} style={{ flex: 1, padding: '7px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', background: C.white }} />
+                      <button onClick={() => handleApproveRate(d.id)} style={{ padding: '7px 12px', background: C.primary, color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        Approve Rate
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Quantity</label>
-              <input type="text" placeholder="e.g. 2 bags / 5 litres" value={qty} onChange={e => setQty(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Desired Vendor</label>
-              <input type="text" placeholder="e.g. Sharma Traders" value={vendor} onChange={e => setVendor(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
+          {/* Previous Demands History */}
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 8px' }}>
+              📜 Previous Demands History ({previousDemands.length})
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {previousDemands.map(d => (
+                <div key={d.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                    <div>
+                      <h4 style={{ fontSize: 14, fontWeight: 800, color: C.text, margin: 0 }}>{d.item}</h4>
+                      <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Qty: {d.qty} · Vendor: {d.vendor} · Date: {d.date}</p>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: C.successBg, color: C.success }}>
+                      ₹{d.totalPrice} (Paid)
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-
-          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: 13, background: C.bg, color: C.textSub, border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
-            <button type="submit" style={{ flex: 1, padding: 13, background: C.primary, color: 'white', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Send to Admin</button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
@@ -747,7 +775,9 @@ const StatRow = ({ items }) => (
 export function TimelineView({ staffId, staffName, role, onBack }) {
   const [activeTab, setActiveTab] = useState('Work Details');
   const [note, setNote] = useState('');
-  const [showReqModal, setShowReqModal] = useState(false);
+  const [showAssignWorkModal, setShowAssignWorkModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showDemandsModal, setShowDemandsModal] = useState(false);
   const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
   const logs = TIMELINE_LOGS[staffId] || Object.values(TIMELINE_LOGS)[0] || [];
 
@@ -757,15 +787,16 @@ export function TimelineView({ staffId, staffName, role, onBack }) {
     setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
   };
 
-  const handleReqSubmit = (newReq) => {
-    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
-    setShowReqModal(false);
-    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
-  };
-
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle={role} onBack={onBack} onReqClick={() => setShowReqModal(true)} />
+      <TopBar 
+        title={staffName} 
+        subtitle={role} 
+        onBack={onBack} 
+        onReqClick={() => setShowDemandsModal(true)} 
+        onAssignWorkClick={() => setShowAssignWorkModal(true)}
+        onProfileClick={() => setShowProfileModal(true)}
+      />
       <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div style={{ padding: '0 16px' }}>
@@ -810,8 +841,19 @@ export function TimelineView({ staffId, staffName, role, onBack }) {
         )}
       </div>
 
-      {showReqModal && (
-        <RequisitionModal staffName={staffName} staffRole={role} onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      {showAssignWorkModal && (
+        <AssignWorkModal staffName={staffName} role={role} onClose={() => setShowAssignWorkModal(false)} onSubmit={(newTask) => {
+          INITIAL_ASSIGNED_STAFF_WORK.unshift(newTask);
+          setAssignedWork(prev => [newTask, ...prev]);
+          setShowAssignWorkModal(false);
+          alert(`New task assigned to ${staffName}!`);
+        }} />
+      )}
+      {showProfileModal && (
+        <StaffProfileModal staffName={staffName} role={role} staffId={staffId} onClose={() => setShowProfileModal(false)} />
+      )}
+      {showDemandsModal && (
+        <StaffDemandedItemsModal staffName={staffName} staffRole={role} onClose={() => setShowDemandsModal(false)} />
       )}
     </div>
   );
@@ -1035,12 +1077,13 @@ export function CookView({ staffId, staffName, onBack }) {
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>campaign</span>
               Broadcast "Food is Ready!" to Students
             </button>
-
-            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '0 0 16px' }}>
+            {/* Time Filter Toggle */}
+            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '20px 0 16px' }}>
               {['day', 'week', 'month'].map(t => (
-                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s', fontFamily: 'inherit' }}>{t}</button>
+                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s' }}>{t}</button>
               ))}
             </div>
+
             {timeFilter === 'day' && (
               <div style={{ marginBottom: 16 }}>
                 <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
@@ -1048,26 +1091,40 @@ export function CookView({ staffId, staffName, onBack }) {
               </div>
             )}
 
+            {/* Meal Cards */}
+            <SectionTitle text={`Daily Meal Roster (${timeFilter.toUpperCase()})`} />
             {renderMealSection('Breakfast', currentStats.breakfast)}
             {renderMealSection('Lunch', currentStats.lunch)}
             {renderMealSection('Dinner', currentStats.dinner)}
+
+            {/* Broadcast History */}
+            <SectionTitle text="Food Ready Broadcasts" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+              {broadcasts.map(b => (
+                <Card key={b.id} style={{ borderLeft: `4px solid ${C.success}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: C.success, textTransform: 'uppercase' }}>📢 {b.meal} Ready</span>
+                    <span style={{ fontSize: 12, color: C.muted }}>{b.date} · {b.time}</span>
+                  </div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: C.text, margin: '0 0 4px' }}>{b.message}</p>
+                  <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>Sent to: <b>{b.target}</b></p>
+                </Card>
+              ))}
+            </div>
           </>
         )}
       </div>
 
-      {/* Item Purchasing Requisition Modal */}
-      {showReqModal && (
-        <RequisitionModal staffName={staffName} staffRole="Cook" onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      {showDemandsModal && (
+        <StaffDemandedItemsModal staffName={staffName} staffRole="Cook" onClose={() => setShowDemandsModal(false)} />
       )}
-
-      {/* Broadcast Food Ready Modal */}
       {showBroadcastModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div style={{ width: '100%', maxWidth: 420, background: C.white, borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
                 <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Broadcast Food Ready</h3>
-                <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Notify students that food is hot & ready</p>
+                <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Notify students that {bMeal} is served!</p>
               </div>
               <button onClick={() => setShowBroadcastModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
             </div>
@@ -1078,7 +1135,6 @@ export function CookView({ staffId, staffName, onBack }) {
                 <select value={bMeal} onChange={e => setBMeal(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, background: 'white', outline: 'none', boxSizing: 'border-box' }}>
                   <option value="Breakfast">Breakfast</option>
                   <option value="Lunch">Lunch</option>
-                  <option value="Snacks">Evening Snacks</option>
                   <option value="Dinner">Dinner</option>
                 </select>
               </div>
@@ -1172,7 +1228,9 @@ export function CleanerView({ staffId, staffName, onBack }) {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [expandedCat, setExpandedCat] = useState(null);
   const [activeModal, setActiveModal] = useState(null);
-  const [showReqModal, setShowReqModal] = useState(false);
+  const [showAssignWorkModal, setShowAssignWorkModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showDemandsModal, setShowDemandsModal] = useState(false);
   const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
 
   const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === 'cleaner');
@@ -1250,7 +1308,14 @@ export function CleanerView({ staffId, staffName, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f8fafc', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle="Housekeeping • Cleaner" onBack={onBack} onReqClick={() => setShowReqModal(true)} />
+      <TopBar 
+        title={staffName} 
+        subtitle="Housekeeping • Cleaner" 
+        onBack={onBack} 
+        onReqClick={() => setShowDemandsModal(true)} 
+        onAssignWorkClick={() => setShowAssignWorkModal(true)}
+        onProfileClick={() => setShowProfileModal(true)}
+      />
       
       {/* Sleek Tabs */}
       <div style={{ display: 'flex', padding: '16px', gap: 10 }}>
@@ -1396,8 +1461,21 @@ export function CleanerView({ staffId, staffName, onBack }) {
         )}
       </div>
 
-      {showReqModal && (
-        <RequisitionModal staffName={staffName} staffRole="Cleaner" onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      {showAssignWorkModal && (
+        <AssignWorkModal staffName={staffName} role="cleaner" onClose={() => setShowAssignWorkModal(false)} onSubmit={(newTask) => {
+          INITIAL_ASSIGNED_STAFF_WORK.unshift(newTask);
+          setAssignedWork(prev => [newTask, ...prev]);
+          setShowAssignWorkModal(false);
+          alert(`New task assigned to ${staffName}!`);
+        }} />
+      )}
+
+      {showProfileModal && (
+        <StaffProfileModal staffName={staffName} role="Cleaner" staffId={staffId} onClose={() => setShowProfileModal(false)} />
+      )}
+
+      {showDemandsModal && (
+        <StaffDemandedItemsModal staffName={staffName} staffRole="Cleaner" onClose={() => setShowDemandsModal(false)} />
       )}
     </div>
   );
@@ -1408,19 +1486,15 @@ export function TicketView({ staffId, staffName, role, onBack }) {
   const [activeTab, setActiveTab] = useState('Work Details');
   const [tickets, setTickets] = useState(TICKET_DATA[staffId] || Object.values(TICKET_DATA)[0] || []);
   const [filter, setFilter] = useState('All');
-  const [showReqModal, setShowReqModal] = useState(false);
+  const [showAssignWorkModal, setShowAssignWorkModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showDemandsModal, setShowDemandsModal] = useState(false);
   const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
 
   const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === (role || '').toLowerCase());
 
   const handleUpdateStatus = (id, newStatus) => {
     setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
-  };
-
-  const handleReqSubmit = (newReq) => {
-    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
-    setShowReqModal(false);
-    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
   };
 
   const update = (id, status) => setTickets(prev => prev.map(t => t.id === id ? { ...t, status } : t));
@@ -1430,7 +1504,14 @@ export function TicketView({ staffId, staffName, role, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle={role} onBack={onBack} onReqClick={() => setShowReqModal(true)} />
+      <TopBar 
+        title={staffName} 
+        subtitle={role} 
+        onBack={onBack} 
+        onReqClick={() => setShowDemandsModal(true)} 
+        onAssignWorkClick={() => setShowAssignWorkModal(true)}
+        onProfileClick={() => setShowProfileModal(true)}
+      />
       <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <div style={{ padding: '0 16px' }}>
@@ -1501,8 +1582,21 @@ export function TicketView({ staffId, staffName, role, onBack }) {
         )}
       </div>
 
-      {showReqModal && (
-        <RequisitionModal staffName={staffName} staffRole={role} onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      {showAssignWorkModal && (
+        <AssignWorkModal staffName={staffName} role={role} onClose={() => setShowAssignWorkModal(false)} onSubmit={(newTask) => {
+          INITIAL_ASSIGNED_STAFF_WORK.unshift(newTask);
+          setAssignedWork(prev => [newTask, ...prev]);
+          setShowAssignWorkModal(false);
+          alert(`New task assigned to ${staffName}!`);
+        }} />
+      )}
+
+      {showProfileModal && (
+        <StaffProfileModal staffName={staffName} role={role} staffId={staffId} onClose={() => setShowProfileModal(false)} />
+      )}
+
+      {showDemandsModal && (
+        <StaffDemandedItemsModal staffName={staffName} staffRole={role} onClose={() => setShowDemandsModal(false)} />
       )}
     </div>
   );
@@ -1514,7 +1608,9 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
   const logs = PURCHASE_LOG[staffId] || Object.values(PURCHASE_LOG)[0] || [];
   const total = logs.reduce((s, l) => s + l.total, 0);
   const [filter, setFilter] = useState('All');
-  const [showReqModal, setShowReqModal] = useState(false);
+  const [showAssignWorkModal, setShowAssignWorkModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showDemandsModal, setShowDemandsModal] = useState(false);
   const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
 
   const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === 'purchase manager');
@@ -1523,18 +1619,19 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
     setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
   };
 
-  const handleReqSubmit = (newReq) => {
-    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
-    setShowReqModal(false);
-    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
-  };
-
   const cats = ['All', ...new Set(logs.map(l => l.category))];
   const filtered = filter === 'All' ? logs : logs.filter(l => l.category === filter);
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle="Purchase Manager" onBack={onBack} onReqClick={() => setShowReqModal(true)} />
+      <TopBar 
+        title={staffName} 
+        subtitle="Purchase Manager" 
+        onBack={onBack} 
+        onReqClick={() => setShowDemandsModal(true)} 
+        onAssignWorkClick={() => setShowAssignWorkModal(true)}
+        onProfileClick={() => setShowProfileModal(true)}
+      />
       <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <div style={{ padding: '0 16px' }}>
@@ -1592,6 +1689,23 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
           </>
         )}
       </div>
+
+      {showAssignWorkModal && (
+        <AssignWorkModal staffName={staffName} role="purchase manager" onClose={() => setShowAssignWorkModal(false)} onSubmit={(newTask) => {
+          INITIAL_ASSIGNED_STAFF_WORK.unshift(newTask);
+          setAssignedWork(prev => [newTask, ...prev]);
+          setShowAssignWorkModal(false);
+          alert(`New task assigned to ${staffName}!`);
+        }} />
+      )}
+
+      {showProfileModal && (
+        <StaffProfileModal staffName={staffName} role="Purchase Manager" staffId={staffId} onClose={() => setShowProfileModal(false)} />
+      )}
+
+      {showDemandsModal && (
+        <StaffDemandedItemsModal staffName={staffName} staffRole="Purchase Manager" onClose={() => setShowDemandsModal(false)} />
+      )}
     </div>
   );
 }
