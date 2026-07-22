@@ -723,20 +723,12 @@ export default function Chat() {
                     {lastMsg && <span style={{ fontSize: 10, color: '#94a3b8' }}>{lastMsg.time}</span>}
                   </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
-                      <p style={{ margin: 0, fontSize: 12, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+                      <p style={{ margin: 0, fontSize: 12, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
                         {contact.reminder ? `⏰ ${contact.reminder}` : lastMsgPreview(lastMsg)}
                       </p>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <button onClick={(e) => { e.stopPropagation(); setReminderTarget(contact); setShowReminderModal(true); }}
-                          style={{ background: contact.reminder ? '#fef3c7' : '#ecfeff', border: `1px solid ${contact.reminder ? '#fde68a' : cyan}`, color: contact.reminder ? '#b45309' : cyan, borderRadius: 8, padding: '3px 8px', fontSize: 11, fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>alarm</span>
-                          {contact.reminder ? 'Edit' : '+ Reminder'}
-                        </button>
-                        <span style={{ fontSize: 11, color: contact.role === 'enquiry' ? '#ec4899' : contact.role === 'student' ? '#6366f1' : '#8b5cf6', background: contact.role === 'enquiry' ? '#fce7f3' : contact.role === 'student' ? '#eef2ff' : '#f5f3ff', padding: '2px 7px', borderRadius: 6, fontWeight: 600 }}>
-                          {contact.role === 'enquiry' ? 'Enquiry' : contact.role === 'student' ? `Rm ${contact.room}` : contact.dept}
-                        </span>
-                      </div>
+                      <span style={{ fontSize: 11, color: contact.role === 'enquiry' ? '#ec4899' : contact.role === 'student' ? '#6366f1' : '#8b5cf6', background: contact.role === 'enquiry' ? '#fce7f3' : contact.role === 'student' ? '#eef2ff' : '#f5f3ff', padding: '2px 7px', borderRadius: 6, fontWeight: 600 }}>
+                        {contact.role === 'enquiry' ? 'Enquiry' : contact.role === 'student' ? `Rm ${contact.room}` : contact.dept}
+                      </span>
                     </div>
                 </div>
               </div>
