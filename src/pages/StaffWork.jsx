@@ -51,6 +51,31 @@ export const STAFF_MEMBERS = {
   carpenter:   [{ id: 'ca1', name: 'Balram Singh',     joined: 'Aug 2022', phone: '9222333444' }],
 };
 
+export const INITIAL_STAFF_PURCHASE_REQUISITIONS = [
+  { id: 1, date: '2026-07-22', staffName: 'Ramesh Yadav', staffRole: 'Cook', item: 'Basmati Rice (25kg)', qty: '2 bags', vendor: 'Sharma Traders', status: 'Pending' },
+  { id: 2, date: '2026-07-22', staffName: 'Sunita Devi', staffRole: 'Cook', item: 'Refined Sunflower Oil (15L)', qty: '3 cans', vendor: 'Local Wholesale Mandi', status: 'Approved' },
+  { id: 3, date: '2026-07-21', staffName: 'Mohan Das', staffRole: 'Cleaner', item: 'Floor Cleaner Liquid 5L', qty: '2 cans', vendor: 'Clean Depot', status: 'Purchased' },
+  { id: 4, date: '2026-07-21', staffName: 'Ashok Kumar', staffRole: 'Plumber', item: '1/2 inch PVC Washers', qty: '20 pcs', vendor: 'Hardware Supply Co', status: 'Approved' },
+];
+
+export const INITIAL_ASSIGNED_STAFF_WORK = [
+  { id: 1, staffId: 'cl1', staffName: 'Mohan Das', role: 'cleaner', title: 'Daily Floor Mopping & Sanitization', type: 'Regular', duration: 'Daily Routine', status: 'In Progress', note: 'Ensure Floor 2 corridor is cleaned before 10 AM', assignedDate: '2026-07-22' },
+  { id: 2, staffId: 'cl1', staffName: 'Mohan Das', role: 'cleaner', title: 'Deep Clean Overhead Water Tank', type: 'Special', duration: '2 Days (22-23 Jul)', status: 'Pending', note: 'Use chlorine solution and scrub inner walls', assignedDate: '2026-07-22' },
+  { id: 3, staffId: 'c1', staffName: 'Ramesh Yadav', role: 'cook', title: 'Prepare Special Sunday Feast', type: 'Special', duration: 'One-time (26 Jul)', status: 'Pending', note: 'Paneer Butter Masala, Gulab Jamun', assignedDate: '2026-07-21' },
+  { id: 4, staffId: 'pl1', staffName: 'Dinesh Patel', role: 'plumber', title: 'Fix Main Water Line Leakage', type: 'Special', duration: '1 Day', status: 'Completed', note: 'Replaced main joint connector', assignedDate: '2026-07-20' },
+];
+
+export const INITIAL_PACKED_FOOD_REQUESTS = [
+  { id: 1, studentId: 'u102', studentName: 'Ravi Gupta', room: '102', phone: '+91 9876543210', date: '2026-07-22', meal: 'Lunch', timing: 'Same Day', note: 'Pack extra pickle', status: 'Pending' },
+  { id: 2, studentId: 'u104', studentName: 'Sneha R.', room: '104', phone: '+91 9876543211', date: '2026-07-22', meal: 'Lunch', timing: 'Same Day', note: 'Leave near security gate', status: 'Packed' },
+  { id: 3, studentId: 'u105', studentName: 'Anil K.', room: '105', phone: '+91 9876543212', date: '2026-07-23', meal: 'Breakfast', timing: 'Day Before', note: 'Leaving early at 7 AM', status: 'Pending' },
+  { id: 4, studentId: 'u201', studentName: 'Priya S.', room: '201', phone: '+91 9876543213', date: '2026-07-22', meal: 'Dinner', timing: 'Same Day', note: 'No onions in salad', status: 'Picked Up' },
+];
+
+export const INITIAL_FOOD_BROADCASTS = [
+  { id: 1, date: '2026-07-22', time: '01:15 PM', meal: 'Lunch', cookName: 'Ramesh Yadav', target: 'All Students', message: 'Lunch is hot & ready! Dal Tadka, Jeera Rice & Hot Rotis.' },
+];
+
 const TIMELINE_LOGS = {
   h1:  [
     { id: 1, date: '2026-07-11', time: '10:30 AM', text: 'Interviewed 2 candidates for Cook position. Shortlisted 1.', pinned: true },
@@ -201,8 +226,8 @@ const NEW_CLEANER_STATS = {
 
 // ─── SHARED UI ─────────────────────────────────────────────────────────────────
 
-const TopBar = ({ title, subtitle, onBack }) => (
-  <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', gap: 14, position: 'sticky', top: 0, zIndex: 20 }}>
+const TopBar = ({ title, subtitle, onBack, onReqClick }) => (
+  <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '0 16px', height: 64, display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 20 }}>
     <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex', alignItems: 'center', padding: 0 }}>
       <span className="material-symbols-outlined" style={{ fontSize: 22 }}>arrow_back_ios_new</span>
     </button>
@@ -210,8 +235,115 @@ const TopBar = ({ title, subtitle, onBack }) => (
       <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.2 }}>{title}</p>
       {subtitle && <p style={{ fontSize: 13, color: C.muted, margin: 0, marginTop: 2 }}>{subtitle}</p>}
     </div>
+    <button onClick={onReqClick} style={{ background: C.primaryBg, color: C.primary, border: `1px solid ${C.primaryBdr}`, borderRadius: 10, padding: '7px 12px', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
+      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>playlist_add</span>
+      Item Purchasing
+    </button>
   </div>
 );
+
+export function RequisitionModal({ staffName, staffRole, onClose, onSubmit }) {
+  const [item, setItem] = useState('');
+  const [qty, setQty] = useState('');
+  const [vendor, setVendor] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!item.trim()) return;
+    const newReq = {
+      id: Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      staffName: staffName || 'Staff Member',
+      staffRole: staffRole || 'Staff',
+      item: item.trim(),
+      qty: qty.trim() || '1 unit',
+      vendor: vendor.trim() || 'Desire Vendor / Local Mandi',
+      status: 'Pending',
+    };
+    onSubmit(newReq);
+  };
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ width: '100%', maxWidth: 420, background: C.white, borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Item Purchasing List</h3>
+            <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Request admin to buy items from desired vendor</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Item Name *</label>
+            <input required type="text" placeholder="e.g. Basmati Rice 25kg / Floor Cleaner" value={item} onChange={e => setItem(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Quantity</label>
+              <input type="text" placeholder="e.g. 2 bags / 5 litres" value={qty} onChange={e => setQty(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Desired Vendor</label>
+              <input type="text" placeholder="e.g. Sharma Traders" value={vendor} onChange={e => setVendor(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: 13, background: C.bg, color: C.textSub, border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+            <button type="submit" style={{ flex: 1, padding: 13, background: C.primary, color: 'white', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Send to Admin</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export function AssignedWorkSection({ staffName, role, assignedTasks, onUpdateTaskStatus }) {
+  const tasks = assignedTasks || [];
+  if (tasks.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '20px 0 10px 0' }}>📋 Admin Assigned Work</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {tasks.map(t => (
+          <Card key={t.id} style={{ borderLeft: t.type === 'Special' ? '4px solid #8b5cf6' : '4px solid #0891b2', padding: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+              <div>
+                <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: t.type === 'Special' ? '#f3e8ff' : '#ecfeff', color: t.type === 'Special' ? '#7c3aed' : '#0891b2', textTransform: 'uppercase', display: 'inline-block', marginBottom: 6 }}>
+                  {t.type === 'Special' ? '⭐ Special Work' : '🔄 Regular Work'}
+                </span>
+                <h4 style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.3 }}>{t.title}</h4>
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 12, background: t.status === 'Completed' ? C.successBg : t.status === 'In Progress' ? C.indigoBg : C.warnBg, color: t.status === 'Completed' ? C.success : t.status === 'In Progress' ? C.indigo : C.warn }}>
+                {t.status}
+              </span>
+            </div>
+
+            {t.note && <p style={{ fontSize: 13, color: C.textSub, margin: '0 0 10px', background: C.bg, padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>📌 {t.note}</p>}
+            <p style={{ fontSize: 12, color: C.muted, margin: '0 0 12px' }}>⏳ Duration: {t.duration} · Assigned: {t.assignedDate}</p>
+
+            {t.status !== 'Completed' && (
+              <div style={{ display: 'flex', gap: 8 }}>
+                {t.status === 'Pending' && (
+                  <button onClick={() => onUpdateTaskStatus(t.id, 'In Progress')} style={{ flex: 1, padding: '8px', background: C.indigoBg, border: `1px solid ${C.indigo}`, borderRadius: 8, color: C.indigo, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    Start Work
+                  </button>
+                )}
+                <button onClick={() => onUpdateTaskStatus(t.id, 'Completed')} style={{ flex: 1, padding: '8px', background: C.successBg, border: `1px solid ${C.success}`, borderRadius: 8, color: C.success, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Mark Completed ✅
+                </button>
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const TopTabs = ({ tabs, activeTab, setActiveTab }) => (
   <div style={{ display: 'flex', borderBottom: `1px solid ${C.border}`, background: C.white, overflowX: 'auto', padding: '0 16px' }}>
@@ -405,11 +537,25 @@ const StatRow = ({ items }) => (
 export function TimelineView({ staffId, staffName, role, onBack }) {
   const [activeTab, setActiveTab] = useState('Work Details');
   const [note, setNote] = useState('');
+  const [showReqModal, setShowReqModal] = useState(false);
+  const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
   const logs = TIMELINE_LOGS[staffId] || Object.values(TIMELINE_LOGS)[0] || [];
+
+  const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === (role || '').toLowerCase());
+
+  const handleUpdateStatus = (id, newStatus) => {
+    setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  };
+
+  const handleReqSubmit = (newReq) => {
+    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
+    setShowReqModal(false);
+    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
+  };
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle={role} onBack={onBack} />
+      <TopBar title={staffName} subtitle={role} onBack={onBack} onReqClick={() => setShowReqModal(true)} />
       <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div style={{ padding: '0 16px' }}>
@@ -417,6 +563,9 @@ export function TimelineView({ staffId, staffName, role, onBack }) {
           <GenericStaffInfo staffId={staffId} />
         ) : (
           <>
+            {/* Admin Assigned Tasks */}
+            <AssignedWorkSection staffName={staffName} role={role} assignedTasks={staffTasks} onUpdateTaskStatus={handleUpdateStatus} />
+
             {/* Note box */}
             <SectionTitle text="Leave an instruction" />
             <Card>
@@ -450,6 +599,10 @@ export function TimelineView({ staffId, staffName, role, onBack }) {
           </>
         )}
       </div>
+
+      {showReqModal && (
+        <RequisitionModal staffName={staffName} staffRole={role} onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      )}
     </div>
   );
 }
@@ -459,78 +612,134 @@ export function CookView({ staffId, staffName, onBack }) {
   const [activeTab, setActiveTab] = useState('Work Details');
   const [timeFilter, setTimeFilter] = useState('day'); // 'day' | 'week' | 'month'
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  
+  const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
+  const [packedRequests, setPackedRequests] = useState(INITIAL_PACKED_FOOD_REQUESTS);
+  const [broadcasts, setBroadcasts] = useState(INITIAL_FOOD_BROADCASTS);
+
+  const [showReqModal, setShowReqModal] = useState(false);
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+  const [showPackedModal, setShowPackedModal] = useState(false);
+  const [selectedMealForPacked, setSelectedMealForPacked] = useState('Lunch');
+
+  // Broadcast state
+  const [bMeal, setBMeal] = useState('Lunch');
+  const [bTarget, setBTarget] = useState('All Students');
+  const [bMessage, setBMessage] = useState('Hot and fresh meal is ready to serve!');
+
   const stats = COOK_STATS[staffId] || COOK_STATS.default;
   const currentStats = stats[timeFilter];
+  const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === 'cook');
 
-  const renderMealSection = (mealName, data) => (
-    <Card style={{ marginBottom: 16 }}>
-      <p style={{ fontSize: 16, fontWeight: 800, color: C.text, textTransform: 'uppercase', marginBottom: 12, borderBottom: `1px solid ${C.border}`, paddingBottom: 8 }}>{mealName}</p>
-      
-      <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px' }}>DINE-IN</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
-        <div style={{ background: C.bg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-          <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>{data.req}</p>
-          <p style={{ fontSize: 11, color: C.muted, margin: 0, fontWeight: 700 }}>Requested</p>
-        </div>
-        <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-          <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.eaten}</p>
-          <p style={{ fontSize: 11, color: C.success, margin: 0, fontWeight: 700 }}>Eaten</p>
-        </div>
-        <div style={{ background: C.dangerBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-          <p style={{ fontSize: 18, fontWeight: 800, color: C.danger, margin: 0 }}>{data.notEaten.length > 0 ? data.notEaten.length : (data.req - data.eaten)}</p>
-          <p style={{ fontSize: 11, color: C.danger, margin: 0, fontWeight: 700 }}>Not Eaten</p>
-        </div>
-      </div>
-      {data.notEaten.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 16 }}>
-          {data.notEaten.map((u, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: C.bg, padding: '6px 12px', borderRadius: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{u.name}</span>
-              <a href={`tel:${u.phone}`} style={{ fontSize: 12, color: C.primary, fontWeight: 700, textDecoration: 'none' }}>Call</a>
-            </div>
-          ))}
-        </div>
-      )}
+  const handleUpdateStatus = (id, newStatus) => {
+    setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  };
 
-      <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px' }}>TIFFIN / PACKED</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
-        <div style={{ background: C.bg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-          <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>{data.tiffinReq}</p>
-          <p style={{ fontSize: 11, color: C.muted, margin: 0, fontWeight: 700 }}>Requested</p>
-        </div>
-        <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-          <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.tiffinTaken.length}</p>
-          <p style={{ fontSize: 11, color: C.success, margin: 0, fontWeight: 700 }}>Picked Up</p>
-        </div>
-        <div style={{ background: C.warnBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-          <p style={{ fontSize: 18, fontWeight: 800, color: C.warn, margin: 0 }}>{data.tiffinMissed.length}</p>
-          <p style={{ fontSize: 11, color: C.warn, margin: 0, fontWeight: 700 }}>Missed</p>
-        </div>
-      </div>
-      {data.tiffinTaken.length > 0 && (
-        <div style={{ marginBottom: 12 }}>
-          {data.tiffinTaken.map((t, i) => (
-            <p key={i} style={{ fontSize: 13, color: C.textSub, margin: '0 0 4px' }}><b>{t.name}</b> took: {t.items}</p>
-          ))}
-        </div>
-      )}
+  const handleReqSubmit = (newReq) => {
+    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
+    setShowReqModal(false);
+    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
+  };
 
-      {data.extra.length > 0 && (
-        <>
-          <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px', marginTop: 12 }}>EXTRA PLATES</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {data.extra.map((e, i) => (
-              <span key={i} style={{ background: C.indigoBg, color: C.indigo, fontSize: 12, fontWeight: 700, padding: '4px 8px', borderRadius: 6 }}>{e.name} (+{e.qty})</span>
+  const handleSendBroadcast = (e) => {
+    e.preventDefault();
+    const newB = {
+      id: Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      meal: bMeal,
+      cookName: staffName || 'Cook',
+      target: bTarget,
+      message: bMessage.trim() || 'Food is ready!',
+    };
+    INITIAL_FOOD_BROADCASTS.unshift(newB);
+    setBroadcasts(prev => [newB, ...prev]);
+    setShowBroadcastModal(false);
+    alert(`"Food Ready" notification sent to ${bTarget}!`);
+  };
+
+  const renderMealSection = (mealName, data) => {
+    const mealPackedReqs = packedRequests.filter(r => r.meal === mealName);
+
+    return (
+      <Card style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottom: `1px solid ${C.border}`, paddingBottom: 8 }}>
+          <p style={{ fontSize: 16, fontWeight: 800, color: C.text, textTransform: 'uppercase', margin: 0 }}>{mealName}</p>
+          <button onClick={() => { setBMeal(mealName); setShowBroadcastModal(true); }} style={{ background: C.successBg, color: C.success, border: `1px solid ${C.success}`, borderRadius: 8, padding: '5px 12px', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>campaign</span>
+            Food Ready!
+          </button>
+        </div>
+
+        <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px' }}>DINE-IN</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
+          <div style={{ background: C.bg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>{data.req}</p>
+            <p style={{ fontSize: 11, color: C.muted, margin: 0, fontWeight: 700 }}>Requested</p>
+          </div>
+          <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.eaten}</p>
+            <p style={{ fontSize: 11, color: C.success, margin: 0, fontWeight: 700 }}>Eaten</p>
+          </div>
+          <div style={{ background: C.dangerBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.danger, margin: 0 }}>{data.notEaten.length > 0 ? data.notEaten.length : (data.req - data.eaten)}</p>
+            <p style={{ fontSize: 11, color: C.danger, margin: 0, fontWeight: 700 }}>Not Eaten</p>
+          </div>
+        </div>
+        {data.notEaten.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 16 }}>
+            {data.notEaten.map((u, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: C.bg, padding: '6px 12px', borderRadius: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{u.name}</span>
+                <a href={`tel:${u.phone}`} style={{ fontSize: 12, color: C.primary, fontWeight: 700, textDecoration: 'none' }}>Call</a>
+              </div>
             ))}
           </div>
-        </>
-      )}
-    </Card>
-  );
+        )}
 
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '14px 0 8px' }}>
+          <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: 0 }}>TIFFIN / PACKED</p>
+          <span style={{ fontSize: 11, color: C.primary, fontWeight: 700 }}>Click requested to view list 🔍</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
+          <div onClick={() => { setSelectedMealForPacked(mealName); setShowPackedModal(true); }}
+               style={{ background: '#ecfeff', border: `1.5px solid ${C.primary}`, padding: '10px 6px', borderRadius: 8, textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(8,145,178,0.1)' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.primary, margin: 0 }}>{mealPackedReqs.length}</p>
+            <p style={{ fontSize: 11, color: C.primary, margin: 0, fontWeight: 800 }}>Requested 🔍</p>
+          </div>
+          <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{mealPackedReqs.filter(r => r.status === 'Packed' || r.status === 'Picked Up').length}</p>
+            <p style={{ fontSize: 11, color: C.success, margin: 0, fontWeight: 700 }}>Packed</p>
+          </div>
+          <div style={{ background: C.warnBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.warn, margin: 0 }}>{mealPackedReqs.filter(r => r.status === 'Pending').length}</p>
+            <p style={{ fontSize: 11, color: C.warn, margin: 0, fontWeight: 700 }}>Pending</p>
+          </div>
+        </div>
+        {data.tiffinTaken.length > 0 && (
+          <div style={{ marginBottom: 12 }}>
+            {data.tiffinTaken.map((t, i) => (
+              <p key={i} style={{ fontSize: 13, color: C.textSub, margin: '0 0 4px' }}><b>{t.name}</b> took: {t.items}</p>
+            ))}
+          </div>
+        )}
+
+        {data.extra.length > 0 && (
+          <>
+            <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px', marginTop: 12 }}>EXTRA PLATES</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {data.extra.map((e, i) => (
+                <span key={i} style={{ background: C.indigoBg, color: C.indigo, fontSize: 12, fontWeight: 700, padding: '4px 8px', borderRadius: 6 }}>{e.name} (+{e.qty})</span>
+              ))}
+            </div>
+          </>
+        )}
+      </Card>
+    );
+  };
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle="Cook" onBack={onBack} />
+      <TopBar title={staffName} subtitle="Cook" onBack={onBack} onReqClick={() => setShowReqModal(true)} />
       <TopTabs tabs={['Work Details', 'Extra Guest Food', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
       <div style={{ padding: '0 16px' }}>
         {activeTab === 'Staff Info' ? <GenericStaffInfo staffId={staffId} /> : 
@@ -593,9 +802,18 @@ export function CookView({ staffId, staffName, onBack }) {
           </>
          ) : (
           <>
-            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '20px 0 16px' }}>
+            {/* Admin Assigned Tasks */}
+            <AssignedWorkSection staffName={staffName} role="cook" assignedTasks={staffTasks} onUpdateTaskStatus={handleUpdateStatus} />
+
+            {/* Broadcast Food Ready Banner */}
+            <button onClick={() => setShowBroadcastModal(true)} style={{ width: '100%', padding: '13px', background: 'linear-gradient(135deg, #059669, #10b981)', color: 'white', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16, boxShadow: '0 4px 12px rgba(16,185,129,0.25)', fontFamily: 'inherit' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>campaign</span>
+              Broadcast "Food is Ready!" to Students
+            </button>
+
+            <div style={{ display: 'flex', background: C.white, borderRadius: 12, overflow: 'hidden', border: `1px solid ${C.border}`, margin: '0 0 16px' }}>
               {['day', 'week', 'month'].map(t => (
-                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s' }}>{t}</button>
+                <button key={t} onClick={() => setTimeFilter(t)} style={{ flex: 1, padding: '10px 0', border: 'none', background: timeFilter === t ? C.primary : 'transparent', color: timeFilter === t ? '#fff' : C.muted, fontSize: 14, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s', fontFamily: 'inherit' }}>{t}</button>
               ))}
             </div>
             {timeFilter === 'day' && (
@@ -604,12 +822,120 @@ export function CookView({ staffId, staffName, onBack }) {
                   style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box', background: C.white }} />
               </div>
             )}
+
             {renderMealSection('Breakfast', currentStats.breakfast)}
             {renderMealSection('Lunch', currentStats.lunch)}
             {renderMealSection('Dinner', currentStats.dinner)}
           </>
         )}
       </div>
+
+      {/* Item Purchasing Requisition Modal */}
+      {showReqModal && (
+        <RequisitionModal staffName={staffName} staffRole="Cook" onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      )}
+
+      {/* Broadcast Food Ready Modal */}
+      {showBroadcastModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ width: '100%', maxWidth: 420, background: C.white, borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Broadcast Food Ready</h3>
+                <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Notify students that food is hot & ready</p>
+              </div>
+              <button onClick={() => setShowBroadcastModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
+            </div>
+
+            <form onSubmit={handleSendBroadcast} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Select Meal</label>
+                <select value={bMeal} onChange={e => setBMeal(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, background: 'white', outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Snacks">Evening Snacks</option>
+                  <option value="Dinner">Dinner</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Target Audience</label>
+                <select value={bTarget} onChange={e => setBTarget(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, background: 'white', outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="All Students">All Students</option>
+                  <option value="Floor 1 Students">Floor 1 Students</option>
+                  <option value="Floor 2 Students">Floor 2 Students</option>
+                  <option value="Floor 3 Students">Floor 3 Students</option>
+                  <option value="Specific Tiffin Requests">Students who requested Tiffin/Packed</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Message Broadcast</label>
+                <textarea value={bMessage} onChange={e => setBMessage(e.target.value)} rows={3} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 14, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box', resize: 'vertical' }} />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+                <button type="button" onClick={() => setShowBroadcastModal(false)} style={{ flex: 1, padding: 13, background: C.bg, color: C.textSub, border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+                <button type="submit" style={{ flex: 1, padding: 13, background: C.success, color: 'white', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Broadcast Now 🚀</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Clickable Requested Packed Food Details Modal */}
+      {showPackedModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ width: '100%', maxWidth: 440, background: C.white, borderRadius: 20, padding: 22, maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Packed Food Requests — {selectedMealForPacked}</h3>
+                <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Click to view student contact & room details</p>
+              </div>
+              <button onClick={() => setShowPackedModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {packedRequests.filter(r => r.meal === selectedMealForPacked).length === 0 ? (
+                <p style={{ textAlign: 'center', color: C.muted, padding: '30px 0', fontSize: 14 }}>No packed food requests for {selectedMealForPacked}.</p>
+              ) : (
+                packedRequests.filter(r => r.meal === selectedMealForPacked).map(req => (
+                  <div key={req.id} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14, padding: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                      <div>
+                        <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: 0 }}>{req.studentName}</p>
+                        <p style={{ fontSize: 13, color: C.primary, fontWeight: 700, margin: '2px 0 0' }}>Room Number: {req.room}</p>
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 8, background: req.timing === 'Day Before' ? '#f3e8ff' : '#ecfeff', color: req.timing === 'Day Before' ? '#7c3aed' : '#0891b2' }}>
+                        {req.timing}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '8px 0' }}>
+                      <a href={`tel:${req.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: C.successBg, color: C.success, border: `1px solid ${C.success}`, borderRadius: 8, padding: '5px 10px', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>call</span>
+                        {req.phone}
+                      </a>
+                      <span style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Req Date: {req.date}</span>
+                    </div>
+
+                    {req.note && <p style={{ fontSize: 12, color: C.textSub, margin: '6px 0', background: C.white, padding: '6px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>📌 Note: {req.note}</p>}
+
+                    <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                      {['Pending', 'Packed', 'Picked Up'].map(st => (
+                        <button key={st} onClick={() => setPackedRequests(prev => prev.map(p => p.id === req.id ? { ...p, status: st } : p))}
+                          style={{ flex: 1, padding: '7px 0', borderRadius: 8, border: req.status === st ? 'none' : `1px solid ${C.border}`, background: req.status === st ? C.primary : C.white, color: req.status === st ? 'white' : C.muted, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                          {st}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -621,7 +947,21 @@ export function CleanerView({ staffId, staffName, onBack }) {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [expandedCat, setExpandedCat] = useState(null);
   const [activeModal, setActiveModal] = useState(null);
-  
+  const [showReqModal, setShowReqModal] = useState(false);
+  const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
+
+  const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === 'cleaner');
+
+  const handleUpdateStatus = (id, newStatus) => {
+    setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  };
+
+  const handleReqSubmit = (newReq) => {
+    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
+    setShowReqModal(false);
+    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
+  };
+
   const [uncleanedRooms, setUncleanedRooms] = useState([
     { room: '103', reason: 'Student Sleeping' },
     { room: '104', reason: 'Door Locked' },
@@ -685,7 +1025,7 @@ export function CleanerView({ staffId, staffName, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f8fafc', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle="Housekeeping • Cleaner" onBack={onBack} />
+      <TopBar title={staffName} subtitle="Housekeeping • Cleaner" onBack={onBack} onReqClick={() => setShowReqModal(true)} />
       
       {/* Sleek Tabs */}
       <div style={{ display: 'flex', padding: '16px', gap: 10 }}>
@@ -700,6 +1040,8 @@ export function CleanerView({ staffId, staffName, onBack }) {
       <div style={{ padding: '0 16px' }}>
         {activeTab === 'Staff Info' ? <GenericStaffInfo staffId={staffId} /> : (
           <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
+            {/* Admin Assigned Tasks */}
+            <AssignedWorkSection staffName={staffName} role="cleaner" assignedTasks={staffTasks} onUpdateTaskStatus={handleUpdateStatus} />
             {/* Time Filter Toggle */}
             <div style={{ display: 'flex', background: '#e2e8f0', borderRadius: 12, padding: 4, marginBottom: 20 }}>
               {['day', 'week', 'month'].map(t => (
@@ -828,6 +1170,10 @@ export function CleanerView({ staffId, staffName, onBack }) {
           </div>
         )}
       </div>
+
+      {showReqModal && (
+        <RequisitionModal staffName={staffName} staffRole="Cleaner" onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      )}
     </div>
   );
 }
@@ -837,6 +1183,20 @@ export function TicketView({ staffId, staffName, role, onBack }) {
   const [activeTab, setActiveTab] = useState('Work Details');
   const [tickets, setTickets] = useState(TICKET_DATA[staffId] || Object.values(TICKET_DATA)[0] || []);
   const [filter, setFilter] = useState('All');
+  const [showReqModal, setShowReqModal] = useState(false);
+  const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
+
+  const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === (role || '').toLowerCase());
+
+  const handleUpdateStatus = (id, newStatus) => {
+    setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  };
+
+  const handleReqSubmit = (newReq) => {
+    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
+    setShowReqModal(false);
+    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
+  };
 
   const update = (id, status) => setTickets(prev => prev.map(t => t.id === id ? { ...t, status } : t));
   const tabs = ['All', 'Pending', 'In Progress', 'Resolved'];
@@ -845,7 +1205,7 @@ export function TicketView({ staffId, staffName, role, onBack }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle={role} onBack={onBack} />
+      <TopBar title={staffName} subtitle={role} onBack={onBack} onReqClick={() => setShowReqModal(true)} />
       <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <div style={{ padding: '0 16px' }}>
@@ -853,6 +1213,9 @@ export function TicketView({ staffId, staffName, role, onBack }) {
           <GenericStaffInfo staffId={staffId} />
         ) : (
           <>
+            {/* Admin Assigned Tasks */}
+            <AssignedWorkSection staffName={staffName} role={role} assignedTasks={staffTasks} onUpdateTaskStatus={handleUpdateStatus} />
+
             <SectionTitle text="Summary" />
             <StatRow items={[
               { label: 'Pending',  value: cnt.Pending,           color: C.warn    },
@@ -912,6 +1275,10 @@ export function TicketView({ staffId, staffName, role, onBack }) {
           </>
         )}
       </div>
+
+      {showReqModal && (
+        <RequisitionModal staffName={staffName} staffRole={role} onClose={() => setShowReqModal(false)} onSubmit={handleReqSubmit} />
+      )}
     </div>
   );
 }
@@ -922,12 +1289,27 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
   const logs = PURCHASE_LOG[staffId] || Object.values(PURCHASE_LOG)[0] || [];
   const total = logs.reduce((s, l) => s + l.total, 0);
   const [filter, setFilter] = useState('All');
+  const [showReqModal, setShowReqModal] = useState(false);
+  const [assignedWork, setAssignedWork] = useState(INITIAL_ASSIGNED_STAFF_WORK);
+
+  const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === 'purchase manager');
+
+  const handleUpdateStatus = (id, newStatus) => {
+    setAssignedWork(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  };
+
+  const handleReqSubmit = (newReq) => {
+    INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
+    setShowReqModal(false);
+    alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
+  };
+
   const cats = ['All', ...new Set(logs.map(l => l.category))];
   const filtered = filter === 'All' ? logs : logs.filter(l => l.category === filter);
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle="Purchase Manager" onBack={onBack} />
+      <TopBar title={staffName} subtitle="Purchase Manager" onBack={onBack} onReqClick={() => setShowReqModal(true)} />
       <TopTabs tabs={['Work Details', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <div style={{ padding: '0 16px' }}>
@@ -935,6 +1317,8 @@ export function PurchaseManagerView({ staffId, staffName, onBack }) {
           <GenericStaffInfo staffId={staffId} />
         ) : (
           <>
+            {/* Admin Assigned Tasks */}
+            <AssignedWorkSection staffName={staffName} role="purchase manager" assignedTasks={staffTasks} onUpdateTaskStatus={handleUpdateStatus} />
             {/* Spend summary */}
             <SectionTitle text="This week's spend" />
             <div style={{ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, borderRadius: 16, padding: '20px 22px', marginBottom: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
