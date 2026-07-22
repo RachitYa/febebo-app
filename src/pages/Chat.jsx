@@ -352,6 +352,16 @@ export default function Chat() {
     );
   };
 
+  const openReminderModal = (target) => {
+    setReminderTarget(target);
+    if (target.reminder) {
+      setReminderReason(target.reminder);
+    } else {
+      setReminderReason('');
+    }
+    setShowReminderModal(true);
+  };
+
   const handleSetReminder = (e) => {
     e.preventDefault();
     if (!reminderTarget) return;
@@ -362,7 +372,6 @@ export default function Chat() {
     }
     setShowReminderModal(false);
     setReminderReason('');
-    alert(`Reconnect reminder set for ${reminderTarget.name} on ${reminderDate} at ${reminderTime}! Chat pinned to top section.`);
   };
 
   const handleClearReminder = (id) => {
@@ -550,9 +559,9 @@ export default function Chat() {
             <p style={{ margin: 0, fontSize: 11, color: '#64748b' }}>{activeContact.role === 'student' ? `Room ${activeContact.room}` : activeContact.role === 'enquiry' ? activeContact.source : activeContact.dept}</p>
           </div>
           
-          <button onClick={() => { setReminderTarget(activeContact); setShowReminderModal(true); }} style={{ background: '#ecfeff', border: `1px solid ${cyan}`, borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: cyan, fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>
+          <button onClick={() => openReminderModal(activeContact)} style={{ background: activeContact.reminder ? '#fef3c7' : '#ecfeff', border: `1px solid ${activeContact.reminder ? '#fde68a' : cyan}`, borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: activeContact.reminder ? '#b45309' : cyan, fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>alarm</span>
-            Reminder
+            {activeContact.reminder ? 'Edit Reminder' : 'Reminder'}
           </button>
 
           <a href={`tel:+91${activeContact.phone || '9999999999'}`} style={{ background: '#ecfeff', border: 'none', borderRadius: 10, padding: 8, cursor: 'pointer', display: 'flex', color: cyan, textDecoration: 'none' }}>
@@ -563,11 +572,14 @@ export default function Chat() {
         {/* Reconnect Reminder Bar if active */}
         {activeContact.reminder && (
           <div style={{ background: '#fef3c7', borderBottom: '1px solid #fde68a', padding: '8px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => openReminderModal(activeContact)}>
               <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#d97706' }}>alarm_on</span>
               <span style={{ fontSize: 12, fontWeight: 700, color: '#92400e' }}>Reminder: {activeContact.reminder}</span>
             </div>
-            <button onClick={() => handleClearReminder(activeContact.id)} style={{ background: 'none', border: 'none', color: '#d97706', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Clear</button>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button onClick={() => openReminderModal(activeContact)} style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>Edit</button>
+              <button onClick={() => handleClearReminder(activeContact.id)} style={{ background: 'none', border: 'none', color: '#d97706', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Clear</button>
+            </div>
           </div>
         )}
 
