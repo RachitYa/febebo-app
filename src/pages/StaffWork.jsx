@@ -262,17 +262,59 @@ const TopBar = ({ title, subtitle, onBack, onReqClick, onAssignWorkClick, onProf
 };
 
 export function StaffDemandedItemsModal({ staffName, staffRole, onClose }) {
+  const VENDORS_LIST = ['The Local Market', 'Shree Traders', 'Daily Harvest Store', 'Sharma Mandi', 'Green Valley Farm', 'RO Water Supplier'];
+
   const [itemsList, setItemsList] = useState([
     { id: 1, date: new Date().toISOString().split('T')[0], isToday: true, item: 'Basmati Rice 25kg', qty: '2 Bags', vendor: 'The Local Market', status: 'Pending Rate', rate: '' },
     { id: 2, date: new Date().toISOString().split('T')[0], isToday: true, item: 'Cooking Oil (Mustard)', qty: '5 Litres', vendor: 'Shree Traders', status: 'Pending Rate', rate: '' },
-    { id: 3, date: '2026-07-20', isToday: false, item: 'Wheat Flour (Aata) 10kg', qty: '3 Bags', vendor: 'Sharma Mandi', status: 'Purchased', rate: '350', totalPrice: 1050 },
-    { id: 4, date: '2026-07-18', isToday: false, item: 'Ghee & Dairy Products', qty: '4 kg', vendor: 'Shree Dairy Farm', status: 'Purchased', rate: '600', totalPrice: 2400 },
-    { id: 5, date: '2026-07-15', isToday: false, item: 'Floor Cleaner & Sanitizer', qty: '5 Litres', vendor: 'Sunil Traders', status: 'Purchased', rate: '120', totalPrice: 600 },
+    { id: 3, date: '2026-07-20', isToday: false, item: 'Wheat Flour (Aata) 10kg', qty: '3 Bags', vendor: 'Sharma Mandi', status: 'Sent to Vendor & Approved', rate: '350', totalPrice: 1050 },
+    { id: 4, date: '2026-07-18', isToday: false, item: 'Ghee & Dairy Products', qty: '4 kg', vendor: 'Shree Dairy Farm', status: 'Sent to Vendor & Approved', rate: '600', totalPrice: 2400 },
+    { id: 5, date: '2026-07-15', isToday: false, item: 'Floor Cleaner & Sanitizer', qty: '5 Litres', vendor: 'Sunil Traders', status: 'Sent to Vendor & Approved', rate: '120', totalPrice: 600 },
   ]);
 
-  const handleApproveRate = (id) => {
-    setItemsList(prev => prev.map(item => item.id === id ? { ...item, status: 'Approved / Purchased' } : item));
-    alert(`Item demand approved and rate updated!`);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemQty, setNewItemQty] = useState('');
+  const [newItemVendor, setNewItemVendor] = useState(VENDORS_LIST[0]);
+  const [newItemRate, setNewItemRate] = useState('');
+
+  const handleUpdateItemField = (id, field, value) => {
+    setItemsList(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const handleSendToVendor = (id) => {
+    const itemObj = itemsList.find(i => i.id === id);
+    if (!itemObj) return;
+    if (!itemObj.rate) {
+      alert('Please enter rate per unit before sending to vendor!');
+      return;
+    }
+    const total = (parseFloat(itemObj.rate) || 0) * (parseFloat(itemObj.qty) || 1);
+    setItemsList(prev => prev.map(item => item.id === id ? { ...item, status: 'Sent to Vendor & Approved', isToday: false, totalPrice: total || parseFloat(itemObj.rate) } : item));
+    alert(`Item "${itemObj.item}" sent to vendor "${itemObj.vendor}" at rate ₹${itemObj.rate}!`);
+  };
+
+  const handleAddDirectDemand = (e) => {
+    e.preventDefault();
+    if (!newItemName.trim()) return;
+    const newEntry = {
+      id: Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      isToday: true,
+      item: newItemName.trim(),
+      qty: newItemQty || '1 Unit',
+      vendor: newItemVendor,
+      status: newItemRate ? 'Sent to Vendor & Approved' : 'Pending Rate',
+      rate: newItemRate,
+      totalPrice: newItemRate ? parseFloat(newItemRate) : 0
+    };
+    if (newItemRate) newEntry.isToday = false;
+    setItemsList(prev => [newEntry, ...prev]);
+    setNewItemName('');
+    setNewItemQty('');
+    setNewItemRate('');
+    setShowAddForm(false);
+    alert(`New item demand created successfully!`);
   };
 
   const todayDemands = itemsList.filter(i => i.isToday);
@@ -280,8 +322,8 @@ export function StaffDemandedItemsModal({ staffName, staffRole, onClose }) {
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div style={{ width: '100%', maxWidth: 440, background: C.white, borderRadius: 20, padding: 22, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+      <div style={{ width: '100%', maxWidth: 460, background: C.white, borderRadius: 20, padding: 22, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxHeight: '88vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div>
             <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Item Demands List</h3>
             <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Demanded by <b>{staffName || 'Staff Member'}</b> ({staffRole || 'Staff'})</p>
@@ -289,54 +331,104 @@ export function StaffDemandedItemsModal({ staffName, staffRole, onClose }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
         </div>
 
+        {/* Add item toggle button */}
+        <button onClick={() => setShowAddForm(!showAddForm)} style={{ padding: '8px 12px', background: showAddForm ? C.bg : C.primaryBg, color: showAddForm ? C.textSub : C.primary, border: `1px solid ${showAddForm ? C.border : C.primary}`, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 14, fontFamily: 'inherit' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{showAddForm ? 'close' : 'add'}</span>
+          {showAddForm ? 'Cancel Direct Add' : '+ Direct Add Item Demand'}
+        </button>
+
+        {showAddForm && (
+          <form onSubmit={handleAddDirectDemand} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14, padding: 14, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase' }}>Item Name *</label>
+              <input required value={newItemName} onChange={e => setNewItemName(e.target.value)} placeholder="e.g. Basmati Rice 25kg" style={{ width: '100%', padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', background: C.white, boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase' }}>Quantity</label>
+                <input value={newItemQty} onChange={e => setNewItemQty(e.target.value)} placeholder="e.g. 2 Bags" style={{ width: '100%', padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', background: C.white, boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase' }}>Rate (₹)</label>
+                <input type="number" value={newItemRate} onChange={e => setNewItemRate(e.target.value)} placeholder="Rate ₹" style={{ width: '100%', padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', background: C.white, boxSizing: 'border-box' }} />
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase' }}>Select Vendor</label>
+              <select value={newItemVendor} onChange={e => setNewItemVendor(e.target.value)} style={{ width: '100%', padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', background: C.white, boxSizing: 'border-box' }}>
+                {VENDORS_LIST.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </div>
+            <button type="submit" style={{ padding: '9px', background: C.primary, color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Add & Send Demand 🚀
+            </button>
+          </form>
+        )}
+
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16, paddingRight: 4 }}>
           {/* Today's Demands */}
           <div>
             <p style={{ fontSize: 12, fontWeight: 800, color: C.primary, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 8px' }}>
-              📅 Today's Demands ({todayDemands.length})
+              📅 Demands Pending Rate & Vendor ({todayDemands.length})
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {todayDemands.map(d => (
-                <div key={d.id} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                    <div>
-                      <h4 style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: 0 }}>{d.item}</h4>
-                      <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Qty: <b>{d.qty}</b> · Vendor: {d.vendor}</p>
+            {todayDemands.length === 0 ? (
+              <p style={{ fontSize: 13, color: C.muted, fontStyle: 'italic', margin: 0 }}>No pending demands for today.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {todayDemands.map(d => (
+                  <div key={d.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: 14, boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                      <div>
+                        <h4 style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: 0 }}>{d.item}</h4>
+                        <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Demanded Qty: <b>{d.qty}</b></p>
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 20, background: '#fffbeb', color: '#d97706' }}>
+                        Pending Rate
+                      </span>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: d.status === 'Pending Rate' ? '#fffbeb' : C.successBg, color: d.status === 'Pending Rate' ? '#d97706' : C.success }}>
-                      {d.status}
-                    </span>
-                  </div>
 
-                  {d.status === 'Pending Rate' && (
-                    <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
-                      <input type="number" placeholder="Enter Rate (₹)" onChange={e => d.rate = e.target.value} style={{ flex: 1, padding: '7px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', background: C.white }} />
-                      <button onClick={() => handleApproveRate(d.id)} style={{ padding: '7px 12px', background: C.primary, color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        Approve Rate
-                      </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: C.bg, padding: 10, borderRadius: 10, border: `1px solid ${C.border}` }}>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 3 }}>Assigned Vendor</label>
+                        <select value={d.vendor} onChange={e => handleUpdateItemField(d.id, 'vendor', e.target.value)} style={{ width: '100%', padding: '6px 8px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, background: 'white', color: C.text, fontFamily: 'inherit' }}>
+                          {VENDORS_LIST.map(v => <option key={v} value={v}>{v}</option>)}
+                        </select>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 3 }}>Enter Rate (₹)</label>
+                          <input type="number" placeholder="Rate ₹" value={d.rate} onChange={e => handleUpdateItemField(d.id, 'rate', e.target.value)} style={{ width: '100%', padding: '6px 8px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, outline: 'none', background: 'white', boxSizing: 'border-box' }} />
+                        </div>
+                        <button onClick={() => handleSendToVendor(d.id)} style={{ flex: 1, height: 32, marginTop: 14, background: C.primary, color: 'white', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                          Send to Vendor 🚀
+                        </button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Previous Demands History */}
+          {/* Sent to Vendor & Previous History */}
           <div>
             <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 8px' }}>
-              📜 Previous Demands History ({previousDemands.length})
+              📜 Sent to Vendor & Approved History ({previousDemands.length})
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {previousDemands.map(d => (
                 <div key={d.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
                       <h4 style={{ fontSize: 14, fontWeight: 800, color: C.text, margin: 0 }}>{d.item}</h4>
-                      <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Qty: {d.qty} · Vendor: {d.vendor} · Date: {d.date}</p>
+                      <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Qty: <b>{d.qty}</b> · Vendor: <b>{d.vendor}</b></p>
+                      <p style={{ fontSize: 11, color: C.muted, margin: '2px 0 0' }}>Date: {d.date}</p>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: C.successBg, color: C.success }}>
-                      ₹{d.totalPrice} (Paid)
-                    </span>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: C.success }}>₹{d.totalPrice || d.rate}</span>
+                      <p style={{ fontSize: 10, fontWeight: 800, color: C.success, margin: '2px 0 0', background: C.successBg, padding: '2px 6px', borderRadius: 4 }}>Sent to Vendor</p>
+                    </div>
                   </div>
                 </div>
               ))}
