@@ -721,6 +721,24 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subVie
       </div>
 
       <div style={{ padding: 16 }}>
+        {/* Put on Notice Period Admin Button for Current Users */}
+        {profile.type === 'current' && (
+          <div style={{ marginBottom: 16, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 12, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#92400e' }}>Current Tenant Status</p>
+              <p style={{ margin: 0, fontSize: 11, color: '#b45309' }}>Tenant is currently active</p>
+            </div>
+            <button onClick={() => {
+              USER_PROFILES[user?.id || 2].type = 'notice_period';
+              USER_PROFILES[user?.id || 2].dateOfLeaving = '30 Aug 2026';
+              alert(`${profile.name} is now put on Notice Period! Leaving date set to 30 Aug 2026.`);
+              setSubView(null);
+            }} style={{ background: '#f59e0b', color: 'white', border: 'none', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+              📌 Put on Notice Period
+            </button>
+          </div>
+        )}
+
         <Accordion title="Personal Details" icon="person_outline" defaultOpen={false}>
           <InfoRow label="Full Name" value={profile.name} />
           <InfoRow label="Date of Birth" value={profile.dob} />
@@ -777,6 +795,52 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subVie
           </div>
         </Accordion>
 
+        {/* Complaints Raised Section for Current and Notice Period Users */}
+        {(profile.type === 'current' || profile.type === 'notice_period') && (
+          <Accordion title="Complaints Raised" icon="report_problem" badge="3 Complaints" defaultOpen={false}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              {[
+                { title: 'Bathroom tap leaking', date: '18 Jul 2026', cat: 'Plumbing', status: 'Resolved', note: 'Washer replaced by Dinesh' },
+                { title: 'Wi-Fi slow in Room', date: '20 Jul 2026', cat: 'Internet', status: 'In Progress', note: 'Router reboot scheduled' },
+                { title: 'AC Remote battery dead', date: '21 Jul 2026', cat: 'Electrical', status: 'Pending', note: 'New batteries requested' },
+              ].map((c, idx) => (
+                <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{c.title}</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: c.status === 'Resolved' ? '#dcfce7' : c.status === 'In Progress' ? '#e0e7ff' : '#fef3c7', color: c.status === 'Resolved' ? '#15803d' : c.status === 'In Progress' ? '#4338ca' : '#b45309' }}>{c.status}</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: 11, color: '#64748b' }}>Category: {c.cat} · {c.date}</p>
+                  <p style={{ margin: '4px 0 0', fontSize: 11, color: cyan, fontWeight: 600 }}>📌 Note: {c.note}</p>
+                </div>
+              ))}
+            </div>
+          </Accordion>
+        )}
+
+        {/* Exchange & Issued Items Section for Current and Notice Period Users */}
+        {(profile.type === 'current' || profile.type === 'notice_period') && (
+          <Accordion title="Exchange / Issued Items" icon="published_with_changes" defaultOpen={false}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              {[
+                { item: 'Room Key & Tag', date: '01 Jan 2025', status: 'Issued', returned: false },
+                { item: 'AC Remote', date: '01 Jan 2025', status: 'Issued', returned: false },
+                { item: 'Blanket (Winter)', date: '10 May 2025', status: 'Exchanged', returned: true, note: 'Replaced with fresh washed blanket' },
+                { item: 'Study Chair', date: '01 Jan 2025', status: 'Issued', returned: false },
+              ].map((ex, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{ex.item}</p>
+                    <p style={{ margin: 0, fontSize: 11, color: '#64748b' }}>Issued: {ex.date} {ex.note ? `· ${ex.note}` : ''}</p>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12, background: ex.returned ? '#e0e7ff' : '#dcfce7', color: ex.returned ? '#4338ca' : '#15803d' }}>
+                    {ex.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Accordion>
+        )}
+
         {profile.type !== 'upcoming' && (
           <Accordion title="Inventory Allotted" icon="inventory_2" onHeaderClick={() => setSubView('inventory')} />
         )}
@@ -818,13 +882,13 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subVie
         )}
 
         {profile.type !== 'upcoming' && (
-          <Accordion title="Pending Amount" badge={pending > 0 ? `₹${pending.toLocaleString()}` : '✓ Clear'} icon="history" defaultOpen={false}>
+          <Accordion title="Pending Amount & Dues" badge={pending > 0 ? `₹${pending.toLocaleString()} Outstanding` : '✓ Clear'} icon="history" defaultOpen={false}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 0' }}>
               {pending > 0 ? (
                 <>
                   <span style={{ fontSize: 13, color: '#475569' }}>• Rent Due: ₹1,500</span>
                   <span style={{ fontSize: 13, color: '#475569' }}>• Late Fee: ₹500</span>
-                  <span style={{ fontSize: 13, color: '#475569' }}>• Others: ₹500</span>
+                  <span style={{ fontSize: 13, color: '#475569' }}>• Remaining Dues: ₹{pending.toLocaleString()}</span>
                   <div style={{ borderTop: '1px dashed #cbd5e1', margin: '4px 0' }} />
                   <span style={{ fontSize: 12, color: '#ca8a04', fontWeight: 600 }}>Note: May be adjusted against security deposit.</span>
                   <span style={{ fontSize: 12, color: '#b91c1c', fontWeight: 600 }}>Due Date: 5th of this month</span>
@@ -849,12 +913,21 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subVie
           )}
         </Accordion>
 
-        {profile.type === 'notice_period' && (
-          <Accordion title="Damages & Deductions" icon="gavel" defaultOpen={true}>
+        {/* Move Out Security Deposit Adjustment section */}
+        {(profile.type === 'notice_period' || profile.type === 'current') && (
+          <Accordion title="Security Deposit Adjustment & Settlement" icon="gavel" defaultOpen={true}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#f1f5f9', borderRadius: 8 }}>
+                <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>Initial Deposit Paid:</span>
+                <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 800 }}>₹{profile.securityAmt.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fffbeb', borderRadius: 8 }}>
+                <span style={{ fontSize: 13, color: '#92400e', fontWeight: 600 }}>(-) Outstanding Dues:</span>
+                <span style={{ fontSize: 13, color: '#b45309', fontWeight: 800 }}>-₹{pending.toLocaleString()}</span>
+              </div>
               {damages.map(d => (
                 <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', border: '1px solid #fecaca', background: '#fef2f2', borderRadius: 8 }}>
-                  <span style={{ fontSize: 13, color: '#7f1d1d', fontWeight: 600 }}>{d.desc}</span>
+                  <span style={{ fontSize: 13, color: '#7f1d1d', fontWeight: 600 }}>(-) {d.desc}</span>
                   <span style={{ fontSize: 14, color: '#b91c1c', fontWeight: 800 }}>-₹{d.cost}</span>
                 </div>
               ))}
@@ -863,9 +936,10 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subVie
                 <input type="number" placeholder="Cost" value={damageCost} onChange={e => setDamageCost(e.target.value)} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, outline: 'none' }} />
                 <button onClick={handleAddDamage} style={{ padding: '8px 12px', background: cyan, color: 'white', borderRadius: 8, border: 'none', fontWeight: 700, cursor: 'pointer' }}>Add</button>
               </div>
+              
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, padding: '12px', background: '#ecfdf5', borderRadius: 8, border: '1px solid #a7f3d0' }}>
-                <span style={{ fontSize: 12, color: '#166534', fontWeight: 700, textTransform: 'uppercase' }}>Final Refundable Deposit:</span>
-                <span style={{ fontSize: 16, color: '#15803d', fontWeight: 900 }}>₹{finalSecurity > 0 ? finalSecurity.toLocaleString() : 0}</span>
+                <span style={{ fontSize: 12, color: '#166534', fontWeight: 700, textTransform: 'uppercase' }}>Net Refundable Deposit:</span>
+                <span style={{ fontSize: 16, color: '#15803d', fontWeight: 900 }}>₹{Math.max(0, profile.securityAmt - pending - totalDamages).toLocaleString()}</span>
               </div>
             </div>
           </Accordion>
@@ -1028,20 +1102,40 @@ function PaymentHistoryView({ onBack }) {
   );
 }
 
-// ─── VIEW 5: RECEIPT ──────────────────────────────────────
+// ─── VIEW 5: RECEIPT & PARTIAL PAYMENT BREAKDOWN ─────────────
 function ReceiptView({ user, onBack }) {
   const profile = USER_PROFILES[user?.id] || DEFAULT_PROFILE;
+  const [payAmount, setPayAmount] = useState(profile.pending > 0 ? (profile.rent - profile.pending) : profile.rent);
+  const remainingDues = Math.max(0, profile.rent - payAmount);
+
   return (
     <>
-      <Header title="Paid Successfully" onBack={onBack} center={false} />
+      <Header title="Payment Receipt & Dues Breakdown" onBack={onBack} center={false} />
       <div style={{ padding: '24px 20px' }}>
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #e2e8f0', padding: '24px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Amount</p>
+          <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 4px' }}>Total Bill Amount</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a' }}>₹ {profile.rent.toLocaleString()}</span>
             <span className="material-symbols-outlined" style={{ background: '#16a34a', color: 'white', borderRadius: '50%', fontSize: 16, padding: 2 }}>check</span>
           </div>
-          <p style={{ fontSize: 11, color: '#94a3b8', margin: '0 0 24px' }}>Paid via Cash</p>
+          <p style={{ fontSize: 11, color: '#94a3b8', margin: '0 0 16px' }}>Paid via Cash / UPI</p>
+
+          {/* Partial payment indicator */}
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 14, marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>Amount Paid Today:</span>
+              <span style={{ fontSize: 16, fontWeight: 800, color: '#16a34a' }}>₹ {payAmount.toLocaleString()}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: remainingDues > 0 ? '#b91c1c' : '#15803d' }}>
+                {remainingDues > 0 ? '⚠️ Remaining Dues (Outstanding):' : '✓ Full Payment Settled:'}
+              </span>
+              <span style={{ fontSize: 16, fontWeight: 800, color: remainingDues > 0 ? '#dc2626' : '#16a34a' }}>
+                ₹ {remainingDues.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20, borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9', padding: '20px 0' }}>
             <div>
               <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 4px' }}>To</p>
@@ -1055,7 +1149,7 @@ function ReceiptView({ user, onBack }) {
           </div>
           <div style={{ padding: '20px 0', borderBottom: '1px dashed #cbd5e1' }}>
             {[
-              { label: 'Rent',          val: profile.rent - 2000 },
+              { label: 'Room Rent',     val: profile.rent - 2000 },
               { label: 'Food Charge',   val: 1000 },
               { label: 'Meter Unit',    val: Math.round(METER_HISTORY[0].units * profile.meterRatePerUnit) },
               { label: 'Laundry',       val: 500 },
@@ -1069,12 +1163,12 @@ function ReceiptView({ user, onBack }) {
           </div>
           <div style={{ paddingTop: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 16, color: '#0f172a', fontWeight: 700 }}>Total</span>
+              <span style={{ fontSize: 16, color: '#0f172a', fontWeight: 700 }}>Total Bill</span>
               <span style={{ fontSize: 16, color: '#0f172a', fontWeight: 700 }}>₹ {profile.rent.toLocaleString()}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 14, color: profile.pending > 0 ? '#ef4444' : '#16a34a', fontWeight: 700 }}>Pending</span>
-              <span style={{ fontSize: 14, color: profile.pending > 0 ? '#ef4444' : '#16a34a', fontWeight: 700 }}>{profile.pending > 0 ? `₹ ${profile.pending.toLocaleString()}` : 'None'}</span>
+              <span style={{ fontSize: 14, color: remainingDues > 0 ? '#ef4444' : '#16a34a', fontWeight: 700 }}>Outstanding Dues Balance</span>
+              <span style={{ fontSize: 14, color: remainingDues > 0 ? '#ef4444' : '#16a34a', fontWeight: 700 }}>{remainingDues > 0 ? `₹ ${remainingDues.toLocaleString()}` : 'Cleared'}</span>
             </div>
           </div>
         </div>
