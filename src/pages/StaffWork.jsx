@@ -226,21 +226,40 @@ const NEW_CLEANER_STATS = {
 
 // ─── SHARED UI ─────────────────────────────────────────────────────────────────
 
-const TopBar = ({ title, subtitle, onBack, onReqClick }) => (
-  <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '0 16px', height: 64, display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 20 }}>
-    <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex', alignItems: 'center', padding: 0 }}>
-      <span className="material-symbols-outlined" style={{ fontSize: 22 }}>arrow_back_ios_new</span>
-    </button>
-    <div style={{ flex: 1 }}>
-      <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.2 }}>{title}</p>
-      {subtitle && <p style={{ fontSize: 13, color: C.muted, margin: 0, marginTop: 2 }}>{subtitle}</p>}
+const TopBar = ({ title, subtitle, onBack, onReqClick, onAssignWorkClick, onProfileClick }) => {
+  const initials = (title || 'Staff').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+  return (
+    <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: '0 16px', height: 64, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 20 }}>
+      <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.primary, display: 'flex', alignItems: 'center', padding: 0 }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 22 }}>arrow_back_ios_new</span>
+      </button>
+
+      {/* Clickable Profile Avatar */}
+      <div onClick={onProfileClick} style={{ width: 38, height: 38, borderRadius: '50%', background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, cursor: 'pointer', flexShrink: 0, boxShadow: '0 2px 6px rgba(8,145,178,0.25)' }}>
+        {initials}
+      </div>
+
+      <div style={{ flex: 1, cursor: 'pointer' }} onClick={onProfileClick}>
+        <p style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 4 }}>
+          {title}
+          <span className="material-symbols-outlined" style={{ fontSize: 16, color: C.primary }}>info</span>
+        </p>
+        {subtitle && <p style={{ fontSize: 12, color: C.muted, margin: 0, marginTop: 1 }}>{subtitle}</p>}
+      </div>
+
+      <button onClick={onAssignWorkClick} style={{ background: '#f3e8ff', color: '#7c3aed', border: '1px solid #d8b4fe', borderRadius: 10, padding: '6px 10px', fontSize: 11, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add_task</span>
+        Assign Work
+      </button>
+
+      <button onClick={onReqClick} style={{ background: C.primaryBg, color: C.primary, border: `1px solid ${C.primaryBdr}`, borderRadius: 10, padding: '6px 10px', fontSize: 11, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>playlist_add</span>
+        Item List
+      </button>
     </div>
-    <button onClick={onReqClick} style={{ background: C.primaryBg, color: C.primary, border: `1px solid ${C.primaryBdr}`, borderRadius: 10, padding: '7px 12px', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
-      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>playlist_add</span>
-      Item Purchasing
-    </button>
-  </div>
-);
+  );
+};
 
 export function RequisitionModal({ staffName, staffRole, onClose, onSubmit }) {
   const [item, setItem] = useState('');
@@ -296,6 +315,197 @@ export function RequisitionModal({ staffName, staffRole, onClose, onSubmit }) {
             <button type="submit" style={{ flex: 1, padding: 13, background: C.primary, color: 'white', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Send to Admin</button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── ADMIN ASSIGN WORK MODAL ──────────────────────────────────────────────────
+export function AssignWorkModal({ staffName, role, onClose, onSubmit }) {
+  const [targetStaff, setTargetStaff] = useState(staffName || 'Ramesh Yadav');
+  const [workType, setWorkType] = useState('Regular'); // 'Regular' | 'Special'
+  const [title, setTitle] = useState('');
+  const [note, setNote] = useState('');
+  const [duration, setDuration] = useState('Daily Routine');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    const newTask = {
+      id: Date.now(),
+      staffId: 1,
+      staffName: targetStaff,
+      role: (role || 'Cook').toLowerCase(),
+      type: workType,
+      title: title.trim(),
+      note: note.trim() || '',
+      duration: workType === 'Regular' ? 'Daily Routine' : (duration || '1-2 Days'),
+      assignedDate: new Date().toISOString().split('T')[0],
+      status: 'Pending',
+    };
+    onSubmit(newTask);
+  };
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ width: '100%', maxWidth: 420, background: C.white, borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Assign Work</h3>
+            <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Assign Regular or Special task to {targetStaff}</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Work Category *</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <button type="button" onClick={() => { setWorkType('Regular'); setDuration('Daily Routine'); }}
+                style={{ padding: '10px', borderRadius: 10, border: workType === 'Regular' ? `2px solid ${C.primary}` : `1px solid ${C.border}`, background: workType === 'Regular' ? C.primaryBg : C.white, color: workType === 'Regular' ? C.primary : C.muted, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>
+                🔄 Regular Work
+              </button>
+              <button type="button" onClick={() => { setWorkType('Special'); setDuration('1-2 Days'); }}
+                style={{ padding: '10px', borderRadius: 10, border: workType === 'Special' ? `2px solid #8b5cf6` : `1px solid ${C.border}`, background: workType === 'Special' ? '#f3e8ff' : C.white, color: workType === 'Special' ? '#7c3aed' : C.muted, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>
+                ⭐ Special Work
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Task Title *</label>
+            <input required type="text" placeholder={workType === 'Regular' ? "e.g. Daily Kitchen Deep Clean" : "e.g. Fix Water Tank Leakage"} value={title} onChange={e => setTitle(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+
+          {workType === 'Special' && (
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Duration / Timeline</label>
+              <input type="text" placeholder="e.g. 2 Days / By Tomorrow Evening" value={duration} onChange={e => setDuration(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+          )}
+
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Instructions & Note</label>
+            <textarea placeholder="Add specific instructions for staff member..." value={note} onChange={e => setNote(e.target.value)} style={{ width: '100%', minHeight: 60, padding: '10px 14px', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 14, fontFamily: 'inherit', color: C.text, outline: 'none', boxSizing: 'border-box', resize: 'vertical' }} />
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: 13, background: C.bg, color: C.textSub, border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+            <button type="submit" style={{ flex: 1, padding: 13, background: workType === 'Special' ? '#7c3aed' : C.primary, color: 'white', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Assign Task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── ALL 40 REQUESTED DINE-IN STUDENTS MODAL ────────────────────────────────
+export function AllRequestedStudentsModal({ mealName, onClose }) {
+  const [students, setStudents] = useState(
+    Array.from({ length: 40 }, (_, i) => ({
+      id: i + 1,
+      name: ['Rahul Sharma', 'Anita Roy', 'Karan Mehta', 'Priya Singh', 'Sanjay Kumar', 'Vikram Patel', 'Sneha Kapoor', 'Ravi Gupta', 'Deepak Verma', 'Neha Joshi'][i % 10] + ` (#${i + 1})`,
+      room: 101 + Math.floor(i / 2),
+      bed: (i % 2) + 1,
+      phone: `+91 98765${String(1000 + i).padStart(4, '0')}`,
+      status: i < 30 ? 'Eaten' : i < 37 ? 'Requested' : 'Skipped'
+    }))
+  );
+
+  const toggleStatus = (id, newStatus) => {
+    setStudents(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
+  };
+
+  const eatenCount = students.filter(s => s.status === 'Eaten').length;
+  const reqCount = students.filter(s => s.status === 'Requested').length;
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ width: '100%', maxWidth: 440, background: C.white, borderRadius: 20, padding: 20, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>All 40 Requested Students</h3>
+            <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>{mealName} Dine-In Roster · {eatenCount} Eaten / {reqCount} Pending</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
+        </div>
+
+        {/* Scrollable list */}
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, paddingRight: 4 }}>
+          {students.map(s => (
+            <div key={s.id} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 800, color: C.text, margin: '0 0 2px' }}>{s.name}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 12, color: C.primary, fontWeight: 700 }}>Room {s.room} · Bed {s.bed}</span>
+                  <a href={`tel:${s.phone}`} style={{ fontSize: 12, color: C.success, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                    📞 {s.phone}
+                  </a>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 4 }}>
+                <button onClick={() => toggleStatus(s.id, 'Eaten')}
+                  style={{ padding: '6px 10px', borderRadius: 6, border: 'none', background: s.status === 'Eaten' ? C.success : C.white, color: s.status === 'Eaten' ? 'white' : C.muted, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                  ✓ Eaten
+                </button>
+                <button onClick={() => toggleStatus(s.id, 'Skipped')}
+                  style={{ padding: '6px 10px', borderRadius: 6, border: 'none', background: s.status === 'Skipped' ? C.danger : C.white, color: s.status === 'Skipped' ? 'white' : C.muted, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                  ✗ Skipped
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── CLICKABLE STAFF PROFILE MODAL ──────────────────────────────────────────
+export function StaffProfileModal({ staffName, role, staffId, onClose }) {
+  const info = STAFF_INFO[staffId] || STAFF_INFO.default;
+  const initials = (staffName || 'Staff').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ width: '100%', maxWidth: 420, background: C.white, borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxHeight: '85vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Staff Profile</h3>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
+        </div>
+
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: 'white', fontSize: 24, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', boxShadow: '0 4px 12px rgba(8,145,178,0.3)' }}>
+            {initials}
+          </div>
+          <h2 style={{ margin: '0 0 4px', fontSize: 20, color: C.text }}>{staffName}</h2>
+          <span style={{ fontSize: 12, fontWeight: 800, color: C.primary, background: C.primaryBg, padding: '4px 10px', borderRadius: 20 }}>{role}</span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ background: C.bg, padding: 12, borderRadius: 12, border: `1px solid ${C.border}` }}>
+            <p style={{ margin: '0 0 4px', fontSize: 11, color: C.muted, textTransform: 'uppercase', fontWeight: 700 }}>Employee ID</p>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.text }}>#EMP-{String(1000 + (staffId || 1))}</p>
+          </div>
+
+          <div style={{ background: C.bg, padding: 12, borderRadius: 12, border: `1px solid ${C.border}` }}>
+            <p style={{ margin: '0 0 4px', fontSize: 11, color: C.muted, textTransform: 'uppercase', fontWeight: 700 }}>Attendance & Timings</p>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.text }}>In-Time: {info.inTime} · Out-Time: {info.outTime}</p>
+          </div>
+
+          <div style={{ background: C.bg, padding: 12, borderRadius: 12, border: `1px solid ${C.border}` }}>
+            <p style={{ margin: '0 0 4px', fontSize: 11, color: C.muted, textTransform: 'uppercase', fontWeight: 700 }}>Monthly Salary & Pay Status</p>
+            <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: C.success }}>₹{info.salary.toLocaleString('en-IN')} / month ({info.payStatus})</p>
+          </div>
+
+          <div style={{ background: C.bg, padding: 12, borderRadius: 12, border: `1px solid ${C.border}` }}>
+            <p style={{ margin: '0 0 4px', fontSize: 11, color: C.muted, textTransform: 'uppercase', fontWeight: 700 }}>Phone / Contact</p>
+            <a href="tel:+919876543214" style={{ fontSize: 14, fontWeight: 700, color: C.primary, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              📞 +91 98765 43214 (Tap to Call)
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -620,7 +830,11 @@ export function CookView({ staffId, staffName, onBack }) {
   const [showReqModal, setShowReqModal] = useState(false);
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [showPackedModal, setShowPackedModal] = useState(false);
+  const [showAssignWorkModal, setShowAssignWorkModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAllRequestedModal, setShowAllRequestedModal] = useState(false);
   const [selectedMealForPacked, setSelectedMealForPacked] = useState('Lunch');
+  const [selectedMealFor40, setSelectedMealFor40] = useState('Breakfast');
 
   // Broadcast state
   const [bMeal, setBMeal] = useState('Lunch');
@@ -639,6 +853,13 @@ export function CookView({ staffId, staffName, onBack }) {
     INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
     setShowReqModal(false);
     alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
+  };
+
+  const handleAssignWorkSubmit = (newTask) => {
+    INITIAL_ASSIGNED_STAFF_WORK.unshift(newTask);
+    setAssignedWork(prev => [newTask, ...prev]);
+    setShowAssignWorkModal(false);
+    alert(`New task "${newTask.title}" assigned to ${newTask.staffName}!`);
   };
 
   const handleSendBroadcast = (e) => {
@@ -671,11 +892,15 @@ export function CookView({ staffId, staffName, onBack }) {
           </button>
         </div>
 
-        <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px' }}>DINE-IN</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 8px' }}>
+          <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: 0 }}>DINE-IN</p>
+          <span style={{ fontSize: 11, color: C.primary, fontWeight: 800 }}>Click requested for all 40 list 🔍</span>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
-          <div style={{ background: C.bg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-            <p style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>{data.req}</p>
-            <p style={{ fontSize: 11, color: C.muted, margin: 0, fontWeight: 700 }}>Requested</p>
+          <div onClick={() => { setSelectedMealFor40(mealName); setShowAllRequestedModal(true); }}
+               style={{ background: '#ecfeff', border: `1.5px solid ${C.primary}`, padding: '10px 6px', borderRadius: 8, textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(8,145,178,0.1)' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.primary, margin: 0 }}>{data.req}</p>
+            <p style={{ fontSize: 11, color: C.primary, margin: 0, fontWeight: 800 }}>Requested 🔍</p>
           </div>
           <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
             <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.eaten}</p>

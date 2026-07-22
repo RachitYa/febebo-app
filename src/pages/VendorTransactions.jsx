@@ -709,24 +709,13 @@ export default function VendorTransactions() {
         </div>
 
         <div style={{ padding: 16 }}>
-          {/* Vendor chip + Add Items */}
-          <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 12, background: 'linear-gradient(135deg,#0891b2,#0e7490)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 22, color: 'white' }}>store</span>
-              </div>
-              <div>
-                <p onClick={() => setPurchaseModalVendor(selectedVendor)} style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 2px', cursor: 'pointer', textDecoration: 'underline' }}>{selectedVendor.name}</p>
-                <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{selectedVendor.store}</p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setPurchaseModalVendor(selectedVendor)}
-                style={{ padding: '9px 14px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13, fontFamily: 'inherit', flex: 1, justifyContent: 'center' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
-                Add Items
-              </button>
-            </div>
+          {/* Fully replaced section: Clean full-width Add Items action button */}
+          <div style={{ background: 'linear-gradient(135deg,#0891b2,#0e7490)', borderRadius: 16, padding: '16px 20px', marginBottom: 16, boxShadow: '0 4px 14px rgba(8,145,178,0.3)' }}>
+            <button onClick={() => setPurchaseModalVendor(selectedVendor)}
+              style={{ width: '100%', padding: '14px', background: 'white', border: 'none', borderRadius: 12, color: '#0891b2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontWeight: 800, fontSize: 16, fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>add_shopping_cart</span>
+              Add Items
+            </button>
           </div>
 
           {/* Overall totals */}
@@ -843,6 +832,39 @@ export default function VendorTransactions() {
             style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 12, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
         </div>
 
+        {/* Staff Purchasing Requisitions List (Submitted by Staff, Approved & Rates Filled by Admin) */}
+        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 16, marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: '#0891b2', textTransform: 'uppercase', letterSpacing: 0.5 }}>📋 Staff Purchase Requisitions (Daily List)</p>
+            <span style={{ fontSize: 11, background: '#ecfeff', color: '#0891b2', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>Updated by Staff</span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[
+              { id: 1, item: 'Basmati Rice 25kg', qty: '2 Bags', staff: 'Ramesh Yadav (Cook)', vendor: 'The Local Market', date: 'Today', status: 'Pending Rate' },
+              { id: 2, item: 'Floor Cleaner & Phenyle', qty: '5 Litres', staff: 'Mohan Das (Cleaner)', vendor: 'Sunil Traders', date: 'Today', status: 'Pending Rate' },
+            ].map(req => (
+              <div key={req.id} style={{ background: 'white', border: '1px solid #cbd5e1', borderRadius: 12, padding: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#0f172a' }}>{req.item}</h4>
+                    <p style={{ margin: '2px 0 0', fontSize: 12, color: '#64748b' }}>Qty: <b>{req.qty}</b> · Requested by: {req.staff}</p>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 800, background: '#fffbeb', color: '#d97706', padding: '2px 6px', borderRadius: 6 }}>{req.status}</span>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center' }}>
+                  <input type="number" placeholder="Enter Rate (₹)" style={{ flex: 1, padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 13, outline: 'none' }} />
+                  <button onClick={() => alert(`Rate saved for ${req.item}! Converted to Vendor Transaction line item.`)}
+                    style={{ padding: '8px 14px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    Approve & Save Rate
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Category tabs */}
         <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 12, marginBottom: 16, msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
           {categories.map(cat => (
@@ -866,26 +888,18 @@ export default function VendorTransactions() {
           ) : (
             filtered.map(v => (
               <div key={v.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-                <div onClick={() => setSelectedVendor(v)} style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }}>
-                  <div style={{ flex: 1 }}>
-                    <p onClick={(e) => { e.stopPropagation(); setPurchaseModalVendor(v); }} style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px', cursor: 'pointer', textDecoration: 'underline' }}>{v.name}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>store</span>
-                      <span style={{ fontSize: 13, color: '#64748b' }}>{v.store}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>phone</span>
-                      <span style={{ fontSize: 13, color: '#64748b' }}>{v.phone}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0891b2' }}>currency_rupee</span>
-                      <span style={{ fontSize: 12, color: '#94a3b8' }}>UPI: {v.upi}</span>
-                    </div>
+                <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: '#0891b2', background: '#ecfeff', padding: '3px 8px', borderRadius: 6, display: 'inline-block', marginBottom: 4 }}>
+                      {v.category} · {v.store}
+                    </span>
+                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 16, color: '#0f172a', margin: 0 }}>₹ {v.amount}</p>
                   </div>
-                  <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
-                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 4px' }}>₹ {v.amount}</p>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: v.status === 'Paid' ? '#059669' : '#e11d48', background: v.status === 'Paid' ? '#dcfce7' : '#fee2e2', padding: '3px 10px', borderRadius: 20 }}>{v.status}</span>
-                  </div>
+                  <button onClick={() => setPurchaseModalVendor(v)}
+                    style={{ padding: '10px 16px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 14, fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(8,145,178,0.25)' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
+                    Add Items
+                  </button>
                 </div>
               </div>
             ))

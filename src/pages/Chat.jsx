@@ -298,7 +298,9 @@ export default function Chat() {
   // Reminder modal state
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [reminderTarget, setReminderTarget] = useState(null);
-  const [reminderNote, setReminderNote] = useState('');
+  const [reminderDate, setReminderDate] = useState(new Date().toISOString().split('T')[0]);
+  const [reminderTime, setReminderTime] = useState('17:00');
+  const [reminderReason, setReminderReason] = useState('');
 
   const bottomRef = useRef(null);
 
@@ -353,14 +355,80 @@ export default function Chat() {
   const handleSetReminder = (e) => {
     e.preventDefault();
     if (!reminderTarget) return;
-    setContacts(prev => prev.map(c => c.id === reminderTarget.id ? { ...c, isPinned: true, reminder: reminderNote || 'Reconnect Today 5:00 PM' } : c));
+    const reminderStr = `${reminderReason ? `${reminderReason} — ` : ''}${reminderDate} ${reminderTime}`;
+    setContacts(prev => prev.map(c => c.id === reminderTarget.id ? { ...c, isPinned: true, reminder: reminderStr } : c));
+    if (activeContact && activeContact.id === reminderTarget.id) {
+      setActiveContact(prev => ({ ...prev, isPinned: true, reminder: reminderStr }));
+    }
     setShowReminderModal(false);
-    setReminderNote('');
-    alert(`Reconnect reminder set for ${reminderTarget.name}! This chat will appear at the top section.`);
+    setReminderReason('');
+    alert(`Reconnect reminder set for ${reminderTarget.name} on ${reminderDate} at ${reminderTime}! Chat pinned to top section.`);
   };
 
   const handleClearReminder = (id) => {
     setContacts(prev => prev.map(c => c.id === id ? { ...c, isPinned: false, reminder: null } : c));
+    if (activeContact && activeContact.id === id) {
+      setActiveContact(prev => ({ ...prev, isPinned: false, reminder: null }));
+    }
+  };
+
+  const renderReminderModal = () => {
+    if (!showReminderModal || !reminderTarget) return null;
+    return (
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+        <div style={{ width: '100%', maxWidth: 420, background: 'white', borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>Set Reconnect Reminder</h3>
+              <p style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>Target: <b>{reminderTarget.name}</b> ({reminderTarget.phone || 'Contact'})</p>
+            </div>
+            <button onClick={() => setShowReminderModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, color: '#64748b', cursor: 'pointer', padding: 0 }}>&times;</button>
+          </div>
+
+          <form onSubmit={handleSetReminder} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Date *</label>
+                <input required type="date" value={reminderDate} onChange={e => setReminderDate(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: 10, fontSize: 14, fontFamily: 'inherit', color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Time *</label>
+                <input required type="time" value={reminderTime} onChange={e => setReminderTime(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: 10, fontSize: 14, fontFamily: 'inherit', color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Reason / Note for Reconnect</label>
+              <input type="text" placeholder="e.g. Call back for AC room availability & advance payment" value={reminderReason} onChange={e => setReminderReason(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: '1px solid #cbd5e1', borderRadius: 10, fontSize: 14, fontFamily: 'inherit', color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {[
+                { label: 'In 2 Hours', time: '19:00', reason: 'Quick Call Back' },
+                { label: 'Today 5 PM', time: '17:00', reason: 'Confirm Room Booking' },
+                { label: 'Tomorrow 10 AM', dateOffset: 1, time: '10:00', reason: 'Follow Up Visit' },
+              ].map(preset => (
+                <button type="button" key={preset.label} onClick={() => {
+                  if (preset.dateOffset) {
+                    const d = new Date(); d.setDate(d.getDate() + preset.dateOffset);
+                    setReminderDate(d.toISOString().split('T')[0]);
+                  }
+                  setReminderTime(preset.time);
+                  setReminderReason(preset.reason);
+                }} style={{ padding: '6px 10px', background: '#ecfeff', border: `1px solid ${cyan}`, borderRadius: 8, fontSize: 12, color: cyan, fontWeight: 700, cursor: 'pointer' }}>
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+              <button type="button" onClick={() => setShowReminderModal(false)} style={{ flex: 1, padding: 12, background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+              <button type="submit" style={{ flex: 1, padding: 12, background: cyan, color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Set & Pin to Top ⏰</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
   };
 
   const getLastMsg = (contactId) => {
@@ -572,6 +640,8 @@ export default function Chat() {
           onSendImage={sendImage} onSendVideo={sendVideo}
           onSendFile={sendFile} onSendLocation={sendLocation}
         />
+
+        {renderReminderModal()}
       </div>
     );
   }
@@ -652,14 +722,22 @@ export default function Chat() {
                     </div>
                     {lastMsg && <span style={{ fontSize: 10, color: '#94a3b8' }}>{lastMsg.time}</span>}
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
-                    <p style={{ margin: 0, fontSize: 12, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
-                      {contact.reminder ? `⏰ ${contact.reminder}` : lastMsgPreview(lastMsg)}
-                    </p>
-                    <span style={{ fontSize: 11, color: contact.role === 'enquiry' ? '#ec4899' : contact.role === 'student' ? '#6366f1' : '#8b5cf6', background: contact.role === 'enquiry' ? '#fce7f3' : contact.role === 'student' ? '#eef2ff' : '#f5f3ff', padding: '2px 7px', borderRadius: 6, fontWeight: 600 }}>
-                      {contact.role === 'enquiry' ? 'Enquiry' : contact.role === 'student' ? `Rm ${contact.room}` : contact.dept}
-                    </span>
-                  </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+                      <p style={{ margin: 0, fontSize: 12, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+                        {contact.reminder ? `⏰ ${contact.reminder}` : lastMsgPreview(lastMsg)}
+                      </p>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <button onClick={(e) => { e.stopPropagation(); setReminderTarget(contact); setShowReminderModal(true); }}
+                          style={{ background: contact.reminder ? '#fef3c7' : '#ecfeff', border: `1px solid ${contact.reminder ? '#fde68a' : cyan}`, color: contact.reminder ? '#b45309' : cyan, borderRadius: 8, padding: '3px 8px', fontSize: 11, fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>alarm</span>
+                          {contact.reminder ? 'Edit' : '+ Reminder'}
+                        </button>
+                        <span style={{ fontSize: 11, color: contact.role === 'enquiry' ? '#ec4899' : contact.role === 'student' ? '#6366f1' : '#8b5cf6', background: contact.role === 'enquiry' ? '#fce7f3' : contact.role === 'student' ? '#eef2ff' : '#f5f3ff', padding: '2px 7px', borderRadius: 6, fontWeight: 600 }}>
+                          {contact.role === 'enquiry' ? 'Enquiry' : contact.role === 'student' ? `Rm ${contact.room}` : contact.dept}
+                        </span>
+                      </div>
+                    </div>
                 </div>
               </div>
             );
@@ -671,37 +749,7 @@ export default function Chat() {
       </div>
 
       {/* Set Reconnect Reminder Modal */}
-      {showReminderModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ width: '100%', maxWidth: 400, background: 'white', borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div>
-                <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>Set Reconnect Reminder</h3>
-                <p style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>For {reminderTarget?.name}</p>
-              </div>
-              <button onClick={() => setShowReminderModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, color: '#64748b', cursor: 'pointer', padding: 0 }}>&times;</button>
-            </div>
-
-            <form onSubmit={handleSetReminder} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Reminder Time / Note</label>
-                <input required type="text" placeholder="e.g. Reconnect Today 5:00 PM to confirm booking" value={reminderNote} onChange={e => setReminderNote(e.target.value)} style={{ width: '100%', padding: '12px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 15, fontFamily: 'inherit', color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {['Today 5:00 PM', 'Tomorrow 10:00 AM', 'In 2 Hours'].map(preset => (
-                  <button type="button" key={preset} onClick={() => setReminderNote(`Reconnect ${preset}`)} style={{ padding: '6px 10px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12, color: '#334155', fontWeight: 700, cursor: 'pointer' }}>{preset}</button>
-                ))}
-              </div>
-
-              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                <button type="button" onClick={() => setShowReminderModal(false)} style={{ flex: 1, padding: 12, background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ flex: 1, padding: 12, background: cyan, color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Pin to Top ⏰</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {renderReminderModal()}
     </div>
   );
 }
