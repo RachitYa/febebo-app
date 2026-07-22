@@ -539,44 +539,35 @@ export function StaffProfileModal({ staffName, role, staffId, onClose }) {
   );
 }
 
-export function AssignedWorkSection({ staffName, role, assignedTasks, onUpdateTaskStatus }) {
+export function AssignedWorkSection({ staffName, role, assignedTasks }) {
   const tasks = assignedTasks || [];
   if (tasks.length === 0) return null;
 
   return (
     <div style={{ marginBottom: 20 }}>
-      <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 1, textTransform: 'uppercase', margin: '20px 0 10px 0' }}>📋 Admin Assigned Work</p>
+      <p style={{ fontSize: 12, fontWeight: 800, color: C.muted, letterSpacing: 0.8, textTransform: 'uppercase', margin: '16px 0 10px 0' }}>📋 Admin Assigned Work</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {tasks.map(t => (
-          <Card key={t.id} style={{ borderLeft: t.type === 'Special' ? '4px solid #8b5cf6' : '4px solid #0891b2', padding: 16 }}>
+          <div key={t.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
               <div>
-                <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: t.type === 'Special' ? '#f3e8ff' : '#ecfeff', color: t.type === 'Special' ? '#7c3aed' : '#0891b2', textTransform: 'uppercase', display: 'inline-block', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 9px', borderRadius: 20, background: t.type === 'Special' ? '#f3e8ff' : '#ecfeff', color: t.type === 'Special' ? '#7c3aed' : C.primary, textTransform: 'uppercase', display: 'inline-block', marginBottom: 6 }}>
                   {t.type === 'Special' ? '⭐ Special Work' : '🔄 Regular Work'}
                 </span>
-                <h4 style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.3 }}>{t.title}</h4>
+                <h4 style={{ fontSize: 15, fontWeight: 800, color: C.text, margin: 0, lineHeight: 1.3 }}>{t.title}</h4>
               </div>
-              <span style={{ fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 12, background: t.status === 'Completed' ? C.successBg : t.status === 'In Progress' ? C.indigoBg : C.warnBg, color: t.status === 'Completed' ? C.success : t.status === 'In Progress' ? C.indigo : C.warn }}>
+              <span style={{ fontSize: 12, fontWeight: 800, padding: '4px 10px', borderRadius: 20, background: t.status === 'Completed' ? C.successBg : t.status === 'In Progress' ? C.indigoBg : '#fffbeb', color: t.status === 'Completed' ? C.success : t.status === 'In Progress' ? C.indigo : '#d97706' }}>
                 {t.status}
               </span>
             </div>
 
-            {t.note && <p style={{ fontSize: 13, color: C.textSub, margin: '0 0 10px', background: C.bg, padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>📌 {t.note}</p>}
-            <p style={{ fontSize: 12, color: C.muted, margin: '0 0 12px' }}>⏳ Duration: {t.duration} · Assigned: {t.assignedDate}</p>
-
-            {t.status !== 'Completed' && (
-              <div style={{ display: 'flex', gap: 8 }}>
-                {t.status === 'Pending' && (
-                  <button onClick={() => onUpdateTaskStatus(t.id, 'In Progress')} style={{ flex: 1, padding: '8px', background: C.indigoBg, border: `1px solid ${C.indigo}`, borderRadius: 8, color: C.indigo, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                    Start Work
-                  </button>
-                )}
-                <button onClick={() => onUpdateTaskStatus(t.id, 'Completed')} style={{ flex: 1, padding: '8px', background: C.successBg, border: `1px solid ${C.success}`, borderRadius: 8, color: C.success, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                  Mark Completed ✅
-                </button>
-              </div>
+            {t.note && (
+              <p style={{ fontSize: 13, color: C.textSub, margin: '8px 0', background: C.bg, padding: '8px 12px', borderRadius: 10, border: `1px solid ${C.border}` }}>
+                📌 {t.note}
+              </p>
             )}
-          </Card>
+            <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>⏳ Duration: {t.duration} · Assigned: {t.assignedDate}</p>
+          </div>
         ))}
       </div>
     </div>
@@ -1331,7 +1322,48 @@ export function CleanerView({ staffId, staffName, onBack }) {
         {activeTab === 'Staff Info' ? <GenericStaffInfo staffId={staffId} /> : (
           <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
             {/* Admin Assigned Tasks */}
-            <AssignedWorkSection staffName={staffName} role="cleaner" assignedTasks={staffTasks} onUpdateTaskStatus={handleUpdateStatus} />
+            <AssignedWorkSection staffName={staffName} role="cleaner" assignedTasks={staffTasks} />
+
+            {/* Student Preferred Cleaning Time Slots */}
+            <div style={{ background: C.white, borderRadius: 16, border: `1px solid ${C.border}`, padding: 16, marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div>
+                  <h4 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 18, color: C.primary }}>schedule</span>
+                    Student Preferred Cleaning Slots
+                  </h4>
+                  <p style={{ fontSize: 11, color: C.muted, margin: '2px 0 0' }}>Time slots requested by students for entry</p>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 800, background: C.primaryBg, color: C.primary, padding: '3px 8px', borderRadius: 20 }}>
+                  5 Slots Today
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { id: 1, room: '101', student: 'Arjun Mehta', slot: '10:00 AM - 11:00 AM', type: 'Full Room Cleaning', status: 'Cleaned' },
+                  { id: 2, room: '102', student: 'Priya Sharma', slot: '11:00 AM - 12:00 PM', type: 'Dusting & Mopping', status: 'Pending' },
+                  { id: 3, room: '105', student: 'Ankit Kumar', slot: '02:00 PM - 03:00 PM', type: 'Bathroom Sanitize', status: 'Pending' },
+                  { id: 4, room: '202', student: 'Sneha Kapoor', slot: '04:00 PM - 05:00 PM', type: 'Full Room Cleaning', status: 'Pending' },
+                  { id: 5, room: '205', student: 'Rahul Verma', slot: '05:30 PM - 06:30 PM', type: 'Dusting & Mopping', status: 'Pending' },
+                ].map(slot => (
+                  <div key={slot.id} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>Rm {slot.room}</span>
+                        <span style={{ fontSize: 12, color: C.textSub, fontWeight: 600 }}>({slot.student})</span>
+                      </div>
+                      <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>
+                        ⏰ <b>{slot.slot}</b> · {slot.type}
+                      </p>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: slot.status === 'Cleaned' ? C.successBg : '#fffbeb', color: slot.status === 'Cleaned' ? C.success : '#d97706' }}>
+                      {slot.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
             {/* Time Filter Toggle */}
             <div style={{ display: 'flex', background: '#e2e8f0', borderRadius: 12, padding: 4, marginBottom: 20 }}>
               {['day', 'week', 'month'].map(t => (
