@@ -384,6 +384,8 @@ export default function Chat() {
 
   const openReminderModal = (target) => {
     setReminderTarget(target);
+    setActiveContact(target);
+    setView('chat');
     if (target.reminder) {
       setReminderReason(target.reminder);
     } else {
@@ -397,9 +399,8 @@ export default function Chat() {
     if (!reminderTarget) return;
     const reminderStr = `${reminderReason ? `${reminderReason} — ` : ''}${reminderDate} ${reminderTime}`;
     setContacts(prev => prev.map(c => c.id === reminderTarget.id ? { ...c, isPinned: true, reminder: reminderStr } : c));
-    if (activeContact && activeContact.id === reminderTarget.id) {
-      setActiveContact(prev => ({ ...prev, isPinned: true, reminder: reminderStr }));
-    }
+    setActiveContact({ ...reminderTarget, isPinned: true, reminder: reminderStr });
+    setView('chat');
     setShowReminderModal(false);
     setReminderReason('');
   };
@@ -635,6 +636,8 @@ export default function Chat() {
           onSendImage={sendImage} onSendVideo={sendVideo}
           onSendFile={sendFile} onSendLocation={sendLocation}
         />
+
+        {renderReminderModal()}
       </div>
     );
   }
