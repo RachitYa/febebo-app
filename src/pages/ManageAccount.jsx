@@ -783,7 +783,7 @@ export default function ManageAccount() {
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Staff..." style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #f43f5e', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {STAFF_ACCOUNT_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
+              {STAFF_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
                 <div key={u.id} onClick={() => setSelectedStaff(u)} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 14, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
                   <img src={u.img} alt={u.name} style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 5, paddingTop: 2 }}>
