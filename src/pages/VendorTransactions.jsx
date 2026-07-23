@@ -342,6 +342,11 @@ export default function VendorTransactions() {
   
   const [showAnalytics, setShowAnalytics]       = useState(false);
   const [analyticsPeriod, setAnalyticsPeriod]   = useState('Monthly'); // 'Weekly', 'Monthly', 'Yearly'
+  const [showStaffReqModal, setShowStaffReqModal] = useState(false);
+  const [staffRequests, setStaffRequests]       = useState([
+    { id: 1, item: 'Basmati Rice 25kg', qty: '2 Bags', staff: 'Ramesh Yadav (Cook)', vendor: 'The Local Market', date: 'Today', status: 'Pending Rate', rate: '' },
+    { id: 2, item: 'Floor Cleaner & Phenyle', qty: '5 Litres', staff: 'Mohan Das (Cleaner)', vendor: 'Sunil Traders', date: 'Today', status: 'Pending Rate', rate: '' },
+  ]);
 
   const handleAddCategory = () => {
     const newCat = window.prompt('Enter new category name:');
@@ -814,8 +819,12 @@ export default function VendorTransactions() {
 
       <div style={{ padding: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#64748b', margin: 0 }}>Payment History</p>
-          <button onClick={() => setFilterOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid #cbd5e1', borderRadius: 20, padding: '6px 12px', fontSize: 13, fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}>
+          <button onClick={() => setShowStaffReqModal(true)}
+            style={{ background: '#ecfeff', border: '1px solid #a5f3fc', borderRadius: 12, padding: '8px 14px', color: '#0891b2', fontSize: 13, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', boxShadow: '0 2px 6px rgba(8,145,178,0.1)' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>assignment</span>
+            Staff Requests ({staffRequests.length})
+          </button>
+          <button onClick={() => setFilterOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid #cbd5e1', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}>
             {filterStatus} <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#0891b2' }}>expand_more</span>
           </button>
         </div>
@@ -830,39 +839,6 @@ export default function VendorTransactions() {
           <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Vendor"
             style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 12, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
-        </div>
-
-        {/* Staff Purchasing Requisitions List (Submitted by Staff, Approved & Rates Filled by Admin) */}
-        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 16, marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: '#0891b2', textTransform: 'uppercase', letterSpacing: 0.5 }}>📋 Staff Purchase Requisitions (Daily List)</p>
-            <span style={{ fontSize: 11, background: '#ecfeff', color: '#0891b2', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>Updated by Staff</span>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {[
-              { id: 1, item: 'Basmati Rice 25kg', qty: '2 Bags', staff: 'Ramesh Yadav (Cook)', vendor: 'The Local Market', date: 'Today', status: 'Pending Rate' },
-              { id: 2, item: 'Floor Cleaner & Phenyle', qty: '5 Litres', staff: 'Mohan Das (Cleaner)', vendor: 'Sunil Traders', date: 'Today', status: 'Pending Rate' },
-            ].map(req => (
-              <div key={req.id} style={{ background: 'white', border: '1px solid #cbd5e1', borderRadius: 12, padding: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                  <div>
-                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#0f172a' }}>{req.item}</h4>
-                    <p style={{ margin: '2px 0 0', fontSize: 12, color: '#64748b' }}>Qty: <b>{req.qty}</b> · Requested by: {req.staff}</p>
-                  </div>
-                  <span style={{ fontSize: 11, fontWeight: 800, background: '#fffbeb', color: '#d97706', padding: '2px 6px', borderRadius: 6 }}>{req.status}</span>
-                </div>
-
-                <div style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center' }}>
-                  <input type="number" placeholder="Enter Rate (₹)" style={{ flex: 1, padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 13, outline: 'none' }} />
-                  <button onClick={() => alert(`Rate saved for ${req.item}! Converted to Vendor Transaction line item.`)}
-                    style={{ padding: '8px 14px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                    Approve & Save Rate
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Category tabs */}
@@ -887,15 +863,17 @@ export default function VendorTransactions() {
             </div>
           ) : (
             filtered.map(v => (
-              <div key={v.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div key={v.id} onClick={() => setSelectedVendor(v)}
+                style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer', transition: 'all 0.15s' }}>
                 <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <span style={{ fontSize: 12, fontWeight: 800, color: '#0891b2', background: '#ecfeff', padding: '3px 8px', borderRadius: 6, display: 'inline-block', marginBottom: 4 }}>
                       {v.category} · {v.store}
                     </span>
-                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 16, color: '#0f172a', margin: 0 }}>₹ {v.amount}</p>
+                    <h3 style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 16, color: '#0f172a', margin: '2px 0 4px' }}>{v.name}</h3>
+                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 14, color: '#475569', margin: 0 }}>₹ {v.amount}</p>
                   </div>
-                  <button onClick={() => setPurchaseModalVendor(v)}
+                  <button onClick={(e) => { e.stopPropagation(); setPurchaseModalVendor(v); }}
                     style={{ padding: '10px 16px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 14, fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(8,145,178,0.25)' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
                     Add Items
@@ -932,6 +910,54 @@ export default function VendorTransactions() {
             <div style={{ display: 'flex', gap: 12 }}>
               <button onClick={() => setFilterOpen(false)} style={{ flex: 1, padding: 14, background: 'white', border: '1.5px solid #cbd5e1', borderRadius: 12, fontSize: 15, fontWeight: 700, color: '#475569', cursor: 'pointer' }}>Cancel</button>
               <button onClick={() => setFilterOpen(false)} style={{ flex: 1, padding: 14, background: '#0891b2', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, color: 'white', cursor: 'pointer' }}>Apply</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Staff Requisitions Modal */}
+      {showStaffReqModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', zIndex: 70, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, backdropFilter: 'blur(3px)' }}
+          onClick={e => { if (e.target === e.currentTarget) setShowStaffReqModal(false); }}>
+          <div style={{ background: 'white', width: '100%', maxWidth: 440, borderRadius: 20, padding: 22, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>Staff Item Requisitions</h3>
+                <p style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>Items demanded by hostel staff</p>
+              </div>
+              <button onClick={() => setShowStaffReqModal(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: 8, padding: 6, cursor: 'pointer', display: 'flex' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#64748b' }}>close</span>
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: '60vh', overflowY: 'auto' }}>
+              {staffRequests.map((req, idx) => (
+                <div key={req.id} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 14, padding: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#0f172a' }}>{req.item}</h4>
+                      <p style={{ margin: '2px 0 0', fontSize: 12, color: '#64748b' }}>Qty: <b>{req.qty}</b> · {req.staff}</p>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 800, background: '#fffbeb', color: '#d97706', padding: '2px 8px', borderRadius: 6 }}>{req.status}</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center' }}>
+                    <input type="number" placeholder="Enter Rate (₹)" value={req.rate || ''} onChange={e => {
+                      const val = e.target.value;
+                      setStaffRequests(prev => prev.map((item, i) => i === idx ? { ...item, rate: val } : item));
+                    }} style={{ flex: 1, padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 13, outline: 'none' }} />
+                    <button onClick={() => {
+                      alert(`Rate ₹${req.rate || 0} saved for ${req.item}! Approved & sent to vendor.`);
+                      setStaffRequests(prev => prev.filter((_, i) => i !== idx));
+                    }} style={{ padding: '8px 14px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Approve & Save Rate
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {staffRequests.length === 0 && (
+                <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14, padding: 20 }}>No pending staff requisitions!</p>
+              )}
             </div>
           </div>
         </div>
