@@ -189,7 +189,7 @@ export default function Login() {
             <span style={{ fontSize: 14, color: '#64748b' }}>
               {isLogin ? "Don't have an account? " : "Already have an account? "}
             </span>
-            <button type="button" onClick={switchMode} style={{ background: 'none', border: 'none', color: cyan, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button type="button" onClick={switchMode} style={{ background: 'none', border: 'none', color cyan, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
               {isLogin ? 'Sign Up' : 'Sign In'}
             </button>
           </div>
