@@ -873,11 +873,7 @@ export default function VendorTransactions() {
                     <h3 style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 16, color: '#0f172a', margin: '2px 0 4px' }}>{v.name}</h3>
                     <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 14, color: '#475569', margin: 0 }}>₹ {v.amount}</p>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); setPurchaseModalVendor(v); }}
-                    style={{ padding: '10px 16px', background: '#0891b2', border: 'none', borderRadius: 10, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 14, fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(8,145,178,0.25)' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_shopping_cart</span>
-                    Add Items
-                  </button>
+                  <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 22 }}>chevron_right</span>
                 </div>
               </div>
             ))
