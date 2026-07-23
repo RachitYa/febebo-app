@@ -109,11 +109,6 @@ function UserListView({ onBack, onAdd, onSelect }) {
                   </div>
                 </div>
               </div>
-              <button onClick={(e) => { e.stopPropagation(); setCollectModalData({ name: u.name, room: `Room ${u.room}`, amount: 8000, month: 'June 2025' }); }}
-                style={{ padding: '8px 12px', background: cyan, color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(14,165,233,0.2)' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
-                Mark Paid
-              </button>
             </div>
           ))}
         </div>
