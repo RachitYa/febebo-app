@@ -10,7 +10,6 @@ const MODULES = [
   { id: 'staff-account', label: 'Staff\nAccount',        icon: 'badge',                  gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)' },
   { id: 'lease-account', label: 'Lease\nAccount',        icon: 'receipt_long',           gradient: 'linear-gradient(135deg,#64748b,#475569)' },
   { id: 'petty-cash',    label: 'Petty\nCash',           icon: 'payments',               gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
-  { id: 'meter-reading', label: 'Meter\nReading',        icon: 'electric_bolt',          gradient: 'linear-gradient(135deg,#7c3aed,#6d28d9)' },
 ];
 
 const RENT_DATA = {
