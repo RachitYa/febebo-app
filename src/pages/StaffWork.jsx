@@ -952,7 +952,7 @@ export function CookView({ staffId, staffName, onBack }) {
   const [packedRequests, setPackedRequests] = useState(INITIAL_PACKED_FOOD_REQUESTS);
   const [broadcasts, setBroadcasts] = useState(INITIAL_FOOD_BROADCASTS);
 
-  const [showReqModal, setShowReqModal] = useState(false);
+  const [showDemandsModal, setShowDemandsModal] = useState(false);
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [showPackedModal, setShowPackedModal] = useState(false);
   const [showAssignWorkModal, setShowAssignWorkModal] = useState(false);
