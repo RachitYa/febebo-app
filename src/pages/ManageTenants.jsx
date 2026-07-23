@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DetailedReceiptModal, { CollectPaymentModal } from '../components/DetailedReceiptModal';
 
 const BASE = { backgroundColor: '#f8fafc', minHeight: '100vh', position: 'relative', paddingBottom: 80, fontFamily: "'Hanken Grotesk', sans-serif" };
 const cyan = '#0ea5e9';
@@ -57,6 +58,8 @@ export default function ManageTenants() {
 function UserListView({ onBack, onAdd, onSelect }) {
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState('Upcoming User');
+  const [activeReceipt, setActiveReceipt] = useState(null);
+  const [collectModalData, setCollectModalData] = useState(null);
 
   const TABS = [
     { id: 'Upcoming User', label: 'Upcoming\nUser', icon: 'person_add' },
@@ -91,23 +94,26 @@ function UserListView({ onBack, onAdd, onSelect }) {
         {/* List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {MOCK_USERS.filter(u => u.type === tab && u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
-            <div key={u.id} onClick={() => onSelect(u)} style={{ background: 'white', borderRadius: 12, padding: 12, display: 'flex', gap: 12, border: '1px solid #f1f5f9', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-              <img src={u.image} alt={u.name} style={{ width: 64, height: 64, borderRadius: 8, objectFit: 'cover' }} />
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
-                <p style={{ fontWeight: 600, fontSize: 14, color: '#0f172a', margin: 0 }}>{u.name}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>badge</span>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>{u.studentId}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>call</span>
-                  <a href={`tel:${u.phone}`} style={{ fontSize: 12, color: '#64748b', textDecoration: 'none' }}>{u.phone}</a>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>calendar_month</span>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>{u.date}</span>
+            <div key={u.id} onClick={() => onSelect(u)} style={{ background: 'white', borderRadius: 14, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, border: '1px solid #f1f5f9', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', flex: 1 }}>
+                <img src={u.image} alt={u.name} style={{ width: 64, height: 64, borderRadius: 8, objectFit: 'cover' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
+                  <p style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', margin: 0 }}>{u.name}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>badge</span>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>{u.studentId} · Room {u.room}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: cyan }}>call</span>
+                    <a href={`tel:${u.phone}`} style={{ fontSize: 12, color: '#64748b', textDecoration: 'none' }}>{u.phone}</a>
+                  </div>
                 </div>
               </div>
+              <button onClick={(e) => { e.stopPropagation(); setCollectModalData({ name: u.name, room: `Room ${u.room}`, amount: 8000, month: 'June 2025' }); }}
+                style={{ padding: '8px 12px', background: cyan, color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(14,165,233,0.2)' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
+                Mark Paid
+              </button>
             </div>
           ))}
         </div>
@@ -117,6 +123,21 @@ function UserListView({ onBack, onAdd, onSelect }) {
           <span className="material-symbols-outlined" style={{ fontSize: 28 }}>add</span>
         </button>
       </div>
+
+      {activeReceipt && (
+        <DetailedReceiptModal receipt={activeReceipt} onClose={() => setActiveReceipt(null)} />
+      )}
+
+      {collectModalData && (
+        <CollectPaymentModal
+          dueData={collectModalData}
+          onClose={() => setCollectModalData(null)}
+          onConfirm={(newReceipt) => {
+            setCollectModalData(null);
+            setActiveReceipt(newReceipt);
+          }}
+        />
+      )}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import DetailedReceiptModal, { CollectPaymentModal } from '../components/DetailedReceiptModal';
 
 const BASE = { backgroundColor: '#f8fafc', minHeight: '100vh', position: 'relative', paddingBottom: 80, fontFamily: "'Hanken Grotesk', sans-serif" };
 const cyan = '#0ea5e9';
@@ -652,7 +653,7 @@ function StudentStaffWorkView({ profile, roomNo, onBack }) {
 }
 
 // ─── MAIN DETAILS VIEW ────────────────────────────────────
-function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subView, setSubView }) {
+function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, onCollectPayment, subView, setSubView }) {
   const profile = USER_PROFILES[user?.id] || DEFAULT_PROFILE;
   const [damages, setDamages] = useState([{ id: 1, desc: 'Broken Chair Hinge', cost: 350 }]);
   const [damageInput, setDamageInput] = useState('');
@@ -721,6 +722,21 @@ function UserDetailsView({ user, onBack, onReceipt, onHistory, onMoveOut, subVie
       </div>
 
       <div style={{ padding: 16 }}>
+        {/* Mark as Paid / Collect Payment Button */}
+        <div style={{ marginBottom: 16, background: 'white', border: `1.5px solid ${cyan}`, borderRadius: 14, padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 8px rgba(14,165,233,0.12)' }}>
+          <div>
+            <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 800, color: '#0f172a' }}>Payment Dues & Rent</p>
+            <p style={{ margin: 0, fontSize: 12, color: pending > 0 ? '#dc2626' : '#059669', fontWeight: 700 }}>
+              {pending > 0 ? `Outstanding: ₹${pending.toLocaleString()}` : `Monthly Rent: ₹${rent.toLocaleString()}`}
+            </p>
+          </div>
+          <button onClick={() => onCollectPayment && onCollectPayment(pending > 0 ? pending : rent)}
+            style={{ background: cyan, color: 'white', border: 'none', borderRadius: 10, padding: '10px 14px', fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 3px 8px rgba(14,165,233,0.3)' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>payments</span>
+            Mark as Paid
+          </button>
+        </div>
+
         {/* Put on Notice Period Admin Button for Current Users */}
         {profile.type === 'current' && (
           <div style={{ marginBottom: 16, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 12, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1182,8 +1198,12 @@ export default function UserProfile() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = location.state?.user || { id: 1, name: 'Rajeev Kumar', phone: '+91 9234567681', room: 15, bed: 3 };
+  const profile = USER_PROFILES[user?.id] || DEFAULT_PROFILE;
+
   const [view, setView]       = useState('details');
   const [subView, setSubView] = useState(null);
+  const [activeReceipt, setActiveReceipt] = useState(null);
+  const [collectModalData, setCollectModalData] = useState(null);
 
   const goBack = () => {
     if (subView) { setSubView(null); return; }
@@ -1193,9 +1213,35 @@ export default function UserProfile() {
 
   return (
     <div style={BASE}>
-      {view === 'details' && <UserDetailsView user={user} onBack={goBack} onReceipt={() => setView('receipt')} onHistory={() => setView('history')} onMoveOut={() => navigate('/move-out', { state: { user } })} subView={subView} setSubView={setSubView} />}
+      {view === 'details' && (
+        <UserDetailsView
+          user={user}
+          onBack={goBack}
+          onReceipt={() => setView('receipt')}
+          onHistory={() => setView('history')}
+          onMoveOut={() => navigate('/move-out', { state: { user } })}
+          onCollectPayment={(amt) => setCollectModalData({ name: profile.name, room: `Room ${profile.roomNo}`, amount: amt || profile.rent, month: 'June 2025' })}
+          subView={subView}
+          setSubView={setSubView}
+        />
+      )}
       {view === 'history' && <PaymentHistoryView onBack={goBack} />}
       {view === 'receipt' && <ReceiptView user={user} onBack={goBack} />}
+
+      {activeReceipt && (
+        <DetailedReceiptModal receipt={activeReceipt} onClose={() => setActiveReceipt(null)} />
+      )}
+
+      {collectModalData && (
+        <CollectPaymentModal
+          dueData={collectModalData}
+          onClose={() => setCollectModalData(null)}
+          onConfirm={(newReceipt) => {
+            setCollectModalData(null);
+            setActiveReceipt(newReceipt);
+          }}
+        />
+      )}
     </div>
   );
 }

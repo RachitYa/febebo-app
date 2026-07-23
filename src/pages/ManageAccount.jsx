@@ -606,20 +606,24 @@ export default function ManageAccount() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {USER_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
-              <div key={u.id} onClick={() => setSelectedUser(u)} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 14, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
-                <img src={u.img} alt={u.name} style={{ width: 90, height: 90, borderRadius: 12, objectFit: 'cover' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, paddingTop: 4 }}>
-                  <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: 0 }}>{u.name}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>door_front</span> Room No: {u.room}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>bed</span> Bed No: {u.bed}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>phone_in_talk</span> {u.phone}
+              <div key={u.id} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div onClick={() => setSelectedUser(u)} style={{ display: 'flex', gap: 14, cursor: 'pointer', flex: 1 }}>
+                  <img src={u.img} alt={u.name} style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 2 }}>
+                    <p style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', margin: 0 }}>{u.name}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#38bdf8' }}>door_front</span> Room {u.room} · Bed {u.bed}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#38bdf8' }}>phone</span> {u.phone}
+                    </div>
                   </div>
                 </div>
+                <button onClick={() => setCollectModalData({ name: u.name, room: `Room ${u.room}`, amount: 8500, month: 'June 2025' })}
+                  style={{ padding: '8px 12px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(8,145,178,0.2)' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
+                  Mark Paid
+                </button>
               </div>
             ))}
           </div>
@@ -698,16 +702,26 @@ export default function ManageAccount() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {currentData.map((t, i) => (
-              <div key={i} style={{ background: 'white', borderRadius: 12, padding: '14px 16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{t.initials}</div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', margin: '0 0 2px' }}>{t.name}</p>
-                  <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>Room {t.room} · {t.date}</p>
+            {currentData.map((t, i) => {
+              const amtVal = parseInt(String(t.amount).replace(/,/g, '')) || 8000;
+              return (
+                <div key={i} style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+                    <div style={{ width: 42, height: 42, borderRadius: 12, background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{t.initials}</div>
+                    <div>
+                      <p style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', margin: '0 0 2px' }}>{t.name}</p>
+                      <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 2px' }}>Room {t.room} · {t.date}</p>
+                      <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 15, color: activeTab.color }}>₹{t.amount}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => setCollectModalData({ name: t.name, room: `Room ${t.room}`, amount: amtVal, month: 'June 2025' })}
+                    style={{ padding: '8px 14px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(8,145,178,0.2)' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
+                    Mark Paid
+                  </button>
                 </div>
-                <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 15, color: activeTab.color }}>₹{t.amount}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
