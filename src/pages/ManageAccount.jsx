@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DetailedReceiptModal, { CollectPaymentModal } from '../components/DetailedReceiptModal';
 
 const MODULES = [
   { id: 'total-rents',   label: 'Total\nRents',         icon: 'account_balance_wallet', gradient: 'linear-gradient(135deg,#0ea5e9,#0891b2)' },
@@ -295,6 +296,8 @@ export default function ManageAccount() {
   const [activeModule, setActiveModule] = useState(null);
   const [rentTab, setRentTab] = useState('upcoming');
   const [search, setSearch] = useState('');
+  const [activeReceipt, setActiveReceipt] = useState(null);
+  const [collectModalData, setCollectModalData] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
 
   // User Account drill-down state
@@ -847,6 +850,22 @@ export default function ManageAccount() {
           ))}
         </div>
       </div>
+
+      {/* Modals for Detailed Receipt Breakdown */}
+      {activeReceipt && (
+        <DetailedReceiptModal receipt={activeReceipt} onClose={() => setActiveReceipt(null)} />
+      )}
+
+      {collectModalData && (
+        <CollectPaymentModal
+          dueData={collectModalData}
+          onClose={() => setCollectModalData(null)}
+          onConfirm={(newReceipt) => {
+            setCollectModalData(null);
+            setActiveReceipt(newReceipt);
+          }}
+        />
+      )}
     </div>
   );
 }

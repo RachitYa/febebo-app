@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import DetailedReceiptModal, { CollectPaymentModal } from '../components/DetailedReceiptModal';
 
 export default function AdminDashboard() {
   const { logout } = useAuth();
@@ -13,6 +14,8 @@ export default function AdminDashboard() {
     'account', 'inventory', 'vendor', 'room', 'user', 'staff', 'work', 'enquiry'
   ]);
   const [duesSheet, setDuesSheet] = useState(null); // selected dues person
+  const [activeReceipt, setActiveReceipt] = useState(null);
+  const [collectModalData, setCollectModalData] = useState(null);
 
   const MODULES = [
     { id: 'account',        label: 'Account',        desc: 'Ledgers',       icon: 'account_balance_wallet', gradient: 'linear-gradient(135deg,#0ea5e9,#0891b2)' },
@@ -231,7 +234,7 @@ export default function AdminDashboard() {
 
               {/* Action Buttons */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 24 }}>
-                <button style={{ background: '#0891b2', color: 'white', border: 'none', borderRadius: 12, padding: '13px 0', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <button onClick={() => setCollectModalData(duesSheet)} style={{ background: '#0891b2', color: 'white', border: 'none', borderRadius: 12, padding: '13px 0', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <span className="material-symbols-outlined" style={{ fontSize: 18 }}>check_circle</span>
                   Mark as Paid
                 </button>
@@ -244,18 +247,39 @@ export default function AdminDashboard() {
               {/* Payment History */}
               <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 15, color: '#0f172a', margin: '0 0 12px' }}>Payment History</p>
               <div style={{ background: '#f8fafc', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                {duesSheet.payHistory.map((ph, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 16px', borderBottom: i < duesSheet.payHistory.length - 1 ? '1px solid #e2e8f0' : 'none' }}>
-                    <div>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: '0 0 2px' }}>{ph.month}</p>
-                      <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{ph.date} · {ph.mode}</p>
+                {duesSheet.payHistory.map((ph, i) => {
+                  const amtVal = typeof ph.amount === 'number' ? ph.amount : parseInt(String(ph.amount).replace(/,/g, '')) || 10000;
+                  return (
+                    <div key={i} onClick={() => setActiveReceipt({
+                      tenantName: duesSheet.name,
+                      room: duesSheet.room || 'Room 104 - AC Double',
+                      month: ph.month,
+                      date: ph.date,
+                      paymentMode: ph.mode,
+                      receivedBy: 'Ravi Kumar (Manager)',
+                      items: [
+                        { label: 'Room Rent', amount: Math.round(amtVal * 0.6) },
+                        { label: 'Amenities', amount: Math.round(amtVal * 0.1) },
+                        { label: 'Food Charge', amount: Math.round(amtVal * 0.1) },
+                        { label: 'Meter Unit', amount: Math.round(amtVal * 0.1) },
+                        { label: 'Laundry', amount: Math.round(amtVal * 0.05) },
+                        { label: 'House Keeping', amount: Math.round(amtVal * 0.05) },
+                        { label: 'Other Charges', amount: 0 },
+                      ],
+                      totalAmount: amtVal,
+                      pendingAmount: 0,
+                    })} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 16px', borderBottom: i < duesSheet.payHistory.length - 1 ? '1px solid #e2e8f0' : 'none', cursor: 'pointer' }}>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: '0 0 2px' }}>{ph.month}</p>
+                        <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{ph.date} · {ph.mode}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: '0 0 2px' }}>₹{ph.amount}</p>
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: ph.status === 'Paid' ? '#ecfdf5' : '#fffbeb', color: payStatusColor(ph.status) }}>{ph.status}</span>
+                      </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: '0 0 2px' }}>₹{ph.amount}</p>
-                      <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: ph.status === 'Paid' ? '#ecfdf5' : '#fffbeb', color: payStatusColor(ph.status) }}>{ph.status}</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Info Row */}
@@ -422,6 +446,31 @@ export default function AdminDashboard() {
         ))}
       </nav>
 
+      {/* Modals for Detailed Receipt Breakdown */}
+      {activeReceipt && (
+        <DetailedReceiptModal receipt={activeReceipt} onClose={() => setActiveReceipt(null)} />
+      )}
+
+      {collectModalData && (
+        <CollectPaymentModal
+          dueData={collectModalData}
+          onClose={() => setCollectModalData(null)}
+          onConfirm={(newReceipt) => {
+            setCollectModalData(null);
+            if (duesSheet) {
+              setDuesSheet(prev => ({
+                ...prev,
+                amount: newReceipt.pendingAmount,
+                payHistory: [
+                  { month: newReceipt.month, date: newReceipt.date, amount: newReceipt.totalAmount, mode: newReceipt.paymentMode, status: 'Paid' },
+                  ...prev.payHistory
+                ]
+              }));
+            }
+            setActiveReceipt(newReceipt);
+          }}
+        />
+      )}
     </div>
   );
 }
