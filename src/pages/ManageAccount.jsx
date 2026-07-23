@@ -335,8 +335,9 @@ export default function ManageAccount() {
 
   const activeTab = TABS.find(t => t.key === rentTab) || TABS[0];
 
-  // ── USER ACCOUNT: Receipt / Day view ──────────────────────────────────────
-  if (activeModule === 'user-account' && selectedUser && selectedUserMonth) {
+  const renderModuleContent = () => {
+    // ── USER ACCOUNT: Receipt / Day view ──────────────────────────────────────
+    if (activeModule === 'user-account' && selectedUser && selectedUserMonth) {
     const total = USER_RECEIPT_ITEMS.reduce((s, i) => s + i.amount, 0);
     const pendingAmt = selectedUserMonth.paid ? 0 : 5000;
     return (
@@ -573,7 +574,7 @@ export default function ManageAccount() {
             </div>
           </div>
 
-          {/* Calendar */}
+{/* Calendar */}
           <AttendanceCalendar year={STAFF_CALENDAR.year} monthIndex={STAFF_CALENDAR.monthIndex} days={STAFF_CALENDAR.days} />
 
           {/* Monthly list */}
@@ -593,276 +594,425 @@ export default function ManageAccount() {
       </div>
     );
   }
-
-  // ── USER ACCOUNT MODULE ────────────────────────────────────────────────────
-  if (activeModule === 'user-account') {
-    return (
-      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-        <SubHeader title="User Account" onBack={() => setActiveModule(null)} />
-        <div style={{ padding: '16px' }}>
-          <div style={{ position: 'relative', marginBottom: 16 }}>
-            <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Product" style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {USER_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
-              <div key={u.id} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                <div onClick={() => setSelectedUser(u)} style={{ display: 'flex', gap: 14, cursor: 'pointer', flex: 1 }}>
-                  <img src={u.img} alt={u.name} style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover' }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 2 }}>
-                    <p style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', margin: 0 }}>{u.name}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#38bdf8' }}>door_front</span> Room {u.room} · Bed {u.bed}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#38bdf8' }}>phone</span> {u.phone}
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => setCollectModalData({ name: u.name, room: `Room ${u.room}`, amount: 8500, month: 'June 2025' })}
-                  style={{ padding: '8px 12px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(8,145,178,0.2)' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
-                  Mark Paid
-                </button>
+    // ── USER ACCOUNT: Receipt / Day view ──────────────────────────────────────
+    if (activeModule === 'user-account' && selectedUser && selectedUserMonth) {
+      const total = USER_RECEIPT_ITEMS.reduce((s, i) => s + i.amount, 0);
+      const pendingAmt = selectedUserMonth.paid ? 0 : 5000;
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <SubHeader title="Paid Successfully" onBack={() => setSelectedUserMonth(null)} color="#0891b2" />
+          <div style={{ padding: '16px' }}>
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* User info */}
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 20, margin: '0 0 8px', color: '#0f172a' }}>{selectedUser.name}</p>
+                <p style={{ fontSize: 14, color: '#0f172a', margin: 0, fontWeight: 500 }}>Payment: Cash</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── STAFF ACCOUNT MODULE ───────────────────────────────────────────────────
-  if (activeModule === 'staff-account') {
-    return (
-      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-        <SubHeader title="Staff Account" onBack={() => setActiveModule(null)} />
-        <div style={{ padding: '16px' }}>
-          <div style={{ position: 'relative', marginBottom: 16 }}>
-            <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Staff" style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {STAFF_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
-              <div key={u.id} onClick={() => setSelectedStaff(u)} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 14, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
-                <img src={u.img} alt={u.name} style={{ width: 90, height: 110, borderRadius: 12, objectFit: 'cover' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, paddingTop: 4 }}>
-                  <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: 0 }}>{u.name}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>badge</span> {u.empId}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>work</span> {u.role}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>mail</span> {u.email}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>phone_in_talk</span> {u.phone}
-                  </div>
-                </div>
+              
+              <div style={{ borderTop: '1px solid #cbd5e1' }} />
+              
+              {/* Received By */}
+              <div>
+                <p style={{ fontSize: 13, color: '#0f172a', margin: '0 0 6px', fontWeight: 600 }}>Received by</p>
+                <p style={{ fontWeight: 700, fontSize: 18, color: '#0f172a', margin: '0 0 6px', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  Ravi Kumar <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>Manager</span>
+                </p>
+                <p style={{ fontSize: 14, color: '#0f172a', margin: 0, fontWeight: 500 }}>Payment: Cash</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  // ── TOTAL RENTS MODULE ─────────────────────────────────────────────────────
-  if (activeModule === 'total-rents') {
-    return (
-      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-        <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
-          <button onClick={() => setActiveModule(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#0891b2' }}>
-            <span className="material-symbols-outlined">arrow_back</span>
-          </button>
-          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Total Rents</p>
-          <div style={{ width: 32 }} />
-        </div>
-
-        <div style={{ padding: '16px' }}>
-          <div style={{ position: 'relative', marginBottom: 16 }}>
-            <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search tenant or room..."
-              style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 12, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-            {TABS.map(tab => (
-              <button key={tab.key} onClick={() => setRentTab(tab.key)}
-                style={{ flex: 1, padding: '10px 8px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 12, background: rentTab === tab.key ? tab.color : 'white', color: rentTab === tab.key ? 'white' : '#64748b', transition: 'all 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {currentData.map((t, i) => {
-              const amtVal = parseInt(String(t.amount).replace(/,/g, '')) || 8000;
-              return (
-                <div key={i} style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
-                    <div style={{ width: 42, height: 42, borderRadius: 12, background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{t.initials}</div>
-                    <div>
-                      <p style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', margin: '0 0 2px' }}>{t.name}</p>
-                      <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 2px' }}>Room {t.room} · {t.date}</p>
-                      <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 15, color: activeTab.color }}>₹{t.amount}</span>
-                    </div>
-                  </div>
-                  <button onClick={() => setCollectModalData({ name: t.name, room: `Room ${t.room}`, amount: amtVal, month: 'June 2025' })}
-                    style={{ padding: '8px 14px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(8,145,178,0.2)' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
-                    Mark Paid
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── PROFIT-LOSS MODULE ─────────────────────────────────────────────────────
-  if (activeModule === 'profit-loss') {
-    return (
-      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-        <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
-          <button onClick={() => { setActiveModule(null); setSelectedMonth(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#0891b2' }}>
-            <span className="material-symbols-outlined">{selectedMonth ? 'arrow_back' : 'arrow_back'}</span>
-          </button>
-          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Profit-Loss Account</p>
-          <div style={{ width: 32 }} />
-        </div>
-        <div style={{ padding: '16px' }}>
-          {selectedMonth ? (
-            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-              <div style={{ padding: '20px', textAlign: 'center', borderBottom: '1px solid #e2e8f0', background: selectedMonth.type === 'profit' ? '#f0fdf4' : '#fff1f2' }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: selectedMonth.type === 'profit' ? '#059669' : '#e11d48', marginBottom: 4 }}>Net {selectedMonth.type === 'profit' ? 'Profit' : 'Loss'}</p>
-                <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 28, fontWeight: 800, color: selectedMonth.type === 'profit' ? '#059669' : '#e11d48', margin: 0 }}>₹{Math.abs(selectedMonth.net).toLocaleString('en-IN')}</p>
-              </div>
-              <div style={{ padding: '16px' }}>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>Breakdown</p>
-                {[['Rent Collected', selectedMonth.details.rent, '+', '#059669'], ['Paid to Staff', selectedMonth.details.staff, '-', '#e11d48'], ['Inventory', selectedMonth.details.inventory, '-', '#e11d48'], ['Maintenance', selectedMonth.details.maintenance, '-', '#e11d48']].map(([label, val, sign, color]) => (
-                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                    <span style={{ fontSize: 14, color: '#64748b' }}>{label}</span>
-                    <span style={{ fontSize: 14, fontWeight: 600, color }}>{sign} ₹{val.toLocaleString('en-IN')}</span>
+              <div style={{ borderTop: '1px solid #cbd5e1' }} />
+              
+              {/* Items list */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '4px 0' }}>
+                {USER_RECEIPT_ITEMS.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 15, color: '#334155', fontWeight: 500 }}>{item.label} :</span>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>₹ {item.amount.toLocaleString('en-IN')}</span>
                   </div>
                 ))}
               </div>
-              <div style={{ padding: '0 16px 16px' }}>
-                <button onClick={() => setSelectedMonth(null)} style={{ width: '100%', padding: 12, background: '#f1f5f9', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', color: '#475569' }}>← Back to List</button>
+
+              <div style={{ borderTop: '1px solid #cbd5e1' }} />
+              
+              {/* Total + pending */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 17, color: '#0f172a', fontWeight: 700 }}>Total</span>
+                  <span style={{ fontSize: 17, fontWeight: 700, color: '#0f172a' }}>₹ {total.toLocaleString('en-IN')}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 15, color: '#059669', fontWeight: 600 }}>Remaining Dues Balance</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#059669' }}>
+                    {pendingAmt === 0 ? '✓ Paid' : `₹ ${pendingAmt.toLocaleString('en-IN')}`}
+                  </span>
+                </div>
               </div>
             </div>
-          ) : (
-            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-              {PROFIT_LOSS_DATA.map((item, i) => (
-                <div key={item.id} onClick={() => setSelectedMonth(item)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderBottom: i < PROFIT_LOSS_DATA.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
+          </div>
+        </div>
+      );
+    }
+
+    // ── USER ACCOUNT: Months view ─────────────────────────────────────────────
+    if (activeModule === 'user-account' && selectedUser) {
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <SubHeader title="User Account" onBack={() => setSelectedUser(null)} color="#0891b2" />
+          <div style={{ padding: '16px' }}>
+            <p style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>{selectedUser.name}</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {USER_MONTHS.map(m => (
+                <div key={m.id} onClick={() => setSelectedUserMonth(m)}
+                  style={{ background: 'white', border: '1.5px solid #0891b2', borderRadius: 12, padding: '16px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: item.type === 'profit' ? '#ecfdf5' : '#fff1f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ color: item.type === 'profit' ? '#059669' : '#e11d48' }}>{item.type === 'profit' ? 'trending_up' : 'trending_down'}</span>
-                    </div>
-                    <span style={{ fontWeight: 600, color: '#0f172a', fontSize: 15 }}>{item.month}</span>
+                    <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 20 }}>calendar_month</span>
+                    <span style={{ fontWeight: 600, fontSize: 16, color: '#0f172a' }}>{m.month}</span>
+                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: m.paid ? '#059669' : '#e11d48', background: m.paid ? '#ecfdf5' : '#fff1f2', padding: '4px 12px', borderRadius: 20 }}>
+                    {m.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── STAFF ACCOUNT: Individual ledger ──────────────────────────────────────
+    if (activeModule === 'staff-account' && selectedStaff) {
+      const activeTabStaff = selectedStaffTab;
+      const historyItems = selectedStaff.history[activeTabStaff] || [];
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <SubHeader title="Staff Account" onBack={() => setSelectedStaff(null)} color="#f43f5e" />
+          <div style={{ padding: '16px' }}>
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', padding: 16, marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <p style={{ fontWeight: 700, fontSize: 18, color: '#0f172a', margin: '0 0 4px' }}>{selectedStaff.name}</p>
+              <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>{selectedStaff.role} · Emp ID: {selectedStaff.empId}</p>
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              {[['salary', 'Salary History'], ['advances', 'Advances / Loans'], ['deductions', 'Deductions']].map(([key, label]) => (
+                <button key={key} onClick={() => setSelectedStaffTab(key)}
+                  style={{ flex: 1, padding: '10px 4px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 11, background: activeTabStaff === key ? '#f43f5e' : 'white', color: activeTabStaff === key ? 'white' : '#64748b', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {historyItems.map((item, i) => (
+                <div key={i} style={{ background: 'white', borderRadius: 12, padding: '14px 16px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <p style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', margin: '0 0 2px' }}>{item.month || item.reason}</p>
+                    <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>{item.date || item.mode}</p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 16, margin: 0, color: item.type === 'profit' ? '#059669' : '#e11d48' }}>₹{Math.abs(item.net).toLocaleString('en-IN')}</p>
-                    <p style={{ fontSize: 11, color: '#94a3b8', margin: '2px 0 0', textTransform: 'capitalize' }}>{item.type}</p>
+                    <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 16, color: '#f43f5e', margin: 0 }}>₹{item.amount}</p>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: item.status === 'Paid' ? '#059669' : '#d97706' }}>{item.status}</span>
                   </div>
                 </div>
               ))}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  // ── PETTY CASH MODULE ─────────────────────────────────────────────────────
-  if (activeModule === 'petty-cash') {
-    return <PettyCashView onBack={() => setActiveModule(null)} />;
-  }
+    // ── VENDOR ACCOUNT MODULE ──────────────────────────────────────────────────
+    if (activeModule === 'vendor') {
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <SubHeader title="Vendor Account" onBack={() => setActiveModule(null)} color="#8b5cf6" />
+          <div style={{ padding: '16px' }}>
+            <p style={{ fontSize: 14, color: '#64748b', margin: '0 0 16px' }}>Vendor management moved to Dedicated Vendor Portal.</p>
+            <button onClick={() => navigate('/vendor-transactions')}
+              style={{ width: '100%', padding: 14, background: '#8b5cf6', color: 'white', border: 'none', borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+              Open Vendor Transactions Portal →
+            </button>
+          </div>
+        </div>
+      );
+    }
 
-  // ── LEASE ACCOUNT MODULE ───────────────────────────────────────────────────
-  if (activeModule === 'lease-account') {
-    return (
-      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
-        <SubHeader title="Lease Amount" onBack={() => setActiveModule(null)} />
-        <div style={{ padding: '16px' }}>
-          <p style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', marginBottom: 12 }}>Filter By</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
-            {[{ label: 'From Date', val: '2025-02-02' }, { label: 'To Date', val: '2025-02-02' }].map((f, idx) => (
-              <label key={idx} style={{ display: 'block', background: 'white', border: '1.5px solid #0891b2', borderRadius: 8, padding: '10px 12px', cursor: 'pointer' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 22, fontWeight: 300 }}>calendar_month</span>
-                  <div>
-                    <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>{f.label}</p>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: '#0891b2', margin: 0 }}>2 Feb 2025</p>
+    // ── USER ACCOUNT: User list view ──────────────────────────────────────────
+    if (activeModule === 'user-account') {
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <SubHeader title="User Account" onBack={() => setActiveModule(null)} />
+          <div style={{ padding: '16px' }}>
+            <div style={{ position: 'relative', marginBottom: 16 }}>
+              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Product" style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {USER_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
+                <div key={u.id} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                  <div onClick={() => setSelectedUser(u)} style={{ display: 'flex', gap: 14, cursor: 'pointer', flex: 1 }}>
+                    <img src={u.img} alt={u.name} style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 2 }}>
+                      <p style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', margin: 0 }}>{u.name}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#38bdf8' }}>door_front</span> Room {u.room} · Bed {u.bed}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#38bdf8' }}>phone</span> {u.phone}
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => setCollectModalData({ name: u.name, room: `Room ${u.room}`, amount: 8500, month: 'June 2025' })}
+                    style={{ padding: '8px 12px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(8,145,178,0.2)' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
+                    Mark Paid
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── STAFF ACCOUNT: Staff list view ────────────────────────────────────────
+    if (activeModule === 'staff-account') {
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <SubHeader title="Staff Account" onBack={() => setActiveModule(null)} color="#f43f5e" />
+          <div style={{ padding: '16px' }}>
+            <div style={{ position: 'relative', marginBottom: 16 }}>
+              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#f43f5e', fontSize: 20, pointerEvents: 'none' }}>search</span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search Staff..." style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #f43f5e', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {STAFF_ACCOUNT_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
+                <div key={u.id} onClick={() => setSelectedStaff(u)} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px', display: 'flex', gap: 14, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
+                  <img src={u.img} alt={u.name} style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5, paddingTop: 2 }}>
+                    <p style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', margin: 0 }}>{u.name}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>badge</span> {u.empId}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#475569' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>work</span> {u.role}
+                    </div>
                   </div>
                 </div>
-              </label>
-            ))}
+              ))}
+            </div>
           </div>
-          <div style={{ background: 'white', border: '1.5px solid #0891b2', borderRadius: 8, padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <p style={{ fontSize: 15, fontWeight: 600, color: '#0891b2', margin: 0 }}>Total Amount</p>
-            <p style={{ fontSize: 20, fontWeight: 600, color: '#333', margin: 0 }}>₹ 2,000,000</p>
+        </div>
+      );
+    }
+
+    // ── TOTAL RENTS MODULE ─────────────────────────────────────────────────────
+    if (activeModule === 'total-rents') {
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
+            <button onClick={() => setActiveModule(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#0891b2' }}>
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Total Rents</p>
+            <div style={{ width: 32 }} />
           </div>
-          <div style={{ background: 'white', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            {LEASE_DATA.map((row, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderBottom: i < LEASE_DATA.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 18, fontWeight: 300 }}>calendar_month</span>
-                  <span style={{ fontSize: 15, color: '#000', fontWeight: 500 }}>{row.month}</span>
+
+          <div style={{ padding: '16px' }}>
+            <div style={{ position: 'relative', marginBottom: 16 }}>
+              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search tenant or room..."
+                style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 12, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              {TABS.map(tab => (
+                <button key={tab.key} onClick={() => setRentTab(tab.key)}
+                  style={{ flex: 1, padding: '10px 8px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 12, background: rentTab === tab.key ? tab.color : 'white', color: rentTab === tab.key ? 'white' : '#64748b', transition: 'all 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {currentData.map((t, i) => {
+                const amtVal = parseInt(String(t.amount).replace(/,/g, '')) || 8000;
+                const isCollected = rentTab === 'collected';
+                return (
+                  <div key={i} style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+                      <div style={{ width: 42, height: 42, borderRadius: 12, background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{t.initials}</div>
+                      <div>
+                        <p style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', margin: '0 0 2px' }}>{t.name}</p>
+                        <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 2px' }}>Room {t.room} · {t.date}</p>
+                        <span style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 800, fontSize: 15, color: activeTab.color }}>₹{t.amount}</span>
+                      </div>
+                    </div>
+                    {isCollected ? (
+                      <button onClick={() => setActiveReceipt({ tenantName: t.name, roomNo: `Room ${t.room}`, month: 'June 2025', date: t.date, totalPaid: amtVal, collector: 'Admin', paymentMode: 'UPI', roomRent: amtVal, meterCharge: 0, foodCharge: 0, amenitiesCharge: 0, laundryCharge: 0, housekeepingCharge: 0, otherCharge: 0, remainingDues: 0 })}
+                        style={{ padding: '8px 12px', background: '#ecfeff', color: '#0891b2', border: '1px solid #0891b2', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>receipt_long</span>
+                        Receipt
+                      </button>
+                    ) : (
+                      <button onClick={() => setCollectModalData({ name: t.name, room: `Room ${t.room}`, amount: amtVal, month: 'June 2025' })}
+                        style={{ padding: '8px 14px', background: '#0891b2', color: 'white', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, boxShadow: '0 2px 6px rgba(8,145,178,0.2)' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
+                        Mark Paid
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── PROFIT-LOSS MODULE ─────────────────────────────────────────────────────
+    if (activeModule === 'profit-loss') {
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
+            <button onClick={() => { setActiveModule(null); setSelectedMonth(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#0891b2' }}>
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+            <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Profit-Loss Account</p>
+            <div style={{ width: 32 }} />
+          </div>
+          <div style={{ padding: '16px' }}>
+            {selectedMonth ? (
+              <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div style={{ padding: '20px', textAlign: 'center', borderBottom: '1px solid #e2e8f0', background: selectedMonth.type === 'profit' ? '#f0fdf4' : '#fff1f2' }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: selectedMonth.type === 'profit' ? '#059669' : '#e11d48', marginBottom: 4 }}>Net {selectedMonth.type === 'profit' ? 'Profit' : 'Loss'}</p>
+                  <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontSize: 28, fontWeight: 800, color: selectedMonth.type === 'profit' ? '#059669' : '#e11d48', margin: 0 }}>₹{Math.abs(selectedMonth.net).toLocaleString('en-IN')}</p>
                 </div>
-                <span style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>₹ {row.amount}</span>
+                <div style={{ padding: '16px' }}>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>Breakdown</p>
+                  {[['Rent Collected', selectedMonth.details.rent, '+', '#059669'], ['Paid to Staff', selectedMonth.details.staff, '-', '#e11d48'], ['Inventory', selectedMonth.details.inventory, '-', '#e11d48'], ['Maintenance', selectedMonth.details.maintenance, '-', '#e11d48']].map(([label, val, sign, color]) => (
+                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ fontSize: 14, color: '#64748b' }}>{label}</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color }}>{sign} ₹{val.toLocaleString('en-IN')}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding: '0 16px 16px' }}>
+                  <button onClick={() => setSelectedMonth(null)} style={{ width: '100%', padding: 12, background: '#f1f5f9', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', color: '#475569' }}>← Back to List</button>
+                </div>
               </div>
+            ) : (
+              <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                {PROFIT_LOSS_DATA.map((item, i) => (
+                  <div key={item.id} onClick={() => setSelectedMonth(item)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderBottom: i < PROFIT_LOSS_DATA.length - 1 ? '1px solid #f1f5f9' : 'none', cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 10, background: item.type === 'profit' ? '#ecfdf5' : '#fff1f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span className="material-symbols-outlined" style={{ color: item.type === 'profit' ? '#059669' : '#e11d48' }}>{item.type === 'profit' ? 'trending_up' : 'trending_down'}</span>
+                      </div>
+                      <span style={{ fontWeight: 600, color: '#0f172a', fontSize: 15 }}>{item.month}</span>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 16, margin: 0, color: item.type === 'profit' ? '#059669' : '#e11d48' }}>₹{Math.abs(item.net).toLocaleString('en-IN')}</p>
+                      <p style={{ fontSize: 11, color: '#94a3b8', margin: '2px 0 0', textTransform: 'capitalize' }}>{item.type}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ── PETTY CASH MODULE ─────────────────────────────────────────────────────
+    if (activeModule === 'petty-cash') {
+      return <PettyCashView onBack={() => setActiveModule(null)} />;
+    }
+
+    // ── LEASE ACCOUNT MODULE ───────────────────────────────────────────────────
+    if (activeModule === 'lease-account') {
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 32 }}>
+          <SubHeader title="Lease Amount" onBack={() => setActiveModule(null)} />
+          <div style={{ padding: '16px' }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', marginBottom: 12 }}>Filter By</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+              {[{ label: 'From Date', val: '2025-02-02' }, { label: 'To Date', val: '2025-02-02' }].map((f, idx) => (
+                <label key={idx} style={{ display: 'block', background: 'white', border: '1.5px solid #0891b2', borderRadius: 8, padding: '10px 12px', cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 22, fontWeight: 300 }}>calendar_month</span>
+                    <div>
+                      <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>{f.label}</p>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: '#0891b2', margin: 0 }}>2 Feb 2025</p>
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <div style={{ background: 'white', border: '1.5px solid #0891b2', borderRadius: 8, padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <p style={{ fontSize: 15, fontWeight: 600, color: '#0891b2', margin: 0 }}>Total Amount</p>
+              <p style={{ fontSize: 20, fontWeight: 600, color: '#333', margin: 0 }}>₹ 2,000,000</p>
+            </div>
+            <div style={{ background: 'white', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+              {LEASE_DATA.map((row, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderBottom: i < LEASE_DATA.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span className="material-symbols-outlined" style={{ color: '#0891b2', fontSize: 18, fontWeight: 300 }}>calendar_month</span>
+                    <span style={{ fontSize: 15, color: '#000', fontWeight: 500 }}>{row.month}</span>
+                  </div>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>₹ {row.amount}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Main Account Overview ──────────────────────────────────────────────────
+    return (
+      <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif" }}>
+        <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
+          <button onClick={() => navigate('/admin-dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#0891b2' }}>
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Account</p>
+          <div style={{ width: 32 }} />
+        </div>
+
+        <div style={{ padding: '20px 16px' }}>
+          <div style={{ position: 'relative', marginBottom: 20 }}>
+            <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
+            <input
+              placeholder="Search accounts..."
+              style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 12, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            {MODULES.map(mod => (
+              <button
+                key={mod.id}
+                onClick={() => handleModule(mod.id)}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '16px 8px', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'all 0.2s' }}
+                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
+                onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: mod.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{mod.icon}</span>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#1e293b', textAlign: 'center', whiteSpace: 'pre-line', lineHeight: 1.3 }}>{mod.label}</span>
+              </button>
             ))}
           </div>
         </div>
       </div>
     );
-  }
+  };
 
-  // ── Main Account Overview ──────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Hanken Grotesk',sans-serif" }}>
-      <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10 }}>
-        <button onClick={() => navigate('/admin-dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#0891b2' }}>
-          <span className="material-symbols-outlined">arrow_back</span>
-        </button>
-        <p style={{ fontFamily: "'Bricolage Grotesque',sans-serif", fontWeight: 700, fontSize: 18, color: '#0f172a', margin: 0, flex: 1, textAlign: 'center' }}>Account</p>
-        <div style={{ width: 32 }} />
-      </div>
-
-      <div style={{ padding: '20px 16px' }}>
-        <div style={{ position: 'relative', marginBottom: 20 }}>
-          <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0891b2', fontSize: 20, pointerEvents: 'none' }}>search</span>
-          <input
-            placeholder="Search accounts..."
-            style={{ width: '100%', paddingLeft: 40, paddingRight: 16, paddingTop: 12, paddingBottom: 12, border: '1.5px solid #0891b2', borderRadius: 12, fontSize: 15, fontFamily: 'inherit', background: 'white', color: '#1e293b', outline: 'none', boxSizing: 'border-box' }}
-          />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-          {MODULES.map(mod => (
-            <button
-              key={mod.id}
-              onClick={() => handleModule(mod.id)}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '16px 8px', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'all 0.2s' }}
-              onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
-              onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: mod.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white' }}>{mod.icon}</span>
-              </div>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#1e293b', textAlign: 'center', whiteSpace: 'pre-line', lineHeight: 1.3 }}>{mod.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+    <>
+      {renderModuleContent()}
 
       {/* Modals for Detailed Receipt Breakdown */}
       {activeReceipt && (
@@ -879,6 +1029,6 @@ export default function ManageAccount() {
           }}
         />
       )}
-    </div>
+    </>
   );
 }

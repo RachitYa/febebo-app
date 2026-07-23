@@ -19,7 +19,21 @@ const ROLE_META = {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const NAMES = ['Arjun Mehta','Priya Sharma','Ravi Kumar','Sneha Kapoor','Karan Singh','Mohan Lal','Ananya Gupta','Rohit Verma','Pooja Rani','Deepak Rathi','Vikram Das','Neha Singh','Amit Kumar','Suresh Patel','Divya Joshi','Rahul Sharma','Swati Roy','Aman Verma','Kavya Nair','Manoj Kumar','Ritu Singh','Alok Verma','Megha Roy','Varun Sharma','Sangeeta Kumari','Gaurav Malhotra','Preeti Mishra','Sunil Kumar','Nisha Agarwal','Vikas Y.'];
-const STUDENTS = Array.from({length:30},(_,i)=>({ id:i+1, name:NAMES[i%30], room:`${101+Math.floor(i/3)}`, bed:`Bed ${(i%3)+1}`, eatenB:i%2===0, eatenL:i%3===0, eatenD:false }));
+
+const STUDENTS = Array.from({length:30},(_,i) => {
+  const statuses = ['notEaten', 'eaten', 'requested', 'pack', 'extra'];
+  return {
+    id: i+1,
+    name: NAMES[i%30],
+    phone: `+91 98${Math.floor(10000000 + Math.random() * 90000000)}`,
+    room: `${101 + Math.floor(i/3)}`,
+    bed: `Bed ${(i%3)+1}`,
+    statusB: statuses[i % 5],
+    statusL: statuses[(i + 1) % 5],
+    statusS: statuses[(i + 2) % 5],
+    statusD: statuses[(i + 3) % 5],
+  };
+});
 
 const STORE_ITEMS = [
   {id:1,name:'Basmati Rice 25kg',cat:'Kitchen',stock:'4 bags',status:'In Stock',min:'2 bags'},
@@ -145,8 +159,13 @@ export default function StaffApp(){
 
   // Cook
   const [students,setStudents]  = useState(STUDENTS);
-  const [mealTab, setMealTab]   = useState('Breakfast');
+  const [timeFilter, setTimeFilter] = useState('Daily'); // Daily | Weekly | Monthly
+  const [mealTab, setMealTab]   = useState('Breakfast'); // Breakfast | Lunch | Snacks | Dinner
+  const [selectedStat, setSelectedStat] = useState('notEaten'); // requested | pack | extra | eaten | notEaten
+  
   const [showBcast,setShowBcast]= useState(false);
+  const [bTarget, setBTarget]   = useState('All');
+  const [bStudentId, setBStudentId] = useState('');
   const [bMsg,setBMsg]          = useState('Fresh hot meal is ready! Please head to the mess hall. 🍽️');
   const [bMeal,setBMeal]        = useState('Breakfast');
 
@@ -296,7 +315,7 @@ export default function StaffApp(){
     setPStu(''); setPRoom(''); setPTrk(''); setShowParcel(false);
   };
 
-  const eaten = students.filter(s=>mealTab==='Breakfast'?s.eatenB:mealTab==='Lunch'?s.eatenL:s.eatenD).length;
+  const eaten = students.filter(s=>s.statusB==='eaten').length; // Home view demo data
 
   // ─── Module tiles on Home ──────────────────────────────────────────────────
   const MODULES = [
@@ -311,7 +330,7 @@ export default function StaffApp(){
 
   // ─── Role quick stats ─────────────────────────────────────────────────────
   const roleStats = {
-    'Cook':             [{l:'Breakfast',v:30,icon:'coffee'},{l:'Lunch',v:28,icon:'lunch_dining'},{l:'Dinner',v:30,icon:'dinner_dining'},{l:'Uneaten',v:2,icon:'no_meals'}],
+    'Cook':             [{l:'Breakfast',v:30,icon:'coffee'},{l:'Lunch',v:28,icon:'lunch_dining'},{l:'Dinner',v:30,icon:'dinner_dining'},{l:'Snacks',v:30,icon:'bakery_dining'}],
     'Cleaner':          [{l:'Pending',v:INIT_CLEANING.filter(c=>!c.done).length,icon:'mop'},{l:'Cleaned',v:INIT_CLEANING.filter(c=>c.done).length,icon:'check_circle'},{l:'Rooms Today',v:4,icon:'room_service'},{l:'Floors',v:3,icon:'stairs'}],
     'Maintenance':      [{l:'Open',v:INIT_TICKETS.filter(t=>t.status==='Open').length,icon:'build'},{l:'In Progress',v:INIT_TICKETS.filter(t=>t.status==='In Progress').length,icon:'construction'},{l:'Resolved',v:8,icon:'check_circle'},{l:'High Priority',v:2,icon:'priority_high'}],
     'Purchase Manager': [{l:'Pending POs',v:INIT_DEMANDS.filter(d=>d.status==='Pending').length,icon:'pending'},{l:'Approved',v:INIT_DEMANDS.filter(d=>d.status==='Approved').length,icon:'verified'},{l:'Items Low',v:2,icon:'inventory_2'},{l:'Out of Stock',v:1,icon:'remove_shopping_cart'}],
@@ -333,8 +352,6 @@ export default function StaffApp(){
       <style>{`
         @keyframes sheetUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
         @keyframes sideIn{from{left:-300px}to{left:0}}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-        .fade-up{animation:fadeUp .22s ease forwards}
         ::-webkit-scrollbar{display:none} *{-webkit-tap-highlight-color:transparent}
       `}</style>
 
@@ -471,7 +488,7 @@ export default function StaffApp(){
           {/* Quick Stats Row */}
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:8,marginBottom:18}}>
             {stats.map((s,i)=>(
-              <div key={i} className="fade-up" style={{background:'#fff',borderRadius:14,padding:'10px 8px',textAlign:'center',border:`1px solid ${C.border}`,boxShadow:'0 2px 8px rgba(0,0,0,.03)'}}>
+              <div key={i} style={{background:'#fff',borderRadius:14,padding:'10px 8px',textAlign:'center',border:`1px solid ${C.border}`,boxShadow:'0 2px 8px rgba(0,0,0,.03)'}}>
                 <span className="material-symbols-outlined" style={{fontSize:18,color:meta.accent,display:'block',marginBottom:3}}>{s.icon}</span>
                 <p style={{margin:0,fontSize:20,fontWeight:900,color:C.text}}>{s.v}</p>
                 <p style={{margin:0,fontSize:9,fontWeight:700,color:C.muted,lineHeight:1.2,textTransform:'uppercase'}}>{s.l}</p>
@@ -485,9 +502,8 @@ export default function StaffApp(){
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:20}}>
             {MODULES.map((m,i)=>(
-              <button key={m.id} onClick={()=>setView(m.id)} className="fade-up"
-                style={{display:'flex',flexDirection:'column',alignItems:'center',gap:7,background:'#fff',border:`1px solid ${C.border}`,borderRadius:18,padding:'14px 6px',cursor:'pointer',transition:'transform .1s',boxShadow:'0 2px 10px rgba(0,0,0,.04)',animationDelay:`${i*30}ms`}}
-                onMouseDown={e=>e.currentTarget.style.transform='scale(0.95)'} onMouseUp={e=>e.currentTarget.style.transform='scale(1)'}>
+              <button key={m.id} onClick={()=>setView(m.id)}
+                style={{display:'flex',flexDirection:'column',alignItems:'center',gap:7,background:'#fff',border:`1px solid ${C.border}`,borderRadius:18,padding:'14px 6px',cursor:'pointer',boxShadow:'0 2px 10px rgba(0,0,0,.04)'}}>
                 <div style={{width:44,height:44,borderRadius:14,background:m.grad,display:'flex',alignItems:'center',justifyContent:'center',boxShadow:`0 4px 12px ${meta.accent}33`}}>
                   <span className="material-symbols-outlined" style={{fontSize:22,color:'white'}}>{m.icon}</span>
                 </div>
@@ -506,15 +522,15 @@ export default function StaffApp(){
                 <div style={{display:'flex',alignItems:'center',gap:10}}>
                   <div style={{width:40,height:40,borderRadius:13,background:meta.grad,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>👨‍🍳</div>
                   <div>
-                    <p style={{margin:0,fontSize:14,fontWeight:800,color:C.text}}>Today's Mess Headcount</p>
-                    <p style={{margin:'2px 0 0',fontSize:12,color:C.muted}}>Breakfast: 30 · Lunch: 28 · Dinner: 30</p>
+                    <p style={{margin:0,fontSize:14,fontWeight:800,color:C.text}}>Today's Mess Overview</p>
+                    <p style={{margin:'2px 0 0',fontSize:12,color:C.muted}}>Breakfast: 30 · Lunch: 28</p>
                   </div>
                 </div>
                 <span className="material-symbols-outlined" style={{fontSize:18,color:C.muted}}>chevron_right</span>
               </Row>
               <div style={{marginTop:12,background:meta.accentBg,borderRadius:12,padding:'10px 12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:12,color:meta.accent,fontWeight:700}}>📊 {eaten}/{students.length} students marked for {mealTab}</span>
-                <Chip label="Tap to update" color={meta.accent} bg={meta.accentBg}/>
+                <span style={{fontSize:12,color:meta.accent,fontWeight:700}}>📊 Track meals, extra plates & packs</span>
+                <Chip label="Update" color={meta.accent} bg={meta.accentBg}/>
               </div>
             </div>
           )}
@@ -619,42 +635,97 @@ export default function StaffApp(){
               <span className="material-symbols-outlined" style={{fontSize:20}}>campaign</span>
               Broadcast "Food is Ready!" 📢
             </button>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-              {[{m:'Breakfast',c:30,icon:'coffee'},{m:'Lunch',c:28,icon:'lunch_dining'},{m:'Dinner',c:30,icon:'dinner_dining'}].map(x=>(
-                <div key={x.m} onClick={()=>setMealTab(x.m)} style={{background:mealTab===x.m?meta.accentBg:'#fff',border:`1.5px solid ${mealTab===x.m?meta.accent:C.border}`,borderRadius:14,padding:'12px 8px',textAlign:'center',cursor:'pointer',transition:'all .15s'}}>
+
+            {/* Time Filter Tabs */}
+            <div style={{display:'flex', background:'#fff', borderRadius:12, padding:4, border:`1px solid ${C.border}`}}>
+              {['Daily', 'Weekly', 'Monthly'].map(f => (
+                <button key={f} onClick={()=>setTimeFilter(f)} style={{flex:1, padding:'8px 0', borderRadius:8, border:'none', background:timeFilter===f?meta.accentBg:'transparent', color:timeFilter===f?meta.accent:C.muted, fontSize:13, fontWeight:800, cursor:'pointer', fontFamily:'inherit'}}>
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            {/* Meal Tabs */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:8}}>
+              {[{m:'Breakfast',icon:'coffee'},{m:'Lunch',icon:'lunch_dining'},{m:'Snacks',icon:'bakery_dining'},{m:'Dinner',icon:'dinner_dining'}].map(x=>(
+                <div key={x.m} onClick={()=>setMealTab(x.m)} style={{background:mealTab===x.m?meta.accentBg:'#fff',border:`1.5px solid ${mealTab===x.m?meta.accent:C.border}`,borderRadius:12,padding:'10px 4px',textAlign:'center',cursor:'pointer'}}>
                   <span className="material-symbols-outlined" style={{fontSize:20,color:mealTab===x.m?meta.accent:C.muted}}>{x.icon}</span>
-                  <p style={{fontSize:22,fontWeight:900,color:C.text,margin:'4px 0 0'}}>{x.c}</p>
-                  <p style={{fontSize:11,fontWeight:700,color:mealTab===x.m?meta.accent:C.muted,margin:0}}>{x.m}</p>
+                  <p style={{fontSize:10,fontWeight:800,color:mealTab===x.m?meta.accent:C.muted,margin:'4px 0 0',textTransform:'uppercase'}}>{x.m}</p>
                 </div>
               ))}
             </div>
-            <div style={{background:'#fff',borderRadius:18,border:`1px solid ${C.border}`,padding:16}}>
-              <Row style={{marginBottom:10}}>
-                <div>
-                  <p style={{margin:0,fontSize:15,fontWeight:800,color:C.text}}>Dine-In Roster · {mealTab}</p>
-                  <p style={{margin:'3px 0 0',fontSize:12,color:C.muted}}>{eaten} of {students.length} marked</p>
-                </div>
-                <Chip label={`${Math.round(eaten/students.length*100)}%`} color={C.success} bg={C.successBg}/>
-              </Row>
-              <div style={{maxHeight:360,overflowY:'auto',display:'flex',flexDirection:'column',gap:8}}>
-                {students.map(s=>{
-                  const ate = mealTab==='Breakfast'?s.eatenB:mealTab==='Lunch'?s.eatenL:s.eatenD;
-                  return(
-                    <div key={s.id} style={{background:ate?C.successBg:C.bg,border:`1px solid ${ate?'#a7f3d0':C.border}`,borderRadius:12,padding:'10px 12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                      <div>
-                        <span style={{fontSize:13,fontWeight:800,color:C.text}}>{s.name} </span>
-                        <Chip label={`Rm ${s.room}`}/>
-                        <p style={{margin:'2px 0 0',fontSize:11,color:C.muted}}>{s.bed}</p>
-                      </div>
-                      <button onClick={()=>setStudents(p=>p.map(st=>st.id===s.id?{...st,[mealTab==='Breakfast'?'eatenB':mealTab==='Lunch'?'eatenL':'eatenD']:!ate}:st))}
-                        style={{padding:'6px 12px',borderRadius:8,border:ate?'none':`1px solid ${C.border}`,background:ate?C.success:'#fff',color:ate?'white':C.sub,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
-                        {ate?'Eaten ✅':'Mark'}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+
+            {/* Stat Cards & Filtered List */}
+            {(() => {
+               const mealKey = mealTab==='Breakfast'?'statusB':mealTab==='Lunch'?'statusL':mealTab==='Snacks'?'statusS':'statusD';
+               const statsObj = {
+                 requested: students.filter(s=>s[mealKey]==='requested').length,
+                 pack: students.filter(s=>s[mealKey]==='pack').length,
+                 extra: students.filter(s=>s[mealKey]==='extra').length,
+                 eaten: students.filter(s=>s[mealKey]==='eaten').length,
+                 notEaten: students.filter(s=>s[mealKey]==='notEaten').length,
+               };
+               
+               const mult = timeFilter==='Monthly'?30:timeFilter==='Weekly'?7:1;
+
+               const statCards = [
+                 {id:'requested', l:'Requested', v:statsObj.requested*mult, c:C.primary, bg:C.primaryBg},
+                 {id:'pack', l:'To Pack', v:statsObj.pack*mult, c:C.warn, bg:C.warnBg},
+                 {id:'extra', l:'Extra Plate', v:statsObj.extra*mult, c:C.indigo, bg:C.indigoBg},
+                 {id:'eaten', l:'Eaten', v:statsObj.eaten*mult, c:C.success, bg:C.successBg},
+                 {id:'notEaten', l:'Not Eaten', v:statsObj.notEaten*mult, c:C.danger, bg:C.dangerBg}
+               ];
+
+               return (
+                 <>
+                   {/* Scrollable Stat Cards Container */}
+                   <div style={{display:'flex', gap:8, overflowX:'auto', paddingBottom:4, margin:'0 -4px', paddingLeft:4, paddingRight:4, scrollbarWidth:'none'}}>
+                     {statCards.map(s => (
+                       <div key={s.id} onClick={()=>setSelectedStat(s.id)} style={{flexShrink:0, width:90, background:selectedStat===s.id?s.bg:'#fff', border:`1.5px solid ${selectedStat===s.id?s.c:C.border}`, borderRadius:14, padding:'12px 10px', textAlign:'center', cursor:'pointer', transition:'all .15s'}}>
+                         <p style={{fontSize:22,fontWeight:900,color:selectedStat===s.id?s.c:C.text,margin:0}}>{s.v}</p>
+                         <p style={{fontSize:10,fontWeight:800,color:selectedStat===s.id?s.c:C.muted,margin:'4px 0 0',textTransform:'uppercase'}}>{s.l}</p>
+                       </div>
+                     ))}
+                   </div>
+                   
+                   {/* Filtered Student List */}
+                   <div style={{background:'#fff',borderRadius:18,border:`1px solid ${C.border}`,padding:16}}>
+                     <p style={{margin:'0 0 12px',fontSize:15,fontWeight:800,color:C.text}}>
+                       {statCards.find(c=>c.id===selectedStat)?.l} · {mealTab}
+                     </p>
+                     
+                     <div style={{maxHeight:360,overflowY:'auto',display:'flex',flexDirection:'column',gap:8,paddingRight:4}}>
+                       {students.filter(s=>s[mealKey]===selectedStat).map(s=>(
+                         <div key={s.id} style={{background:C.bg,border:`1px solid ${C.border}`,borderRadius:12,padding:'10px 12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                           <div>
+                             <span style={{fontSize:13,fontWeight:800,color:C.text}}>{s.name} </span>
+                             <p style={{margin:'2px 0 6px',fontSize:11,color:C.muted}}>Rm {s.room} · {s.bed}</p>
+                             <Chip label={s.phone} color={meta.accent} bg={meta.accentBg}/>
+                           </div>
+                           
+                           {/* Quick Action button for 'eaten' */}
+                           {selectedStat !== 'eaten' && timeFilter === 'Daily' && (
+                             <button onClick={()=>setStudents(p=>p.map(st=>st.id===s.id?{...st,[mealKey]:'eaten'}:st))}
+                               style={{padding:'6px 12px',borderRadius:8,border:`1px solid ${C.border}`,background:'#fff',color:C.sub,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
+                               Mark Eaten
+                             </button>
+                           )}
+                           {selectedStat === 'eaten' && timeFilter === 'Daily' && (
+                              <Chip label="Eaten ✅" color={C.success} bg={C.successBg}/>
+                           )}
+                         </div>
+                       ))}
+                       {students.filter(s=>s[mealKey]===selectedStat).length === 0 && (
+                         <div style={{textAlign:'center', padding:'30px 10px'}}>
+                           <span className="material-symbols-outlined" style={{fontSize:32,color:C.border}}>sentiment_dissatisfied</span>
+                           <p style={{fontSize:13, color:C.muted, margin:'8px 0 0'}}>No students found.</p>
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 </>
+               )
+            })()}
           </>)}
 
           {/* CLEANER */}
@@ -906,7 +977,7 @@ export default function StaffApp(){
             // Contacts List View
             <div style={{flex:1, overflowY:'auto', background:'#fff'}}>
               {sortedContacts.map(c => (
-                <div key={c.id} onClick={() => setActiveContact(c)} className="fade-up" style={{display:'flex',alignItems:'center',padding:'14px 16px',borderBottom:`1px solid ${C.border}`,cursor:'pointer',transition:'background .15s',gap:14}} onMouseEnter={e=>e.currentTarget.style.background=C.bg} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                <div key={c.id} onClick={() => setActiveContact(c)} style={{display:'flex',alignItems:'center',padding:'14px 16px',borderBottom:`1px solid ${C.border}`,cursor:'pointer',transition:'background .15s',gap:14}} onMouseEnter={e=>e.currentTarget.style.background=C.bg} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                   <div style={{position:'relative'}}>
                     <div style={{width:48,height:48,borderRadius:'50%',background:meta.accentBg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:24}}>
                       {c.avatar}
@@ -952,7 +1023,7 @@ export default function StaffApp(){
                   </div>
                 )}
                 {(chatHist[activeContact.id] || []).map(m => (
-                  <div key={m.id} className="fade-up" style={{display:'flex',flexDirection:'column',alignItems:m.me?'flex-end':'flex-start',gap:4}}>
+                  <div key={m.id} style={{display:'flex',flexDirection:'column',alignItems:m.me?'flex-end':'flex-start',gap:4}}>
                     <div style={{maxWidth:'78%',background:m.me?meta.grad:'#fff',color:m.me?'white':C.text,borderRadius:m.me?'18px 18px 4px 18px':'18px 18px 18px 4px',padding:'11px 14px',boxShadow:m.me?`0 4px 12px ${meta.accent}33`:'0 2px 8px rgba(0,0,0,.06)'}}>
                       <p style={{margin:0,fontSize:14,lineHeight:1.5}}>{m.text}</p>
                     </div>
@@ -1039,11 +1110,31 @@ export default function StaffApp(){
         </form>
       </Sheet>
 
-      <Sheet show={showBcast} onClose={()=>setShowBcast(false)} title="Broadcast — Food is Ready!" sub="Send meal notification to residents">
-        <form onSubmit={e=>{e.preventDefault();setShowBcast(false);alert(`📢 ${bMeal} broadcast sent!`);}} style={{display:'flex',flexDirection:'column',gap:12}}>
-          <SelectField label="Meal" value={bMeal} onChange={e=>setBMeal(e.target.value)}><option>Breakfast</option><option>Lunch</option><option>Dinner</option></SelectField>
+      <Sheet show={showBcast} onClose={()=>setShowBcast(false)} title="Broadcast — Food is Ready!" sub="Send meal notification">
+        <form onSubmit={e=>{
+          e.preventDefault();
+          setShowBcast(false);
+          const targetName = bTarget === 'All' ? 'All Students' : students.find(s=>s.id===Number(bStudentId))?.name;
+          alert(`📢 ${bMeal} broadcast sent to ${targetName}!`);
+        }} style={{display:'flex',flexDirection:'column',gap:12}}>
+          <SelectField label="Send To" value={bTarget} onChange={e=>setBTarget(e.target.value)}>
+            <option value="All">All Students</option>
+            <option value="Individual">Individual Student</option>
+          </SelectField>
+          {bTarget === 'Individual' && (
+            <SelectField label="Select Student" required value={bStudentId} onChange={e=>setBStudentId(e.target.value)}>
+              <option value="">-- Choose --</option>
+              {students.map(s => <option key={s.id} value={s.id}>{s.name} (Rm {s.room})</option>)}
+            </SelectField>
+          )}
+          <SelectField label="Meal" value={bMeal} onChange={e=>setBMeal(e.target.value)}>
+            <option>Breakfast</option>
+            <option>Lunch</option>
+            <option>Snacks</option>
+            <option>Dinner</option>
+          </SelectField>
           <InputField label="Message" textarea rows={3} value={bMsg} onChange={e=>setBMsg(e.target.value)}/>
-          <button type="submit" style={{padding:14,background:'linear-gradient(135deg,#059669,#10b981)',color:'white',border:'none',borderRadius:14,fontSize:14,fontWeight:800,cursor:'pointer',fontFamily:'inherit',boxShadow:'0 4px 14px rgba(16,185,129,.3)'}}>Broadcast Now 📢</button>
+          <button type="submit" style={{padding:14,background:'linear-gradient(135deg,#059669,#10b981)',color:'white',border:'none',borderRadius:14,fontSize:14,fontWeight:800,cursor:'pointer',fontFamily:'inherit',boxShadow:'0 4px 14px rgba(16,185,129,.3)'}}>Send Notification 📢</button>
         </form>
       </Sheet>
 
