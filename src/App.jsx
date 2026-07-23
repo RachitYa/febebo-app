@@ -44,6 +44,7 @@ const RootRedirect = () => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === 'admin' && !user.hasProfile) return <Navigate to="/create-pg-profile" replace />;
+  if (user.role === 'staff') return <Navigate to="/staff-app" replace />;
   return <Navigate to={`/${user.role}-dashboard`} replace />;
 };
 
@@ -112,7 +113,7 @@ function AppRoutes() {
 
       {/* Staff Routes */}
       <Route path="/staff-dashboard" element={<ProtectedRoute allowedRoles={['staff']}><StaffDashboard /></ProtectedRoute>} />
-      <Route path="/staff-app" element={<StaffApp />} />
+      <Route path="/staff-app" element={<ProtectedRoute allowedRoles={['staff']}><StaffApp /></ProtectedRoute>} />
 
       {/* Customer Routes */}
       <Route path="/customer-dashboard" element={<ProtectedRoute allowedRoles={['customer']}><CustomerDashboard /></ProtectedRoute>} />

@@ -15,10 +15,18 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (mobile, role) => {
+  const login = (mobileOrUsername, role = 'admin', extraData = {}) => {
     // Dummy login logic: Admin lacks profile initially for demo purposes
     const hasProfile = role !== 'admin'; 
-    const dummyUser = { id: 1, mobile, role, hasProfile };
+    const dummyUser = { 
+      id: extraData.id || Date.now(), 
+      mobile: mobileOrUsername, 
+      username: mobileOrUsername,
+      role, 
+      staffRole: extraData.staffRole || (role === 'staff' ? 'Cook' : null),
+      name: extraData.name || (role === 'admin' ? 'PG Admin Owner' : 'Staff Member'),
+      hasProfile 
+    };
     setUser(dummyUser);
     localStorage.setItem('febebo_user', JSON.stringify(dummyUser));
   };
@@ -44,3 +52,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+

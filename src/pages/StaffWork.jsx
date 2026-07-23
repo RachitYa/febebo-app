@@ -967,7 +967,7 @@ export function CookView({ staffId, staffName, onBack }) {
   const [bMessage, setBMessage] = useState('Hot and fresh meal is ready to serve!');
 
   const stats = COOK_STATS[staffId] || COOK_STATS.default;
-  const currentStats = stats[timeFilter];
+  const currentStats = (stats && stats[timeFilter]) ? stats[timeFilter] : stats.day;
   const staffTasks = assignedWork.filter(w => w.staffId === staffId || w.role === 'cook');
 
   const handleUpdateStatus = (id, newStatus) => {
@@ -976,7 +976,7 @@ export function CookView({ staffId, staffName, onBack }) {
 
   const handleReqSubmit = (newReq) => {
     INITIAL_STAFF_PURCHASE_REQUISITIONS.unshift(newReq);
-    setShowReqModal(false);
+    setShowDemandsModal(false);
     alert(`Purchasing request for "${newReq.item}" sent to Admin successfully!`);
   };
 
@@ -1004,7 +1004,11 @@ export function CookView({ staffId, staffName, onBack }) {
     alert(`"Food Ready" notification sent to ${bTarget}!`);
   };
 
-  const renderMealSection = (mealName, data) => {
+  const renderMealSection = (mealName, dataInput) => {
+    const data = dataInput || { req: 40, eaten: 35, notEaten: [], tiffinReq: 5, tiffinTaken: [], tiffinMissed: [], extra: [] };
+    const notEatenList = data.notEaten || [];
+    const tiffinTakenList = data.tiffinTaken || [];
+    const extraList = data.extra || [];
     const mealPackedReqs = packedRequests.filter(r => r.meal === mealName);
 
     return (
@@ -1024,21 +1028,21 @@ export function CookView({ staffId, staffName, onBack }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
           <div onClick={() => { setSelectedMealFor40(mealName); setShowAllRequestedModal(true); }}
                style={{ background: '#ecfeff', border: `1.5px solid ${C.primary}`, padding: '10px 6px', borderRadius: 8, textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(8,145,178,0.1)' }}>
-            <p style={{ fontSize: 18, fontWeight: 800, color: C.primary, margin: 0 }}>{data.req}</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.primary, margin: 0 }}>{data.req || 40}</p>
             <p style={{ fontSize: 11, color: C.primary, margin: 0, fontWeight: 800 }}>Requested 🔍</p>
           </div>
           <div style={{ background: C.successBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-            <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.eaten}</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.success, margin: 0 }}>{data.eaten || 35}</p>
             <p style={{ fontSize: 11, color: C.success, margin: 0, fontWeight: 700 }}>Eaten</p>
           </div>
           <div style={{ background: C.dangerBg, padding: '10px 6px', borderRadius: 8, textAlign: 'center' }}>
-            <p style={{ fontSize: 18, fontWeight: 800, color: C.danger, margin: 0 }}>{data.notEaten.length > 0 ? data.notEaten.length : (data.req - data.eaten)}</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: C.danger, margin: 0 }}>{notEatenList.length > 0 ? notEatenList.length : ((data.req || 40) - (data.eaten || 35))}</p>
             <p style={{ fontSize: 11, color: C.danger, margin: 0, fontWeight: 700 }}>Not Eaten</p>
           </div>
         </div>
-        {data.notEaten.length > 0 && (
+        {notEatenList.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 16 }}>
-            {data.notEaten.map((u, i) => (
+            {notEatenList.map((u, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: C.bg, padding: '6px 12px', borderRadius: 6 }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{u.name}</span>
                 <a href={`tel:${u.phone}`} style={{ fontSize: 12, color: C.primary, fontWeight: 700, textDecoration: 'none' }}>Call</a>
@@ -1066,19 +1070,19 @@ export function CookView({ staffId, staffName, onBack }) {
             <p style={{ fontSize: 11, color: C.warn, margin: 0, fontWeight: 700 }}>Pending</p>
           </div>
         </div>
-        {data.tiffinTaken.length > 0 && (
+        {tiffinTakenList.length > 0 && (
           <div style={{ marginBottom: 12 }}>
-            {data.tiffinTaken.map((t, i) => (
+            {tiffinTakenList.map((t, i) => (
               <p key={i} style={{ fontSize: 13, color: C.textSub, margin: '0 0 4px' }}><b>{t.name}</b> took: {t.items}</p>
             ))}
           </div>
         )}
 
-        {data.extra.length > 0 && (
+        {extraList.length > 0 && (
           <>
             <p style={{ fontSize: 13, fontWeight: 800, color: C.muted, margin: '0 0 8px', marginTop: 12 }}>EXTRA PLATES</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {data.extra.map((e, i) => (
+              {extraList.map((e, i) => (
                 <span key={i} style={{ background: C.indigoBg, color: C.indigo, fontSize: 12, fontWeight: 700, padding: '4px 8px', borderRadius: 6 }}>{e.name} (+{e.qty})</span>
               ))}
             </div>
@@ -1089,7 +1093,7 @@ export function CookView({ staffId, staffName, onBack }) {
   };
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', background: C.bg, fontFamily: "'Hanken Grotesk',sans-serif", paddingBottom: 40 }}>
-      <TopBar title={staffName} subtitle="Cook" onBack={onBack} onReqClick={() => setShowReqModal(true)} />
+      <TopBar title={staffName} subtitle="Cook" onBack={onBack} onReqClick={() => setShowDemandsModal(true)} onProfileClick={() => setShowProfileModal(true)} />
       <TopTabs tabs={['Work Details', 'Extra Guest Food', 'Staff Info']} activeTab={activeTab} setActiveTab={setActiveTab} />
       <div style={{ padding: '0 16px' }}>
         {activeTab === 'Staff Info' ? <GenericStaffInfo staffId={staffId} /> : 
@@ -1299,6 +1303,43 @@ export function CookView({ staffId, staffName, onBack }) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 40 Student Dine-In Roster Modal */}
+      {showAllRequestedModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ width: '100%', maxWidth: 440, background: C.white, borderRadius: 20, padding: 22, maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>40 Student Dine-In Roster — {selectedMealFor40}</h3>
+                <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>Live status for today's meal</p>
+              </div>
+              <button onClick={() => setShowAllRequestedModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, color: C.muted, cursor: 'pointer', padding: 0 }}>&times;</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {Array.from({ length: 40 }).map((_, i) => {
+                const isEaten = i < 35;
+                const isTiffin = i >= 35 && i < 38;
+                return (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
+                    <div>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: C.text, margin: 0 }}>Student #{i + 1} (Room 10{Math.floor(i / 4) + 1})</p>
+                      <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>+91 98765 432{i < 10 ? `0${i}` : i}</p>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 8, background: isEaten ? C.successBg : isTiffin ? '#f3e8ff' : C.dangerBg, color: isEaten ? C.success : isTiffin ? '#7c3aed' : C.danger }}>
+                      {isEaten ? '✓ Eaten' : isTiffin ? '📦 Tiffin' : '⏳ Not Eaten'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showProfileModal && (
+        <StaffProfileModal staffName={staffName} role="Cook" staffId={staffId} onClose={() => setShowProfileModal(false)} />
       )}
     </div>
   );
@@ -1892,40 +1933,43 @@ export const ROLE_CATS = [
 export default function StaffWork() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [selRole,  setSelRole]  = useState(location.state?.role || null);
+  const rawRole = location.state?.role || null;
+
+  const resolveRole = (r) => {
+    if (!r) return null;
+    if (typeof r === 'object' && r.id) return r;
+    if (typeof r === 'string') {
+      return ROLES.find(x => x.id.toLowerCase() === r.toLowerCase() || x.label.toLowerCase() === r.toLowerCase()) || null;
+    }
+    return null;
+  };
+
+  const [selRole,  setSelRole]  = useState(resolveRole(rawRole));
   const [selStaff, setSelStaff] = useState(null);
 
-  if (selRole && selStaff) {
-    try {
-      const p   = { staffId: selStaff.id, staffName: selStaff.name, role: selRole.label, onBack: () => setSelStaff(null) };
-      const cat = selRole.category;
-      if (cat === 'A')       return <TimelineView {...p} />;
-      if (cat === 'B_cook')  return <CookView {...p} />;
-      if (cat === 'B_clean') return <CleanerView {...p} />;
-      if (cat === 'C')       return <TicketView {...p} />;
-      if (cat === 'D')       return <PurchaseManagerView {...p} />;
-      
-      // Fallback if category is unknown or undefined
-      return (
-        <div style={{ padding: 20 }}>
-          <h2>Error</h2>
-          <p>Unknown category: {String(cat)}</p>
-          <button onClick={() => setSelStaff(null)}>Go Back</button>
-        </div>
-      );
-    } catch (err) {
-      return (
-        <div style={{ padding: 20 }}>
-          <h2>Component Crash</h2>
-          <p>{err.message}</p>
-          <button onClick={() => setSelStaff(null)}>Go Back</button>
-        </div>
-      );
-    }
+  const activeRole = resolveRole(selRole);
+
+  if (activeRole && selStaff) {
+    const p   = { staffId: selStaff.id, staffName: selStaff.name, role: activeRole.label, onBack: () => setSelStaff(null) };
+    const cat = activeRole.category;
+    if (cat === 'A')       return <TimelineView {...p} />;
+    if (cat === 'B_cook')  return <CookView {...p} />;
+    if (cat === 'B_clean') return <CleanerView {...p} />;
+    if (cat === 'C')       return <TicketView {...p} />;
+    if (cat === 'D')       return <PurchaseManagerView {...p} />;
+    
+    // Fallback if category is unknown or undefined
+    return (
+      <div style={{ padding: 20 }}>
+        <h2>Error</h2>
+        <p>Unknown category: {String(cat)}</p>
+        <button onClick={() => setSelStaff(null)}>Go Back</button>
+      </div>
+    );
   }
 
-  if (selRole) {
-    return <StaffMemberList role={selRole} onBack={() => setSelRole(null)} onSelect={m => setSelStaff(m)} />;
+  if (activeRole) {
+    return <StaffMemberList role={activeRole} onBack={() => setSelRole(null)} onSelect={m => setSelStaff(m)} />;
   }
 
   return (
