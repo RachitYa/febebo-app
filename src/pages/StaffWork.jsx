@@ -1948,9 +1948,10 @@ export default function StaffWork() {
   const [selStaff, setSelStaff] = useState(null);
 
   const activeRole = resolveRole(selRole);
+  const currentStaff = selStaff || (activeRole ? (STAFF_MEMBERS[activeRole.id]?.[0] || { id: 'c1', name: 'Ramesh Yadav' }) : null);
 
-  if (activeRole && selStaff) {
-    const p   = { staffId: selStaff.id, staffName: selStaff.name, role: activeRole.label, onBack: () => setSelStaff(null) };
+  if (activeRole && currentStaff) {
+    const p   = { staffId: currentStaff.id, staffName: currentStaff.name, role: activeRole.label, onBack: () => { setSelRole(null); setSelStaff(null); } };
     const cat = activeRole.category;
     if (cat === 'A')       return <TimelineView {...p} />;
     if (cat === 'B_cook')  return <CookView {...p} />;
@@ -1963,13 +1964,9 @@ export default function StaffWork() {
       <div style={{ padding: 20 }}>
         <h2>Error</h2>
         <p>Unknown category: {String(cat)}</p>
-        <button onClick={() => setSelStaff(null)}>Go Back</button>
+        <button onClick={() => { setSelRole(null); setSelStaff(null); }}>Go Back</button>
       </div>
     );
-  }
-
-  if (activeRole) {
-    return <StaffMemberList role={activeRole} onBack={() => setSelRole(null)} onSelect={m => setSelStaff(m)} />;
   }
 
   return (

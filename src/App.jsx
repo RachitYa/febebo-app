@@ -88,8 +88,8 @@ function AppRoutes() {
       <Route path="/manage-staff" element={<AdminRoute><ManageStaff /></AdminRoute>} />
       <Route path="/staff/:id" element={<AdminRoute><StaffProfile /></AdminRoute>} />
       <Route path="/staff-attendance" element={<AdminRoute><StaffAttendance /></AdminRoute>} />
-      <Route path="/staff-work" element={<AdminRoute><StaffWork /></AdminRoute>} />
-      <Route path="/staff-work/:id" element={<AdminRoute><StaffWorkDetails /></AdminRoute>} />
+      <Route path="/staff-work" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><StaffWork /></ProtectedRoute>} />
+      <Route path="/staff-work/:id" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><StaffWorkDetails /></ProtectedRoute>} />
       <Route path="/approvals" element={<AdminRoute><Approvals /></AdminRoute>} />
       <Route path="/hired-workers" element={<AdminRoute><HiredWorkers /></AdminRoute>} />
       <Route path="/admin-profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
